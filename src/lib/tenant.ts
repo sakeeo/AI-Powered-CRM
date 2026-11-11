@@ -33,6 +33,9 @@ export const TENANT_MODELS = new Set<string>([
   "QuotationSettings",
   "Quotation",
   "QuotationItem",
+  "CustomerSegment",
+  "CustomerSegmentMember",
+  "Feedback",
 ]);
 
 const WHERE_OPS = new Set([

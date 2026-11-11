@@ -14,13 +14,13 @@ Customer diturunkan dari deal Won dengan riwayat lengkap, segmentasi, dan tindak
 
 ## Tugas
 
-- [ ] Definisikan customer = contact/company dengan ≥1 deal Won (turunan dari data transaksi, bukan input manual); catat aturan di `docs/decisions.md`.
-- [ ] Halaman Customers + Customer 360 profile: deal/pembelian, aktivitas, quotation, feedback.
-- [ ] Customer segmentation dasar (tags/segments sederhana).
-- [ ] Post-sales follow-up dan renewal reminder (membuat task terjadwal).
-- [ ] Pencatatan feedback & complaint.
-- [ ] Safe AI Customer 360 Briefing: cheat-sheet 3 butir (total belanja, isu terakhir, peluang repeat/renewal); total belanja dihitung kode, bukan LLM.
-- [ ] Test: status customer berubah saat deal Won; briefing tidak mengubah data.
+- [x] Definisikan customer = contact/company dengan ≥1 deal Won (turunan dari data transaksi, bukan input manual); catat aturan di `docs/decisions.md`.
+- [x] Halaman Customers + Customer 360 profile: deal/pembelian, aktivitas, quotation, feedback.
+- [x] Customer segmentation dasar (tags/segments sederhana).
+- [x] Post-sales follow-up dan renewal reminder (membuat task terjadwal).
+- [x] Pencatatan feedback & complaint.
+- [x] Safe AI Customer 360 Briefing: cheat-sheet 3 butir (total belanja, isu terakhir, peluang repeat/renewal); total belanja dihitung kode, bukan LLM.
+- [x] Test: status customer berubah saat deal Won; briefing tidak mengubah data.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,8 +28,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Vercel AI SDK`,
 
 ## Acceptance Criteria
 
-- [ ] Deal Won otomatis memunculkan customer tanpa input ulang.
-- [ ] Customer 360 menampilkan riwayat lengkap.
+- [x] Deal Won otomatis memunculkan customer tanpa input ulang.
+- [x] Customer 360 menampilkan riwayat lengkap.
 
 ## Verifikasi
 

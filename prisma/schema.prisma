@@ -130,6 +130,9 @@ model Organization {
   quotationSettings       QuotationSettings?
   quotations              Quotation[]
   quotationItems          QuotationItem[]
+  customerSegments        CustomerSegment[]
+  customerSegmentMembers  CustomerSegmentMember[]
+  feedbacks               Feedback[]
 
   @@map("organizations")
 }
@@ -306,6 +309,9 @@ model Company {
 
   quotations Quotation[]
 
+  feedbacks    Feedback[]
+  segmentLinks CustomerSegmentMember[]
+
   @@index([organizationId, name])
   @@index([organizationId, ownerId])
   @@map("companies")
@@ -341,6 +347,9 @@ model Contact {
   activities Activity[]
 
   quotations Quotation[]
+
+  feedbacks    Feedback[]
+  segmentLinks CustomerSegmentMember[]
 
   @@index([organizationId, name])
   @@index([organizationId, email])
@@ -517,6 +526,8 @@ model Deal {
   products DealProduct[]
 
   quotations Quotation[]
+
+  feedbacks Feedback[]
 
   @@index([organizationId, status, stageId])
   @@index([organizationId, ownerId])
@@ -807,4 +818,68 @@ model QuotationItem {
 
   @@index([organizationId, quotationId, position])
   @@map("quotation_items")
+}
+
+/// Segmen pelanggan sederhana (RET-04). Fase 2 menambah tags & custom fields yang lebih lengkap.
+model CustomerSegment {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      CustomerSegmentMember[]
+
+  @@unique([organizationId, name])
+  @@map("customer_segments")
+}
+
+/// Keanggotaan segmen: tepat satu dari contactId / companyId (customer diturunkan dari deal Won).
+model CustomerSegmentMember {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  segmentId      String   @map("segment_id") @db.Uuid
+  contactId      String?  @map("contact_id") @db.Uuid
+  companyId      String?  @map("company_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  segment      CustomerSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  contact      Contact?        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company      Company?        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([segmentId, contactId])
+  @@unique([segmentId, companyId])
+  @@index([organizationId, segmentId])
+  @@map("customer_segment_members")
+}
+
+/// Feedback & complaint pelanggan (RET-06).
+model Feedback {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  /// feedback | complaint
+  type           String
+  subject        String
+  body           String?
+  /// open | resolved
+  status         String    @default("open")
+  contactId      String?   @map("contact_id") @db.Uuid
+  companyId      String?   @map("company_id") @db.Uuid
+  dealId         String?   @map("deal_id") @db.Uuid
+  ownerId        String?   @map("owner_id") @db.Uuid
+  resolvedAt     DateTime? @map("resolved_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?   @map("created_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contact      Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company      Company?     @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  deal         Deal?        @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status, createdAt(sort: Desc)])
+  @@index([organizationId, contactId])
+  @@index([organizationId, companyId])
+  @@map("feedbacks")
 }

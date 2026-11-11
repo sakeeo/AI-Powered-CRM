@@ -24,6 +24,8 @@ export type DealFilters = {
   /** Rentang perkiraan closing (YYYY-MM-DD), inklusif. */
   closeFrom?: string;
   closeTo?: string;
+  /** Batasi ke beberapa pemilik (mis. anggota tim) — dipakai filter dashboard. */
+  ownerIds?: string[];
 };
 
 const include = {
@@ -57,6 +59,7 @@ export function dealWhere(ctx: TenantContext, filters: DealFilters, q?: string):
             },
           ]
         : []),
+      ...(filters.ownerIds ? [{ ownerId: { in: filters.ownerIds } }] : []),
       ...(filters.contactId ? [{ contactId: filters.contactId }] : []),
       ...(filters.companyId ? [{ companyId: filters.companyId }] : []),
       ...(filters.owner

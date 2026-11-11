@@ -14,6 +14,7 @@ Mengacu pada PRD §14.1. Status: **Diusulkan** = default sementara yang fleksibe
 | 8   | Retensi & penghapusan data?                | Soft delete (`deleted_at`) di MVP; kebijakan retensi final sebelum plan 1.20.     | Diusulkan | 1.20         |
 | 9   | Default provider AI?                       | Gemini sebagai rekomendasi awal; semua provider tetap BYOK.                       | Diusulkan | 1.4          |
 | 10  | Simpan log prompt/response AI?             | Tidak menyimpan isi; hanya metadata (fitur, waktu, status) hingga kebijakan privasi diputuskan. | Diusulkan | 1.4          |
+| 11  | Definisi "customer"?                       | Turunan, bukan input manual: contact atau company dengan ≥1 deal berstatus Won (tertaut langsung pada deal). Status hilang bila semua deal Won dibuka kembali/dihapus. Nilai pembelian = jumlah nilai deal Won (Decimal, per mata uang). | Diputuskan | 1.16 |
 
 ## Keputusan Teknis (sudah ditetapkan)
 
