@@ -12,6 +12,7 @@ import {
   closeWonSchema,
   dealSchema,
   moveStageSchema,
+  setLostCategorySchema,
   renamePipelineSchema,
   reorderStageSchema,
   stageSchema,
@@ -181,23 +182,50 @@ export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
 });
 
 /** Tandai deal Lost — alasan wajib (kategori diisi otomatis di plan 1.18). */
-export const markDealLost = tenantAction(closeLostSchema, async (ctx, { id, reason }) => {
+export const markDealLost = tenantAction(closeLostSchema, async (ctx, { id, reason, category }) => {
   const deal = await loadOpenDeal(ctx, id);
   if (deal.status !== "open") throw new AppError("Deal sudah ditutup");
   await ctx.db.deal.update({
     where: { id },
-    data: { status: "lost", closedAt: new Date(), lostReason: reason, updatedBy: ctx.userId },
+    data: {
+      status: "lost",
+      closedAt: new Date(),
+      lostReason: reason,
+      lostCategory: category ?? null,
+      updatedBy: ctx.userId,
+    },
   });
   await writeAudit(ctx, {
     action: "deal.lost",
     entityType: "Deal",
     entityId: id,
     before: { status: "open" },
-    after: { status: "lost", reason },
+    after: { status: "lost", reason, category },
   });
   revalidatePath("/deals");
   revalidatePath(`/deals/${id}`);
 });
+
+/** User mengonfirmasi/mengubah kategori alasan Lost (usulan AI tidak pernah final dengan sendirinya). */
+export const setLostCategory = tenantAction(
+  setLostCategorySchema,
+  async (ctx, { id, category }) => {
+    const deal = await loadOpenDeal(ctx, id);
+    if (deal.status !== "lost") throw new AppError("Hanya deal Lost yang punya kategori alasan");
+    await ctx.db.deal.update({
+      where: { id },
+      data: { lostCategory: category, updatedBy: ctx.userId },
+    });
+    await writeAudit(ctx, {
+      action: "deal.lost_category_set",
+      entityType: "Deal",
+      entityId: id,
+      before: { category: deal.lostCategory },
+      after: { category },
+    });
+    revalidatePath(`/deals/${id}`);
+  },
+);
 
 /** Buka kembali deal yang sudah ditutup (mis. salah klik). */
 export const reopenDeal = tenantAction(closeWonSchema, async (ctx, { id }) => {

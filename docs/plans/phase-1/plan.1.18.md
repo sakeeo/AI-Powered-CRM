@@ -14,11 +14,11 @@ Laporan inti dengan filter dan export, plus kategorisasi alasan Lost berbantuan 
 
 ## Tugas
 
-- [ ] Laporan: Lead, Pipeline, Won/Lost (P0); Conversion, Lead Source, Sales Performance, Activity, Revenue dari deal Won (P1).
-- [ ] Filter periode, user, tim; export laporan CSV/XLSX.
-- [ ] Safe AI Lost Reason Categorizer: usulkan kategori baku dari teks bebas; user mengonfirmasi/mengubah kategori — tidak otomatis final.
-- [ ] Pastikan label revenue jelas: nilai deal Won ≠ cash received/accounting revenue.
-- [ ] Test: konsistensi angka antar laporan dan dashboard.
+- [x] Laporan: Lead, Pipeline, Won/Lost (P0); Conversion, Lead Source, Sales Performance, Activity, Revenue dari deal Won (P1).
+- [x] Filter periode, user, tim; export laporan CSV/XLSX.
+- [x] Safe AI Lost Reason Categorizer: usulkan kategori baku dari teks bebas; user mengonfirmasi/mengubah kategori — tidak otomatis final.
+- [x] Pastikan label revenue jelas: nilai deal Won ≠ cash received/accounting revenue.
+- [x] Test: konsistensi angka antar laporan dan dashboard.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -26,8 +26,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Recharts`, `Exc
 
 ## Acceptance Criteria
 
-- [ ] Semua laporan P0 tersedia dan dapat di-export.
-- [ ] Kategori Lost reason dapat dipakai pada laporan Won/Lost.
+- [x] Semua laporan P0 tersedia dan dapat di-export.
+- [x] Kategori Lost reason dapat dipakai pada laporan Won/Lost.
 
 ## Verifikasi
 

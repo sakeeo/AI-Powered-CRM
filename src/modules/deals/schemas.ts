@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { currencySchema, optionalMoney } from "@/lib/money";
 import { optionalText, optionalUuid } from "@/lib/schema-helpers";
+import { LOST_CATEGORIES } from "@/modules/reports/constants";
 
 const optionalDate = z.preprocess(
   (v) => (v === "" || v === null ? undefined : v),
@@ -60,4 +61,10 @@ export const closeLostSchema = z.object({
     .trim()
     .min(3, "Alasan kalah wajib diisi (min. 3 karakter)")
     .max(500, "Maksimal 500 karakter"),
+  /** Opsional; dipilih/dikonfirmasi user (AI hanya mengusulkan). */
+  category: z.preprocess(
+    (v) => (v === "" || v === null ? undefined : v),
+    z.enum(LOST_CATEGORIES).optional(),
+  ),
 });
+export const setLostCategorySchema = z.object({ id: z.uuid(), category: z.enum(LOST_CATEGORIES) });

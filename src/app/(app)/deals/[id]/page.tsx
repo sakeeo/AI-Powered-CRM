@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/money";
 import { orNotFound } from "@/lib/not-found";
 import { listCompanyOptions, listContactOptions } from "@/modules/contacts/server/queries";
 import { DEAL_STATUS_LABEL, DEAL_STATUS_TONE, type DealStatus } from "@/modules/deals/constants";
+import { LostCategoryEditor } from "@/modules/deals/components/lost-category-editor";
 import { DealCloseButtons } from "@/modules/deals/components/deal-close-buttons";
 import { DealActions } from "@/modules/deals/components/deal-actions";
 import { getDealOrThrow } from "@/modules/deals/server/detail";
@@ -118,7 +119,17 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
               )}
             </DetailField>
             {deal.status === "lost" && (
-              <DetailField label="Alasan kalah">{deal.lostReason}</DetailField>
+              <>
+                <DetailField label="Alasan kalah">{deal.lostReason}</DetailField>
+                <DetailField label="Kategori alasan">
+                  <LostCategoryEditor
+                    id={deal.id}
+                    reason={deal.lostReason ?? ""}
+                    category={deal.lostCategory}
+                    canEdit={ctx.ability.can("update", subject)}
+                  />
+                </DetailField>
+              </>
             )}
             {deal.closedAt && (
               <DetailField label="Ditutup">

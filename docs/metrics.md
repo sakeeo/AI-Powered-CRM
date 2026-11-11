@@ -51,3 +51,18 @@ Satu-satunya sumber definisi metrik. Kode: `src/modules/dashboard/server/metrics
 ## Performa query
 
 Agregasi memakai `count`/`groupBy` di database (bukan memuat seluruh baris), didukung indeks: `leads(organization_id, status)`, `leads(organization_id, created_at desc)`, `leads(organization_id, owner_id)`, `deals(organization_id, status, stage_id)`, `deals(organization_id, owner_id)`, `activities(organization_id, status, due_at)`, `activities(organization_id, owner_id, status)`, `quotations(organization_id, status, valid_until)`. Pengecualian: seri harian & konversi per sumber membaca maksimal 10.000 lead dalam periode (hanya kolom tanggal/sumber).
+
+## Laporan (halaman Reports, plan 1.18)
+
+Semua laporan memakai `resolveFilters` yang sama dengan dashboard (periode, tim, pengguna) dan izin yang sama, sehingga angkanya konsisten dengan KPI dashboard (diuji di `tests/integration/reports.test.ts`).
+
+| Laporan | Definisi |
+| --- | --- |
+| Lead | Lead dibuat pada periode, per status; persentase = jumlah status ÷ total lead periode. |
+| Pipeline | Deal `open` saat ini per stage: jumlah, total nilai, nilai tertimbang probabilitas (nilai × probabilitas deal ?? stage ÷ 100). |
+| Won/Lost | Deal ditutup (`closedAt`) pada periode. Win rate = Won ÷ (Won + Lost). Alasan Lost per kategori (kategori ditetapkan user; usulan AI tidak otomatis final); kategori kosong = "Belum dikategorikan". |
+| Conversion | Cohort = lead dibuat pada periode. Funnel: dibuat → Qualified (atau sudah dikonversi) → dikonversi → deal Won; persentase terhadap lead dibuat. |
+| Lead Source | Cohort sama; per sumber: lead, terkonversi, konversi %, deal Won dari lead tersebut. |
+| Sales Performance | Per pemilik: lead baru, Won, nilai Won, Lost, win rate, deal terbuka (saat ini), aktivitas selesai (`completedAt` pada periode). |
+| Activity | Aktivitas dibuat pada periode per jenis; tingkat selesai = Selesai ÷ Dibuat; Terlambat = masih `open` dan lewat tenggat. |
+| Revenue | Σ nilai deal **Won** per bulan (zona waktu organisasi) per mata uang. **Bukan** cash received maupun pendapatan akuntansi. |
