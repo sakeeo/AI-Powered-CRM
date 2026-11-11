@@ -15,11 +15,11 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
-| [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 3 / 5 | In progress |
+| [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 4 / 5 | In progress |
 | [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 0 / 20 | Not started |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **3 / 39** | |
+| **Total** | **4 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -28,7 +28,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [0.1](plans/phase-0/plan.0.1.md) | Repository & tooling baseline              | Done | 2026-11-11 | Struktur modul, Prettier/ESLint, validasi env Zod, decisions.md, README, commit awal. |
 | [0.2](plans/phase-0/plan.0.2.md) | Dev infrastructure (Redis, object storage) | Done | 2026-11-11 | Redis + MinIO (image chainguard, minio/minio sudah tidak tersedia di Docker Hub), bucket init script, /api/health, helper storage per tenant. |
 | [0.3](plans/phase-0/plan.0.3.md) | Database foundation                        | Done | 2026-11-11 | Konvensi UUIDv7/snake_case, helper forTenant + TENANT_MODELS (diuji), seed, DB test crm_test, docs/database.md. Vitest dipasang lebih awal dari plan 0.5. |
-| [0.4](plans/phase-0/plan.0.4.md) | UI foundation & app shell                  | Not started |         |                                                                                                                            |
+| [0.4](plans/phase-0/plan.0.4.md) | UI foundation & app shell                  | Done | 2026-11-11 | shadcn/ui (preset radix-nova, Radix), next-themes, sidebar lipat, Ctrl+K palette, 14 halaman placeholder. Dicek di browser: dark/light, sidebar, palette. Cek responsif 375px ditunda ke Playwright (plan 0.5). |
 | [0.5](plans/phase-0/plan.0.5.md) | Testing, logging & CI                      | Not started |         |                                                                                                                            |
 
 ## Phase 1 — MVP
