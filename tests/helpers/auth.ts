@@ -36,3 +36,33 @@ export function actAs(user: { cookie: string }) {
 export function headersFor(user: { cookie: string }) {
   return new Headers({ cookie: user.cookie, origin: ORIGIN });
 }
+
+import { testPrisma } from "./db";
+
+type Role = "owner" | "admin" | "sales_manager" | "sales_rep" | "viewer";
+const profile = {
+  timezone: "Asia/Jakarta",
+  defaultCurrency: "IDR",
+  dateFormat: "dd/MM/yyyy",
+} as const;
+
+/** Buat pengguna + organisasi baru (pengguna menjadi Owner). */
+export async function makeOrg(name: string) {
+  const { createOrganizationAction } = await import("@/modules/organizations/server/actions");
+  const owner = await createUser(`${name} Owner`);
+  actAs(owner);
+  const res = await createOrganizationAction({ ...profile, name });
+  if (!res.ok) throw new Error(res.error);
+  return { owner, orgId: res.data.id };
+}
+
+/** Tambahkan pengguna baru ke organisasi dengan role tertentu (langsung ke DB, tanpa alur undangan). */
+export async function addUserWithRole(orgId: string, role: Role, name: string) {
+  const user = await createUser(name);
+  await testPrisma.member.create({ data: { organizationId: orgId, userId: user.id, role } });
+  await testPrisma.session.updateMany({
+    where: { userId: user.id },
+    data: { activeOrganizationId: orgId },
+  });
+  return user;
+}

@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 
 // Spec ini menguji alur sebagai pengunjung/pengguna baru, bukan memakai session global.
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({
+  storageState: { cookies: [], origins: [] },
+  // Rate limit auth bersifat per-IP; beri IP unik per run agar run berulang tidak saling memblokir.
+  extraHTTPHeaders: { "x-forwarded-for": `10.8.${Date.now() % 250}.${process.pid % 250}` },
+});
 
 const password = "rahasia-12345";
 

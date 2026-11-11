@@ -14,13 +14,13 @@ CRUD contact dan company dengan relasi eksplisit, pencarian, dan data table stan
 
 ## Tugas
 
-- [ ] Model Company, Contact, ContactCompany (relasi eksplisit many-to-many).
-- [ ] Skema Zod bersama untuk validasi client + server; Route Handlers/Server Actions dengan tenant scope & CASL.
-- [ ] Halaman list (TanStack Table: sorting, filter, pagination server-side) dan detail untuk Contact & Company.
-- [ ] Slide-over Sheet untuk Quick Add dan preview.
-- [ ] Menampilkan related deals (placeholder sampai plan 1.9) dan catatan internal.
-- [ ] Komponen reusable `DataTable` dan `EntitySheet` untuk dipakai modul lain.
-- [ ] Empty state yang mengarahkan aksi (Import CSV / Tambah).
+- [x] Model Company, Contact, ContactCompany (relasi eksplisit many-to-many).
+- [x] Skema Zod bersama untuk validasi client + server; Route Handlers/Server Actions dengan tenant scope & CASL.
+- [x] Halaman list (TanStack Table: sorting, filter, pagination server-side) dan detail untuk Contact & Company.
+- [x] Slide-over Sheet untuk Quick Add dan preview.
+- [x] Menampilkan related deals (placeholder sampai plan 1.9) dan catatan internal.
+- [x] Komponen reusable `DataTable` dan `EntitySheet` untuk dipakai modul lain.
+- [x] Empty state yang mengarahkan aksi (Import CSV / Tambah).
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `TanStack Table`
 
 ## Acceptance Criteria
 
-- [ ] CRUD contact & company berfungsi dengan relasi.
-- [ ] Pencarian, filter, sort, pagination bekerja di server.
-- [ ] Test CRUD + isolasi tenant lulus.
+- [x] CRUD contact & company berfungsi dengan relasi.
+- [x] Pencarian, filter, sort, pagination bekerja di server.
+- [x] Test CRUD + isolasi tenant lulus.
 
 ## Verifikasi
 

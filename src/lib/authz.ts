@@ -22,3 +22,12 @@ export function scopeWhere(ctx: Ctx, action: Action, type: SubjectName): Record<
   if (where === null) throw ForbiddenError();
   return where;
 }
+
+/**
+ * Pemilik record baru. Sales Rep selalu menjadi pemilik data yang ia buat (agar tetap bisa
+ * mengelolanya); peran lain boleh menetapkan pemilik lain (harus anggota aktif — divalidasi pemanggil).
+ */
+export function resolveOwner(ctx: { role: string; userId: string }, requested?: string | null) {
+  if (ctx.role === "sales_rep") return ctx.userId;
+  return requested ?? ctx.userId;
+}

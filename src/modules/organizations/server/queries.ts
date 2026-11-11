@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { TenantContext } from "@/lib/context";
+import { AppError } from "@/lib/errors";
 
 /** Organisasi tempat pengguna menjadi anggota aktif — hanya milik user itu sendiri. */
 export async function listMyOrganizations(userId: string) {
@@ -55,4 +56,23 @@ export async function listTeams(ctx: TenantContext) {
     include: { members: { select: { userId: true } } },
   });
   return teams.map((t) => ({ id: t.id, name: t.name, userIds: t.members.map((m) => m.userId) }));
+}
+
+/** Anggota aktif organisasi untuk dropdown pemilik/assignee. */
+export async function listOwnerOptions(ctx: TenantContext) {
+  const rows = await ctx.db.member.findMany({
+    where: { active: true },
+    orderBy: { createdAt: "asc" },
+    include: { user: { select: { id: true, name: true } } },
+  });
+  return rows.map((m) => ({ userId: m.userId, name: m.user.name }));
+}
+
+/** Pastikan `userId` adalah anggota aktif organisasi (cegah menugaskan ke user tenant lain). */
+export async function assertActiveMember(ctx: TenantContext, userId: string) {
+  const ok = await ctx.db.member.findFirst({
+    where: { userId, active: true },
+    select: { id: true },
+  });
+  if (!ok) throw new AppError("Pemilik harus anggota aktif organisasi");
 }

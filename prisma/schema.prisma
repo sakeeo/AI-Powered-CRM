@@ -104,12 +104,15 @@ model Organization {
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
 
-  members     Member[]
-  invitations Invitation[]
-  teams       Team[]
-  auditLogs   AuditLog[]
-  connectors  TenantConnector[]
-  aiCallLogs  AiCallLog[]
+  members          Member[]
+  invitations      Invitation[]
+  teams            Team[]
+  auditLogs        AuditLog[]
+  connectors       TenantConnector[]
+  aiCallLogs       AiCallLog[]
+  companies        Company[]
+  contacts         Contact[]
+  contactCompanies ContactCompany[]
 
   @@map("organizations")
 }
@@ -252,4 +255,82 @@ model AiCallLog {
 
   @@index([organizationId, createdAt(sort: Desc)])
   @@map("ai_call_logs")
+}
+
+/// Perusahaan pelanggan/prospek (CONT-02).
+model Company {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String
+  industry       String?
+  website        String?
+  email          String?
+  phone          String?
+  address        String?
+  city           String?
+  country        String?
+  /// Catatan internal (CONT-10)
+  notes          String?
+  ownerId        String?   @map("owner_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?   @map("created_by") @db.Uuid
+  updatedBy      String?   @map("updated_by") @db.Uuid
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contacts     ContactCompany[]
+
+  @@index([organizationId, name])
+  @@index([organizationId, ownerId])
+  @@map("companies")
+}
+
+/// Individu yang berhubungan dengan bisnis (CONT-01).
+model Contact {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String
+  email          String?
+  phone          String?
+  jobTitle       String?   @map("job_title")
+  address        String?
+  city           String?
+  country        String?
+  notes          String?
+  ownerId        String?   @map("owner_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?   @map("created_by") @db.Uuid
+  updatedBy      String?   @map("updated_by") @db.Uuid
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  companies    ContactCompany[]
+
+  @@index([organizationId, name])
+  @@index([organizationId, email])
+  @@index([organizationId, ownerId])
+  @@map("contacts")
+}
+
+/// Relasi eksplisit many-to-many contact ↔ company (decisions #2).
+model ContactCompany {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  contactId      String   @map("contact_id") @db.Uuid
+  companyId      String   @map("company_id") @db.Uuid
+  /// Jabatan contact di company ini
+  roleTitle      String?  @map("role_title")
+  isPrimary      Boolean  @default(false) @map("is_primary")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contact      Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, companyId])
+  @@index([organizationId])
+  @@index([companyId])
+  @@map("contact_companies")
 }
