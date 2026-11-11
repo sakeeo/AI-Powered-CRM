@@ -14,13 +14,13 @@ Data masuk massal dan otomatis: CSV/XLSX, webhook form website, dan ekstraksi le
 
 ## Tugas
 
-- [ ] Import CSV (PapaParse) dengan mapping kolom, validasi per baris, laporan error, dan job background untuk berkas besar.
-- [ ] Export CSV/XLSX (ExcelJS) untuk lead, contact, company dengan filter aktif dan cek permission export.
-- [ ] Inbound Webhook generator per tenant: URL + secret/signature, validasi payload Zod, rate limit, pembuatan lead sumber 'Website'.
-- [ ] UI webhook di Connector Hub (rotate secret, lihat log penerimaan).
-- [ ] Safe AI Text-to-Lead: tempel teks WA/email → draf field lead terstruktur (Zod structured output) → ditampilkan untuk direview; tidak disimpan otomatis.
-- [ ] Guardrail AI: output hanya draf, wajib klik Simpan oleh user.
-- [ ] Test: import baris valid/invalid, webhook sah/tidak sah, AI draft tidak menulis ke DB.
+- [x] Import CSV (PapaParse) dengan mapping kolom, validasi per baris, laporan error, dan job background untuk berkas besar.
+- [x] Export CSV/XLSX (ExcelJS) untuk lead, contact, company dengan filter aktif dan cek permission export.
+- [x] Inbound Webhook generator per tenant: URL + secret/signature, validasi payload Zod, rate limit, pembuatan lead sumber 'Website'.
+- [x] UI webhook di Connector Hub (rotate secret, lihat log penerimaan).
+- [x] Safe AI Text-to-Lead: tempel teks WA/email → draf field lead terstruktur (Zod structured output) → ditampilkan untuk direview; tidak disimpan otomatis.
+- [x] Guardrail AI: output hanya draf, wajib klik Simpan oleh user.
+- [x] Test: import baris valid/invalid, webhook sah/tidak sah, AI draft tidak menulis ke DB.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `PapaParse`, `Ex
 
 ## Acceptance Criteria
 
-- [ ] Import 1.000+ baris tanpa memblokir UI.
-- [ ] Webhook menolak signature salah dan membuat lead untuk payload sah.
-- [ ] Text-to-Lead hanya menghasilkan draf.
+- [x] Import 1.000+ baris tanpa memblokir UI.
+- [x] Webhook menolak signature salah dan membuat lead untuk payload sah.
+- [x] Text-to-Lead hanya menghasilkan draf.
 
 ## Verifikasi
 

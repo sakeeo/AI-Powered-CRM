@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { requireTenant } from "@/lib/context";
 import { parseListParams, pickParam, type SearchParams } from "@/lib/list-params";
 import { LEAD_SORTS } from "@/modules/leads/constants";
+import { ExportButton } from "@/modules/import-export/components/export-button";
+import { ImportLeadsDialog } from "@/modules/import-export/components/import-leads-dialog";
+import { TextToLeadDialog } from "@/modules/leads/components/text-to-lead-dialog";
 import { LeadsTable } from "@/modules/leads/components/leads-table";
 import { listLeadSources, listLeads } from "@/modules/leads/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
@@ -24,6 +27,8 @@ export default async function Page(props: PageProps<"/leads">) {
     listOwnerOptions(ctx),
     getOrganization(ctx),
   ]);
+  const sourceOptions = sources.map((s) => ({ id: s.id, name: s.name }));
+  const canAssignOwner = ctx.role !== "sales_rep" && ctx.role !== "viewer";
   return (
     <LeadsTable
       table={{
@@ -35,11 +40,31 @@ export default async function Page(props: PageProps<"/leads">) {
         dir: params.dir,
         q: params.q,
       }}
-      sources={sources.map((s) => ({ id: s.id, name: s.name }))}
+      sources={sourceOptions}
       owners={owners}
-      canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
+      canAssignOwner={canAssignOwner}
       defaultCurrency={org.defaultCurrency}
       archived={archived}
+      actions={
+        <>
+          {ctx.ability.can("create", "Lead") && !archived && (
+            <>
+              <TextToLeadDialog
+                sources={sourceOptions}
+                owners={owners}
+                canAssignOwner={canAssignOwner}
+                defaultCurrency={org.defaultCurrency}
+              />
+              <ImportLeadsDialog
+                sources={sourceOptions}
+                owners={owners}
+                canAssignOwner={canAssignOwner}
+              />
+            </>
+          )}
+          <ExportButton entity="leads" />
+        </>
+      }
     />
   );
 }

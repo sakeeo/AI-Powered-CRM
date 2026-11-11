@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ExportButton } from "@/modules/import-export/components/export-button";
 import { requireTenant } from "@/lib/context";
 import { parseListParams, pickParam, type SearchParams } from "@/lib/list-params";
 import { CompaniesTable } from "@/modules/companies/components/companies-table";
@@ -29,6 +30,7 @@ export default async function Page(props: PageProps<"/companies">) {
       }}
       owners={owners}
       canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
+      actions={<ExportButton entity="companies" />}
     />
   );
 }

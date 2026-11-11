@@ -87,3 +87,26 @@ export async function listContactOptions(ctx: TenantContext) {
     select: { id: true, name: true },
   });
 }
+
+/** Kontak sesuai pencarian/owner & izin (untuk export). */
+export async function listContactsForExport(
+  ctx: TenantContext,
+  q: string | undefined,
+  ownerId: string | undefined,
+  take: number,
+) {
+  assertCan(ctx, "export", "Contact");
+  return ctx.db.contact.findMany({
+    where: {
+      AND: [
+        { deletedAt: null },
+        scopeWhere(ctx, "view", "Contact") as Where,
+        ...(searchWhere(q) ? [searchWhere(q)!] : []),
+        ...(ownerId ? [{ ownerId }] : []),
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+    include: companyInclude,
+  });
+}

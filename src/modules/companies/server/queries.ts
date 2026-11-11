@@ -6,13 +6,8 @@ import type { ListParams } from "@/lib/list-params";
 
 type Where = Prisma.CompanyWhereInput;
 
-export async function listCompanies(
-  ctx: TenantContext,
-  params: ListParams,
-  filters: { ownerId?: string } = {},
-) {
-  const q = params.q;
-  const where: Where = {
+function companyWhere(ctx: TenantContext, q: string | undefined, ownerId?: string): Where {
+  return {
     AND: [
       { deletedAt: null },
       scopeWhere(ctx, "view", "Company") as Where,
@@ -28,9 +23,17 @@ export async function listCompanies(
             },
           ]
         : []),
-      ...(filters.ownerId ? [{ ownerId: filters.ownerId }] : []),
+      ...(ownerId ? [{ ownerId }] : []),
     ],
   };
+}
+
+export async function listCompanies(
+  ctx: TenantContext,
+  params: ListParams,
+  filters: { ownerId?: string } = {},
+) {
+  const where = companyWhere(ctx, params.q, filters.ownerId);
   const [total, rows] = await Promise.all([
     ctx.db.company.count({ where }),
     ctx.db.company.findMany({
@@ -59,4 +62,19 @@ export async function getCompany(ctx: TenantContext, id: string) {
   if (!row) throw NotFoundError("Company");
   assertCan(ctx, "view", "Company", row);
   return { ...row, contacts: row.contacts.filter((c) => !c.contact.deletedAt) };
+}
+
+/** Perusahaan sesuai pencarian/owner & izin (untuk export). */
+export async function listCompaniesForExport(
+  ctx: TenantContext,
+  q: string | undefined,
+  ownerId: string | undefined,
+  take: number,
+) {
+  assertCan(ctx, "export", "Company");
+  return ctx.db.company.findMany({
+    where: companyWhere(ctx, q, ownerId),
+    orderBy: { createdAt: "desc" },
+    take,
+  });
 }

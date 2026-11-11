@@ -24,7 +24,9 @@ export type AuditInput = {
   after?: unknown;
 };
 
-type AuditCtx = Pick<TenantContext, "db" | "userId"> & {
+type AuditCtx = Pick<TenantContext, "db"> & {
+  /** null = tindakan sistem/eksternal (mis. webhook masuk). */
+  userId: string | null;
   ip?: string | null;
   userAgent?: string | null;
 };

@@ -37,9 +37,8 @@ export type LeadFilters = {
   archived?: boolean;
 };
 
-export async function listLeads(ctx: TenantContext, params: ListParams, filters: LeadFilters = {}) {
-  const q = params.q;
-  const where: Where = {
+function leadWhere(ctx: TenantContext, q: string | undefined, filters: LeadFilters): Where {
+  return {
     AND: [
       filters.archived ? { archivedAt: { not: null } } : { archivedAt: null },
       scopeWhere(ctx, "view", "Lead") as Where,
@@ -62,6 +61,10 @@ export async function listLeads(ctx: TenantContext, params: ListParams, filters:
         : []),
     ],
   };
+}
+
+export async function listLeads(ctx: TenantContext, params: ListParams, filters: LeadFilters = {}) {
+  const where = leadWhere(ctx, params.q, filters);
   const [total, rows] = await Promise.all([
     ctx.db.lead.count({ where }),
     ctx.db.lead.findMany({
@@ -88,4 +91,20 @@ export async function getLead(ctx: TenantContext, id: string) {
   if (!row) throw NotFoundError("Lead");
   assertCan(ctx, "view", "Lead", row);
   return { ...row, budget: decimalToString(row.budget) };
+}
+
+/** Semua lead sesuai filter aktif & izin (untuk export). Dibatasi `take` agar memori terkendali. */
+export async function listLeadsForExport(
+  ctx: TenantContext,
+  q: string | undefined,
+  filters: LeadFilters,
+  take: number,
+) {
+  assertCan(ctx, "export", "Lead");
+  return ctx.db.lead.findMany({
+    where: leadWhere(ctx, q, filters),
+    orderBy: { createdAt: "desc" },
+    take,
+    include: { source: { select: { name: true } } },
+  });
 }
