@@ -31,8 +31,11 @@ test("kanban: kartu di papan, drag keyboard memindah stage, Lost wajib alasan", 
   await expect(first.getByText(deal)).toBeVisible();
   const card = first.locator("[data-rfd-draggable-id]", { hasText: deal });
   await card.focus();
+  await expect(card).toBeFocused();
   await page.keyboard.press("Space");
+  await page.waitForTimeout(400); // animasi angkat kartu
   await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(400);
   await page.keyboard.press("Space");
   await expect(page.getByTestId("col-Contacted").getByText(deal)).toBeVisible();
 

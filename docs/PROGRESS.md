@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 10 / 20 | In progress |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 11 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **16 / 39** | |
+| **Total** | **17 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -45,7 +45,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [1.8](plans/phase-1/plan.1.8.md)   | Import/export, inbound webhook & AI Text-to-Lead       | Done | 2026-11-11 | Import CSV (PapaParse di browser, pemetaan kolom, batch 200 baris + progres, validasi ulang di server, laporan error); export CSV/XLSX (ExcelJS) dengan filter aktif + izin export + anti formula-injection; webhook masuk per tenant (HMAC SHA-256, secret terenkripsi tampil sekali + rotasi, rate limit Redis, log penerimaan); AI Text-to-Lead hanya draf (Zod structured output, review di form, wajib Simpan). BullMQ ditunda ke 1.13 (batch klien cukup untuk ≤5.000 baris). 12 test integrasi + 2 E2E. |
 | [1.9](plans/phase-1/plan.1.9.md)   | Pipelines & Deal management                            | Done | 2026-11-11 | Pipeline/PipelineStage/Deal (Won/Lost = outcome, bukan stage), pipeline default + lazy ensure, Settings pipeline (tambah/ubah/urut/arsip stage dengan guard), CRUD deal (Decimal, contact/company wajib salah satu), ringkasan nilai per stage + tertimbang (Decimal), related deals di contact/company. 10 test integrasi + 1 E2E. |
 | [1.10](plans/phase-1/plan.1.10.md) | Kanban board, Won/Lost & Deal Risk advisor             | Done | 2026-11-11 | DealStageHistory (setiap perpindahan tercatat), Kanban @hello-pangea/dnd (mouse/sentuh/keyboard, optimistik + rollback), filter owner & periode, Won/Lost/Buka kembali (Lost wajib alasan), badge risiko pasif deterministik (tidak mengubah data). Peringatan 'tanpa next activity' dikerjakan di 1.11 (butuh Activity). Perbaikan useCan dengan record. 8 test + 1 E2E. |
-| [1.11](plans/phase-1/plan.1.11.md) | Activities, tasks & timeline                           | Not started |         |                                                                                   |
+| [1.11](plans/phase-1/plan.1.11.md) | Activities, tasks & timeline                           | Done | 2026-11-11 | Activity (FK eksplisit ke lead/contact/company/deal, ownerId = assignee), task + log call/meeting/email/note, composer Tiptap (HTML disanitasi di server), timeline di 4 halaman detail, halaman Activities (Terlambat/Mendatang/Selesai) akurat terhadap timezone organisasi (tenggat tanggal-saja = akhir hari), aktivitas ikut berpindah saat konversi lead, peringatan 'tanpa next activity' di Kanban + aktivitas menyegarkan indikator risiko. 13 test + 1 E2E. |
 | [1.12](plans/phase-1/plan.1.12.md) | Calendar & AI notes assistant                          | Not started |         |                                                                                   |
 | [1.13](plans/phase-1/plan.1.13.md) | Notifications, email delivery & reminder jobs          | Not started |         |                                                                                   |
 | [1.14](plans/phase-1/plan.1.14.md) | Product & service catalog                              | Not started |         |                                                                                   |

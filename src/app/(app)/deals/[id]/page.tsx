@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
-import { PlaceholderCard } from "@/components/shared/placeholder-card";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { asSubject } from "@/lib/abilities";
@@ -154,7 +154,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           )}
         </CardContent>
       </Card>
-      <PlaceholderCard title="Aktivitas" description="Timeline dan next activity deal." />
+      <ActivitiesPanel ctx={ctx} link={{ dealId: deal.id }} />
     </div>
   );
 }

@@ -122,6 +122,14 @@ export function KanbanBoard({
                                     {(c.ownerId && ownerNames[c.ownerId]) || ""}
                                   </span>
                                 </div>
+                                {c.noNextActivity && (
+                                  <p
+                                    className="text-xs text-amber-600 dark:text-amber-400"
+                                    data-testid="no-next-activity"
+                                  >
+                                    Belum ada aktivitas terjadwal
+                                  </p>
+                                )}
                                 {c.risk && (
                                   <ToneBadge tone={c.risk.level === "high" ? "red" : "orange"}>
                                     <span

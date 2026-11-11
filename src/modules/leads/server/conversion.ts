@@ -148,6 +148,16 @@ export async function convertLeadService(ctx: ActionContext, input: ConvertLeadD
       dealId = d.id;
     }
 
+    // Riwayat aktivitas lead ikut tertaut ke contact/company/deal hasil konversi.
+    await tx.activity.updateMany({
+      where: { leadId: lead.id },
+      data: {
+        ...(contactId ? { contactId } : {}),
+        ...(companyId ? { companyId } : {}),
+        ...(dealId ? { dealId } : {}),
+      },
+    });
+
     await tx.lead.update({
       where: { id: lead.id },
       data: {

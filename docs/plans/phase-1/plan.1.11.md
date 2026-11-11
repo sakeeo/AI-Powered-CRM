@@ -14,12 +14,12 @@ Task dan aktivitas (call, meeting, email, note) terhubung ke lead/contact/compan
 
 ## Tugas
 
-- [ ] Model Activity (tipe: task/call/meeting/email/note; status; due date; assignee; relasi polymorphic eksplisit).
-- [ ] CRUD task dengan assignee dan due date; tandai selesai/dibatalkan; jadwalkan follow-up.
-- [ ] Quick composer untuk log call/note/meeting; catatan memakai Tiptap.
-- [ ] Activity timeline terpadu pada detail lead, contact, company, deal.
-- [ ] Daftar Upcoming dan Overdue activity (halaman Activities & Tasks).
-- [ ] Test: relasi polymorphic, izin, timeline urut kronologis.
+- [x] Model Activity (tipe: task/call/meeting/email/note; status; due date; assignee; relasi polymorphic eksplisit).
+- [x] CRUD task dengan assignee dan due date; tandai selesai/dibatalkan; jadwalkan follow-up.
+- [x] Quick composer untuk log call/note/meeting; catatan memakai Tiptap.
+- [x] Activity timeline terpadu pada detail lead, contact, company, deal.
+- [x] Daftar Upcoming dan Overdue activity (halaman Activities & Tasks).
+- [x] Test: relasi polymorphic, izin, timeline urut kronologis.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,8 +27,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Tiptap`, `date-
 
 ## Acceptance Criteria
 
-- [ ] Aktivitas tercatat dan tampil di timeline record terkait.
-- [ ] Upcoming/Overdue akurat terhadap timezone organisasi.
+- [x] Aktivitas tercatat dan tampil di timeline record terkait.
+- [x] Upcoming/Overdue akurat terhadap timezone organisasi.
 
 ## Verifikasi
 

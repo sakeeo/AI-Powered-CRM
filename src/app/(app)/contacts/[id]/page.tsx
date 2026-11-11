@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
-import { PlaceholderCard } from "@/components/shared/placeholder-card";
 import { RelatedDeals } from "@/modules/deals/components/related-deals";
 import { listRelatedDeals } from "@/modules/deals/server/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,7 +131,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
         matches={dups}
         canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
       />
-      <PlaceholderCard title="Aktivitas" description="Timeline aktivitas contact." />
+      <ActivitiesPanel ctx={ctx} link={{ contactId: contact.id }} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import type { TenantContext } from "@/lib/context";
 import { NotFoundError } from "@/lib/errors";
 import type { ListParams } from "@/lib/list-params";
 import { decimalToString } from "@/lib/money-db";
+import { dealActivityInfo } from "@/modules/activities/server/queries";
 import { dealRisk } from "@/modules/deals/risk";
 import { ensureDefaultPipeline } from "@/modules/deals/server/pipeline";
 
@@ -182,10 +183,20 @@ export async function getKanban(ctx: TenantContext, pipelineId: string, filters:
     }),
   ]);
   const now = new Date();
-  const cards = deals.map((d) => ({
-    ...serialize(d),
-    risk: dealRisk(d, d.updatedAt, now),
-  }));
+  const info = await dealActivityInfo(
+    ctx,
+    deals.map((d) => d.id),
+  );
+  const cards = deals.map((d) => {
+    const act = info.get(d.id);
+    const lastTouch = act?.lastAt && act.lastAt > d.updatedAt ? act.lastAt : d.updatedAt;
+    return {
+      ...serialize(d),
+      risk: dealRisk(d, lastTouch, now),
+      /** Peringatan non-blocking: deal terbuka tanpa aktivitas terjadwal. */
+      noNextActivity: !act?.hasOpen,
+    };
+  });
   return { summary, cards, truncated: cards.length >= KANBAN_MAX_DEALS };
 }
 export type KanbanCard = Awaited<ReturnType<typeof getKanban>>["cards"][number];

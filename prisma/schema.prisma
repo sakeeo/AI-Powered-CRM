@@ -113,6 +113,7 @@ model Organization {
   inboundWebhook    InboundWebhook?
   webhookDeliveries WebhookDelivery[]
   dealStageHistory  DealStageHistory[]
+  activities        Activity[]
   companies         Company[]
   contacts          Contact[]
   contactCompanies  ContactCompany[]
@@ -291,6 +292,8 @@ model Company {
   contacts     ContactCompany[]
   deals        Deal[]
 
+  activities Activity[]
+
   @@index([organizationId, name])
   @@index([organizationId, ownerId])
   @@map("companies")
@@ -322,6 +325,8 @@ model Contact {
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   companies    ContactCompany[]
   deals        Deal[]
+
+  activities Activity[]
 
   @@index([organizationId, name])
   @@index([organizationId, email])
@@ -405,6 +410,8 @@ model Lead {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   source       LeadSource?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  activities Activity[]
 
   @@index([organizationId, status])
   @@index([organizationId, ownerId])
@@ -491,6 +498,8 @@ model Deal {
   contact      Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
   company      Company?           @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
+  activities Activity[]
+
   @@index([organizationId, status, stageId])
   @@index([organizationId, ownerId])
   @@index([organizationId, contactId])
@@ -553,4 +562,43 @@ model DealStageHistory {
 
   @@index([organizationId, dealId, createdAt(sort: Desc)])
   @@map("deal_stage_history")
+}
+
+/// Aktivitas & task (ACT-01…06). Relasi ke record bisnis eksplisit (satu FK per tipe, bukan polymorphic string).
+/// `ownerId` = assignee (nama kolom disamakan agar kondisi kepemilikan CASL berlaku).
+model Activity {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  /// task | call | meeting | email | note
+  type           String
+  subject        String
+  /// HTML hasil editor (Tiptap), disanitasi di server
+  body           String?
+  /// open | done | cancelled
+  status         String    @default("open")
+  dueAt          DateTime? @map("due_at") @db.Timestamptz(3)
+  completedAt    DateTime? @map("completed_at") @db.Timestamptz(3)
+  ownerId        String?   @map("owner_id") @db.Uuid
+  leadId         String?   @map("lead_id") @db.Uuid
+  contactId      String?   @map("contact_id") @db.Uuid
+  companyId      String?   @map("company_id") @db.Uuid
+  dealId         String?   @map("deal_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?   @map("created_by") @db.Uuid
+  updatedBy      String?   @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lead         Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contact      Contact?     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company      Company?     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deal         Deal?        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status, dueAt])
+  @@index([organizationId, ownerId, status])
+  @@index([organizationId, leadId, createdAt(sort: Desc)])
+  @@index([organizationId, contactId, createdAt(sort: Desc)])
+  @@index([organizationId, companyId, createdAt(sort: Desc)])
+  @@index([organizationId, dealId, createdAt(sort: Desc)])
+  @@map("activities")
 }

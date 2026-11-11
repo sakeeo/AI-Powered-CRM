@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import { DetailField } from "@/components/shared/detail-field";
-import { PlaceholderCard } from "@/components/shared/placeholder-card";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { asSubject } from "@/lib/abilities";
@@ -206,7 +206,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
         matches={dups}
         canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
       />
-      <PlaceholderCard title="Aktivitas" description="Timeline aktivitas lead." />
+      <ActivitiesPanel ctx={ctx} link={{ leadId: lead.id }} />
     </div>
   );
 }

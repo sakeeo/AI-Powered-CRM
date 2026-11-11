@@ -24,6 +24,7 @@ export const TENANT_MODELS = new Set<string>([
   "InboundWebhook",
   "WebhookDelivery",
   "DealStageHistory",
+  "Activity",
 ]);
 
 const WHERE_OPS = new Set([
