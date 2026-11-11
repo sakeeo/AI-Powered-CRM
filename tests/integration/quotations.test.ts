@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { actAs, addUserWithRole, makeOrg } from "../helpers/auth";
 import { resetDb, testPrisma } from "../helpers/db";
 import { headersFor } from "../helpers/auth";
@@ -17,7 +17,17 @@ const contactActions = await import("@/modules/contacts/server/actions");
 const { renderQuotationPdf } = await import("@/modules/quotations/pdf/quotation-pdf");
 const { scanQuotations } = await import("@/lib/reminders");
 const { GET: pdfRoute } = await import("@/app/api/quotations/[id]/pdf/route");
-const { getTenantObject } = await import("@/lib/storage");
+const { getTenantObject } = await import("@/lib/storage"); // dimock di bawah (tanpa MinIO di CI)
+
+const store = vi.hoisted(() => new Map<string, Uint8Array>());
+vi.mock("@/lib/storage", () => ({
+  putTenantObject: async (org: string, path: string, body: Uint8Array) => {
+    const key = `${org}/${path}`;
+    store.set(key, body);
+    return key;
+  },
+  getTenantObject: async (org: string, path: string) => store.get(`${org}/${path}`)!,
+}));
 
 const idOf = (r: unknown) => (r as { data: { id: string } }).data.id;
 const ctxNow = async () => (await getTenantContext())!;

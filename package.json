@@ -24,7 +24,8 @@
     "db:test:setup": "node scripts/test-db.mjs",
     "test:e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium",
-    "worker": "tsx src/worker/index.ts"
+    "worker": "tsx src/worker/index.ts",
+    "loadtest": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.102",
@@ -84,6 +85,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.2",
+    "autocannon": "^9.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "eslint-config-prettier": "^10.1.8",

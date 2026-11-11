@@ -14,14 +14,14 @@ Kualitas, keamanan, dan performa diverifikasi sebelum rilis.
 
 ## Tugas
 
-- [ ] Functional test: E2E Playwright untuk alur Lead→Deal→Activity→Quotation→Customer.
-- [ ] Tenant isolation & permission test menyeluruh untuk seluruh entitas dan endpoint.
-- [ ] AI Red Zone enforcement test: tidak ada auto-send, auto-calculate, auto-mutate, auto-merge/delete.
-- [ ] Test enkripsi Connector Hub: key tidak bocor di response/log/audit.
-- [ ] Validasi API (Zod), rate limiting, review OWASP/IDOR; audit dependency (`npm audit`).
-- [ ] Load test (target awal P95 < 500 ms endpoint umum) dan optimasi index/query.
-- [ ] Responsive UI test di desktop, tablet, smartphone.
-- [ ] Perbaiki seluruh bug kritis yang ditemukan.
+- [x] Functional test: E2E Playwright untuk alur Lead→Deal→Activity→Quotation→Customer.
+- [x] Tenant isolation & permission test menyeluruh untuk seluruh entitas dan endpoint.
+- [x] AI Red Zone enforcement test: tidak ada auto-send, auto-calculate, auto-mutate, auto-merge/delete.
+- [x] Test enkripsi Connector Hub: key tidak bocor di response/log/audit.
+- [x] Validasi API (Zod), rate limiting, review OWASP/IDOR; audit dependency (`npm audit`).
+- [x] Load test (target awal P95 < 500 ms endpoint umum) dan optimasi index/query.
+- [x] Responsive UI test di desktop, tablet, smartphone.
+- [x] Perbaiki seluruh bug kritis yang ditemukan.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -29,9 +29,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Playwright`, `k
 
 ## Acceptance Criteria
 
-- [ ] Seluruh test otomatis hijau.
-- [ ] Tidak ada temuan keamanan severity tinggi yang terbuka.
-- [ ] Target performa tercapai pada beban uji.
+- [x] Seluruh test otomatis hijau.
+- [x] Tidak ada temuan keamanan severity tinggi yang terbuka.
+- [x] Target performa tercapai pada beban uji.
 
 ## Verifikasi
 
