@@ -16,6 +16,18 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN npx prisma generate && npm run build
 
+# Migrasi database (sekali jalan): `docker compose run --rm migrate`
+FROM builder AS migrate
+ENV NODE_ENV=production
+CMD ["sh", "-c", "npx prisma migrate deploy && node scripts/init-storage.mjs"]
+
+# Worker BullMQ (email + reminder). Proses terpisah dari web.
+FROM builder AS worker
+ENV NODE_ENV=production
+# Pengguna non-root bawaan image node; berkas aplikasi (root, read-only) cukup dibaca.
+USER node
+CMD ["npx", "tsx", "src/worker/index.ts"]
+
 FROM base AS runner
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \

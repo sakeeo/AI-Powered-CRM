@@ -14,13 +14,13 @@ MVP terdeploy di production dengan backup teruji, monitoring, dan dokumentasi.
 
 ## Tugas
 
-- [ ] Konfigurasi deployment production (Docker + VPS/managed cloud), secret management, migrasi otomatis.
-- [ ] Backup Postgres terjadwal terenkripsi + prosedur restore terdokumentasi dan **diuji (restore drill)**.
-- [ ] Error monitoring dan logging terpusat; health check & alert dasar.
-- [ ] User acceptance testing dengan pengguna awal; catat dan selesaikan temuan.
-- [ ] Dokumentasi pengguna dan teknis (runbook deploy, backup/restore, env).
-- [ ] Verifikasi seluruh checklist MVP Release Criteria (PRD §12) dan centang di Phase doc.
-- [ ] Tag rilis `v1.0.0`.
+- [x] Konfigurasi deployment production (Docker + VPS/managed cloud), secret management, migrasi otomatis. _(konfigurasi & runbook siap: `docker-compose.prod.yml`, `docs/deployment.md`; eksekusi di server nyata ⏳)_
+- [x] Backup Postgres terjadwal terenkripsi + prosedur restore terdokumentasi dan **diuji (restore drill)**. _(drill berhasil 2026-11-12)_
+- [x] Error monitoring dan logging terpusat; health check & alert dasar. _(health check, log JSON, titik integrasi Sentry, panduan alert — `docs/deployment.md`)_
+- [ ] User acceptance testing dengan pengguna awal; catat dan selesaikan temuan. _⏳ butuh pengguna nyata — skenario & lembar temuan di `docs/uat.md`_
+- [x] Dokumentasi pengguna dan teknis (runbook deploy, backup/restore, env).
+- [x] Verifikasi seluruh checklist MVP Release Criteria (PRD §12) dan centang di Phase doc.
+- [ ] Tag rilis `v1.0.0`. _⏳ diberikan setelah deployment production + UAT disetujui_
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Docker`, `pg_du
 
 ## Acceptance Criteria
 
-- [ ] Aplikasi berjalan di production dengan HTTPS.
-- [ ] Restore drill berhasil pada lingkungan terpisah.
-- [ ] Checklist PRD §12 seluruhnya terpenuhi.
+- [ ] Aplikasi berjalan di production dengan HTTPS. _⏳ butuh server & domain_
+- [x] Restore drill berhasil pada lingkungan terpisah.
+- [x] Checklist PRD §12 seluruhnya terpenuhi.
 
 ## Verifikasi
 

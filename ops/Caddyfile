@@ -1,0 +1,15 @@
+# Reverse proxy + HTTPS otomatis (Let's Encrypt). Set APP_DOMAIN di .env.production.
+{$APP_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000 {
+		health_uri /api/health
+		health_interval 15s
+	}
+	header {
+		-Server
+	}
+	log {
+		output stdout
+		format json
+	}
+}

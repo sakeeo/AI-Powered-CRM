@@ -51,9 +51,30 @@ Merilis MVP sesuai PRD §12: alur Lead → Deal → Activity → Quotation → C
 
 ## Kriteria Selesai Phase (Exit Criteria)
 
-- [ ] Seluruh checklist MVP Release Criteria (PRD §12) terpenuhi.
-- [ ] Tenant isolation dan permission lulus automated test (termasuk akses silang tenant).
-- [ ] Red Zone Policy AI lulus test enforcement.
-- [ ] Backup dan restore telah diuji; deployment production berjalan.
-- [ ] Tidak ada bug kritis pada alur utama; UAT disetujui.
-- [ ] Semua plan Phase 1 berstatus Done di `docs/PROGRESS.md`.
+- [x] Seluruh checklist MVP Release Criteria (PRD §12) terpenuhi — diverifikasi 2026-11-12 terhadap kode/test (tabel bukti di bawah).
+- [x] Tenant isolation dan permission lulus automated test (termasuk akses silang tenant) — `tenant-isolation.test.ts`, `security.test.ts`, `abilities.test.ts`.
+- [x] Red Zone Policy AI lulus test enforcement — `security.test.ts` (pemindaian sumber + snapshot semua tabel).
+- [ ] Backup dan restore telah diuji (✅ restore drill 2026-11-12, `docs/backup-restore.md`); **deployment production berjalan (⏳ menunggu server/domain dari pemilik produk — `docs/deployment.md`)**.
+- [ ] Tidak ada bug kritis pada alur utama (✅ E2E alur penuh hijau); **UAT disetujui (⏳ belum dijalankan — skenario di `docs/uat.md`)**.
+- [ ] Semua plan Phase 1 berstatus Done di `docs/PROGRESS.md` (19/20; plan 1.20 menunggu deployment production + UAT + tag `v1.0.0`).
+
+## Bukti verifikasi MVP Release Criteria (PRD §12)
+
+| Kriteria | Bukti |
+| --- | --- |
+| Organisasi dapat membuat workspace | `organizations.test.ts`, E2E `organization.spec.ts` |
+| Admin dapat mengundang anggota | `organizations.test.ts` (undangan, accept, revoke) |
+| Data antarorganisasi terisolasi & teruji | `tenant-isolation.test.ts`, `security.test.ts` |
+| Permission di backend | CASL `assertCan`/`scopeWhere` + `abilities.test.ts`, test izin tiap modul |
+| Lead → deal | `leads`, `duplicates-conversion` tests; E2E `conversion.spec.ts`, `full-flow.spec.ts` |
+| Deal di Kanban | `kanban.test.ts`, E2E `kanban.spec.ts` |
+| Aktivitas & follow-up terjadwal | `activities.test.ts`, `notifications-email.test.ts` (reminder idempoten) |
+| Riwayat aktivitas tertelusur | Timeline di 4 detail + Customer 360; `DealStageHistory`; audit log |
+| Quotation + PDF | `quotations.test.ts` (PDF `%PDF-`, storage tenant), `quotation-calc.test.ts`, E2E `quotations.spec.ts` |
+| Dashboard data aktual | `dashboard.test.ts` (angka = data seed), `docs/metrics.md` |
+| Import/export dasar | `import-export-webhook.test.ts`, E2E `import-export.spec.ts` |
+| Responsif desktop & smartphone | `responsive.spec.ts` (15 halaman × 375/768 px, desktop) |
+| Backup & restore diuji | `scripts/restore-drill.sh` — berhasil 2026-11-12 (`docs/backup-restore.md`) |
+| Connector Hub mandiri (AI, Webhook, Email) | `connectors`, `import-export-webhook`, `notifications-email` tests; E2E `connectors.spec.ts`, `notifications.spec.ts` |
+| Safe AI human-in-the-loop | `security.test.ts` + test AI per modul (draf, tidak menyimpan) |
+| Tidak ada bug kritis alur utama | E2E `full-flow.spec.ts` hijau; tinjauan keamanan `docs/security-review.md` |

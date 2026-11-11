@@ -49,3 +49,10 @@ next-env.d.ts
 /test-results
 /playwright-report
 /e2e/.auth
+
+!.env.production.example
+
+# backup lokal (berisi data & terenkripsi) — jangan pernah di-commit
+/backups
+*.dump
+*.dump.enc
