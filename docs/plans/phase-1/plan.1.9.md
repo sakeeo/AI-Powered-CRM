@@ -14,12 +14,12 @@ Pipeline configurable dan CRUD deal dengan owner, nilai, mata uang, dan closing 
 
 ## Tugas
 
-- [ ] Model Pipeline, PipelineStage, Deal; seed pipeline default (New Opportunity → Negotiation) + outcome terminal Won/Lost.
-- [ ] Konfigurasi pipeline & stage di Settings (tambah/ubah/urut/arsip stage; probability per stage).
-- [ ] CRUD deal: contact/company, owner, nilai (`Decimal`) + currency, expected closing date, probability dasar.
-- [ ] Halaman Deal List (TanStack Table) dan detail deal; ringkasan nilai pipeline per stage.
-- [ ] Hubungkan deal ke related deals di halaman contact/company.
-- [ ] Test: CRUD, isolasi tenant, validasi nilai uang.
+- [x] Model Pipeline, PipelineStage, Deal; seed pipeline default (New Opportunity → Negotiation) + outcome terminal Won/Lost.
+- [x] Konfigurasi pipeline & stage di Settings (tambah/ubah/urut/arsip stage; probability per stage).
+- [x] CRUD deal: contact/company, owner, nilai (`Decimal`) + currency, expected closing date, probability dasar.
+- [x] Halaman Deal List (TanStack Table) dan detail deal; ringkasan nilai pipeline per stage.
+- [x] Hubungkan deal ke related deals di halaman contact/company.
+- [x] Test: CRUD, isolasi tenant, validasi nilai uang.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,8 +27,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `TanStack Table`
 
 ## Acceptance Criteria
 
-- [ ] Pipeline dan stage dapat dikonfigurasi organisasi.
-- [ ] Deal dapat dibuat dan dikelola dengan nilai & mata uang benar.
+- [x] Pipeline dan stage dapat dikonfigurasi organisasi.
+- [x] Deal dapat dibuat dan dikelola dengan nilai & mata uang benar.
 
 ## Verifikasi
 

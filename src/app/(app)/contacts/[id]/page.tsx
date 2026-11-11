@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
 import { PlaceholderCard } from "@/components/shared/placeholder-card";
+import { RelatedDeals } from "@/modules/deals/components/related-deals";
+import { listRelatedDeals } from "@/modules/deals/server/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireTenant } from "@/lib/context";
 import { orNotFound } from "@/lib/not-found";
@@ -112,10 +114,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
           </CardContent>
         </Card>
       </div>
-      <PlaceholderCard
-        title="Related deals"
-        description="Deal yang terhubung dengan contact ini."
-      />
+      <RelatedDeals deals={await listRelatedDeals(ctx, { contactId: contact.id })} />
       <PlaceholderCard title="Aktivitas" description="Timeline aktivitas contact." />
     </div>
   );

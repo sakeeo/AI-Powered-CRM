@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { forTenant } from "@/lib/tenant";
+import { ensureDefaultPipeline } from "@/modules/deals/server/pipeline";
 import { DEFAULT_LEAD_SOURCES } from "@/modules/leads/constants";
 
 /**
- * Data bawaan untuk organisasi baru (idempoten). Plan berikutnya menambahkan pipeline default.
+ * Data bawaan untuk organisasi baru (idempoten). Mencakup sumber lead dan pipeline default.
  * Dipanggil saat onboarding; query terkait juga memanggil versi "ensure" untuk organisasi lama.
  */
 export async function seedOrganizationDefaults(organizationId: string) {
@@ -14,4 +16,5 @@ export async function seedOrganizationDefaults(organizationId: string) {
     })),
     skipDuplicates: true,
   });
+  await ensureDefaultPipeline(forTenant(prisma, organizationId));
 }

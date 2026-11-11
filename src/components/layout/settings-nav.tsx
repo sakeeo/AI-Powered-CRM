@@ -10,6 +10,7 @@ export const SETTINGS_LINKS: { href: string; label: string; subject?: SubjectNam
   { href: "/settings", label: "Organisasi" },
   { href: "/settings/roles", label: "Roles & Permissions" },
   { href: "/settings/lead-sources", label: "Lead Source" },
+  { href: "/settings/pipelines", label: "Pipeline" },
   { href: "/settings/connectors", label: "Connectors", subject: "Connector" },
   { href: "/settings/audit-log", label: "Audit Log", subject: "AuditLog" },
 ];

@@ -76,3 +76,14 @@ export async function listCompanyOptions(ctx: TenantContext) {
     select: { id: true, name: true },
   });
 }
+
+/** Opsi contact untuk dropdown (maks. 300, alfabet). */
+export async function listContactOptions(ctx: TenantContext) {
+  assertCan(ctx, "view", "Contact");
+  return ctx.db.contact.findMany({
+    where: { deletedAt: null },
+    orderBy: { name: "asc" },
+    take: 300,
+    select: { id: true, name: true },
+  });
+}

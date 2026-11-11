@@ -115,6 +115,9 @@ model Organization {
   contactCompanies ContactCompany[]
   leadSources      LeadSource[]
   leads            Lead[]
+  pipelines        Pipeline[]
+  pipelineStages   PipelineStage[]
+  deals            Deal[]
 
   @@map("organizations")
 }
@@ -282,6 +285,7 @@ model Company {
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   contacts     ContactCompany[]
+  deals        Deal[]
 
   @@index([organizationId, name])
   @@index([organizationId, ownerId])
@@ -309,6 +313,7 @@ model Contact {
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   companies    ContactCompany[]
+  deals        Deal[]
 
   @@index([organizationId, name])
   @@index([organizationId, email])
@@ -395,4 +400,88 @@ model Lead {
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([organizationId, email])
   @@map("leads")
+}
+
+/// Pipeline penjualan (DEAL-06). Skema mendukung banyak pipeline; UI MVP mengelola satu default.
+model Pipeline {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String
+  isDefault      Boolean   @default(false) @map("is_default")
+  archivedAt     DateTime? @map("archived_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  stages       PipelineStage[]
+  deals        Deal[]
+
+  @@index([organizationId])
+  @@map("pipelines")
+}
+
+/// Tahap aktif pipeline. Won/Lost BUKAN stage — itu outcome terminal pada Deal.status (PRD §4.4).
+model PipelineStage {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  pipelineId     String    @map("pipeline_id") @db.Uuid
+  name           String
+  position       Int
+  /// Probabilitas default (0–100) untuk deal pada tahap ini
+  probability    Int       @default(0)
+  archivedAt     DateTime? @map("archived_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pipeline     Pipeline     @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals        Deal[]
+
+  @@index([organizationId])
+  @@index([pipelineId, position])
+  @@map("pipeline_stages")
+}
+
+/// Peluang penjualan (DEAL-01…05). Nilai uang Decimal(18,2) + currency; tidak pernah float.
+model Deal {
+  id                String    @id @default(uuid(7)) @db.Uuid
+  organizationId    String    @map("organization_id") @db.Uuid
+  title             String
+  pipelineId        String    @map("pipeline_id") @db.Uuid
+  stageId           String    @map("stage_id") @db.Uuid
+  /// open | won | lost
+  status            String    @default("open")
+  value             Decimal   @default(0) @db.Decimal(18, 2)
+  currency          String    @default("IDR") @db.VarChar(3)
+  expectedCloseDate DateTime? @map("expected_close_date") @db.Date
+  /// Override probabilitas deal; null = ikut probabilitas stage
+  probability       Int?
+  contactId         String?   @map("contact_id") @db.Uuid
+  companyId         String?   @map("company_id") @db.Uuid
+  ownerId           String?   @map("owner_id") @db.Uuid
+  notes             String?
+  /// Diisi saat Won/Lost (plan 1.10)
+  closedAt          DateTime? @map("closed_at") @db.Timestamptz(3)
+  lostReason        String?   @map("lost_reason")
+  lostCategory      String?   @map("lost_category")
+  /// Asal deal bila dikonversi dari lead (plan 1.7)
+  sourceLeadId      String?   @map("source_lead_id") @db.Uuid
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy         String?   @map("created_by") @db.Uuid
+  updatedBy         String?   @map("updated_by") @db.Uuid
+  deletedAt         DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pipeline     Pipeline      @relation(fields: [pipelineId], references: [id])
+  stage        PipelineStage @relation(fields: [stageId], references: [id])
+  contact      Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status, stageId])
+  @@index([organizationId, ownerId])
+  @@index([organizationId, contactId])
+  @@index([organizationId, companyId])
+  @@index([organizationId, expectedCloseDate])
+  @@map("deals")
 }
