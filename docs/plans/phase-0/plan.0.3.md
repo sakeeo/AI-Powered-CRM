@@ -14,12 +14,12 @@ Konvensi schema dan alur migrasi/seed ditetapkan sehingga semua entitas Phase 1 
 
 ## Tugas
 
-- [ ] Tetapkan konvensi: `id` UUID, `organization_id`, `created_at`, `updated_at`, `created_by`, `updated_by`, `deleted_at`; uang `Decimal` + kode ISO 4217; timestamp UTC.
-- [ ] Perbarui model `Organization` mengikuti konvensi (UUID, soft delete bila perlu).
-- [ ] Buat helper tenant-scoped Prisma (client extension) yang otomatis menyisipkan `organization_id` pada query/create — skeleton, diuji penuh di plan 1.3.
-- [ ] Buat seed (`prisma/seed.ts`): organisasi demo dan data dasar; script `db:migrate`, `db:seed`, `db:reset`, `db:studio`.
-- [ ] Siapkan database test terpisah (`crm_test`) dan helper reset untuk integration test.
-- [ ] Dokumentasikan alur migrasi (dev vs production) di `docs/database.md`.
+- [x] Tetapkan konvensi: `id` UUID, `organization_id`, `created_at`, `updated_at`, `created_by`, `updated_by`, `deleted_at`; uang `Decimal` + kode ISO 4217; timestamp UTC.
+- [x] Perbarui model `Organization` mengikuti konvensi (UUID, soft delete bila perlu).
+- [x] Buat helper tenant-scoped Prisma (client extension) yang otomatis menyisipkan `organization_id` pada query/create — skeleton, diuji penuh di plan 1.3.
+- [x] Buat seed (`prisma/seed.ts`): organisasi demo dan data dasar; script `db:migrate`, `db:seed`, `db:reset`, `db:studio`.
+- [x] Siapkan database test terpisah (`crm_test`) dan helper reset untuk integration test.
+- [x] Dokumentasikan alur migrasi (dev vs production) di `docs/database.md`.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,9 +27,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Prisma`, `@pris
 
 ## Acceptance Criteria
 
-- [ ] Migrasi dan seed berjalan dari database kosong.
-- [ ] Unit test membuktikan helper tenant scope menyisipkan `organization_id`.
-- [ ] Konvensi schema terdokumentasi.
+- [x] Migrasi dan seed berjalan dari database kosong.
+- [x] Unit test membuktikan helper tenant scope menyisipkan `organization_id`.
+- [x] Konvensi schema terdokumentasi.
 
 ## Verifikasi
 
@@ -46,8 +46,8 @@ Jalankan juga verifikasi manual/E2E yang relevan dengan acceptance criteria di a
 
 Plan dianggap selesai hanya setelah kedua langkah ini dilakukan, berurutan:
 
-1. [ ] **Update progress** — ubah status plan 0.3 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
-2. [ ] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
+1. [x] **Update progress** — ubah status plan 0.3 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
+2. [x] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
 
 ```bash
 git add -A

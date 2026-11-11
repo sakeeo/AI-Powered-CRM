@@ -12,7 +12,16 @@
     "format:check": "prettier --check .",
     "infra:up": "docker compose up -d --wait && node scripts/init-storage.mjs",
     "infra:down": "docker compose down",
-    "infra:reset": "docker compose down -v && npm run infra:up"
+    "infra:reset": "docker compose down -v && npm run infra:up",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "db:test:setup": "node scripts/test-db.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1166.0",
@@ -28,7 +37,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
-    "@types/node": "^20",
+    "@types/node": "^22.20.5",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -39,6 +48,8 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "~7.10.1",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
   }
 }

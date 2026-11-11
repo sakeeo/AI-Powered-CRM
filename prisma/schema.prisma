@@ -1,3 +1,11 @@
+// Konvensi data (PRD §7.4) — berlaku untuk semua model bisnis:
+//  - id            : UUID v7 (urut waktu), kolom `uuid`
+//  - organization_id: wajib pada setiap record bisnis (tenant); tambahkan @@index([organizationId])
+//  - created_at / updated_at (UTC), created_by / updated_by (nullable, id user)
+//  - deleted_at    : soft delete bila diperlukan
+//  - uang          : Decimal(18,2) + kolom `currency` (ISO 4217), jangan Float
+//  - nama tabel/kolom snake_case via @@map/@map; model PascalCase, field camelCase
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -7,11 +15,14 @@ datasource db {
   provider = "postgresql"
 }
 
-// Foundation model: multi-tenancy root. Entitas lain (PRD bagian 7.1) ditambahkan bertahap.
+/// Tenant root. Satu-satunya model tanpa organization_id.
 model Organization {
-  id        String   @id @default(cuid())
+  id        String    @id @default(uuid(7)) @db.Uuid
   name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  slug      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@map("organizations")
 }

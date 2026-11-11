@@ -23,7 +23,7 @@ for (let i = 0; i < 20; i++) {
       console.log(`Bucket "${bucket}" dibuat.`);
     }
     process.exit(0);
-  } catch (e) {
+  } catch {
     await new Promise((r) => setTimeout(r, 1000));
   }
 }

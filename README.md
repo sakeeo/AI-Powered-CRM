@@ -9,6 +9,7 @@ CRM berbasis cloud (multi-tenant, SaaS-ready) untuk Lead Acquisition, Sales Conv
 - [docs/plans/](docs/plans) — plan kerja per phase (`plan.<phase>.<nomor>.md`)
 - [docs/PROGRESS.md](docs/PROGRESS.md) — status pengerjaan plan
 - [docs/decisions.md](docs/decisions.md) — keputusan produk & teknis
+- [docs/database.md](docs/database.md) — konvensi database, tenant scope, migrasi
 
 ## Prasyarat
 
@@ -26,17 +27,21 @@ npm run dev                 # http://localhost:3000
 
 ## Script
 
-| Script                 | Fungsi                                   |
-| ---------------------- | ---------------------------------------- |
-| `npm run dev`          | Development server                       |
-| `npm run build`        | Build production                         |
-| `npm run lint`         | ESLint                                   |
-| `npm run typecheck`    | Generate route types + `tsc --noEmit`    |
-| `npm run format`       | Prettier (tulis)                         |
-| `npm run format:check` | Prettier (cek saja)                      |
-| `npm run infra:up`     | Nyalakan Postgres, Redis, MinIO + bucket |
-| `npm run infra:down`   | Matikan infrastruktur                    |
-| `npm run infra:reset`  | Hapus volume & nyalakan ulang            |
+| Script                  | Fungsi                                   |
+| ----------------------- | ---------------------------------------- |
+| `npm run dev`           | Development server                       |
+| `npm run build`         | Build production                         |
+| `npm run lint`          | ESLint                                   |
+| `npm run typecheck`     | Generate route types + `tsc --noEmit`    |
+| `npm run format`        | Prettier (tulis)                         |
+| `npm run format:check`  | Prettier (cek saja)                      |
+| `npm test`              | Vitest (unit + integration)              |
+| `npm run db:migrate`    | Migrasi dev (`prisma migrate dev`)       |
+| `npm run db:seed`       | Seed data demo                           |
+| `npm run db:test:setup` | Siapkan database `crm_test`              |
+| `npm run infra:up`      | Nyalakan Postgres, Redis, MinIO + bucket |
+| `npm run infra:down`    | Matikan infrastruktur                    |
+| `npm run infra:reset`   | Hapus volume & nyalakan ulang            |
 
 ## Struktur folder
 
