@@ -8,6 +8,7 @@ import {
   Handshake,
   LayoutDashboard,
   MessageSquareHeart,
+  Package,
   Plug,
   Settings,
   Target,
@@ -70,6 +71,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/calendar",
         icon: CalendarDays,
         description: "Jadwal aktivitas harian dan mingguan.",
+      },
+      {
+        title: "Products",
+        href: "/products",
+        icon: Package,
+        description: "Katalog produk dan layanan beserta harga.",
       },
       {
         title: "Quotations",

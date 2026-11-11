@@ -14,10 +14,10 @@ Katalog produk/layanan dasar untuk digunakan di deal dan quotation.
 
 ## Tugas
 
-- [ ] Model Product (nama, deskripsi, SKU opsional, kategori, harga `Decimal`, currency, aktif/nonaktif) dan kategori.
-- [ ] CRUD + aktif/nonaktif; list dengan data table dan pencarian.
-- [ ] Hubungkan produk dengan deal (DEAL-13) sebagai item referensi.
-- [ ] Test: validasi harga, isolasi tenant.
+- [x] Model Product (nama, deskripsi, SKU opsional, kategori, harga `Decimal`, currency, aktif/nonaktif) dan kategori.
+- [x] CRUD + aktif/nonaktif; list dengan data table dan pencarian.
+- [x] Hubungkan produk dengan deal (DEAL-13) sebagai item referensi.
+- [x] Test: validasi harga, isolasi tenant.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -25,8 +25,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `TanStack Table`
 
 ## Acceptance Criteria
 
-- [ ] Produk dapat dikelola dan dipilih pada deal.
-- [ ] Tidak ada fitur stok/inventory (di luar scope).
+- [x] Produk dapat dikelola dan dipilih pada deal.
+- [x] Tidak ada fitur stok/inventory (di luar scope).
 
 ## Verifikasi
 

@@ -27,6 +27,9 @@ export const TENANT_MODELS = new Set<string>([
   "Activity",
   "Notification",
   "NotificationPreference",
+  "ProductCategory",
+  "Product",
+  "DealProduct",
 ]);
 
 const WHERE_OPS = new Set([

@@ -13,6 +13,8 @@ import { DEAL_STATUS_LABEL, DEAL_STATUS_TONE, type DealStatus } from "@/modules/
 import { DealCloseButtons } from "@/modules/deals/components/deal-close-buttons";
 import { DealActions } from "@/modules/deals/components/deal-actions";
 import { getDealOrThrow } from "@/modules/deals/server/detail";
+import { DealProductsCard } from "@/modules/products/components/deal-products-card";
+import { listActiveProducts, listDealProducts } from "@/modules/products/server/queries";
 import { listStageHistory } from "@/modules/deals/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
@@ -31,7 +33,11 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
   const subject = asSubject("Deal", deal);
   const status = deal.status as DealStatus;
   const owner = owners.find((o) => o.userId === deal.ownerId)?.name;
-  const history = await listStageHistory(ctx, deal.id);
+  const [history, dealItems, productOptions] = await Promise.all([
+    listStageHistory(ctx, deal.id),
+    listDealProducts(ctx, deal.id),
+    listActiveProducts(ctx),
+  ]);
   const stageName = new Map(pipeline.stages.map((s) => [s.id, s.name]));
   const stages = pipeline.stages.map((s) => ({ id: s.id, name: s.name }));
   return (
@@ -133,6 +139,12 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           </p>
         </CardContent>
       </Card>
+      <DealProductsCard
+        dealId={deal.id}
+        items={dealItems}
+        products={productOptions}
+        canEdit={ctx.ability.can("update", subject) && deal.status === "open"}
+      />
       <Card>
         <CardHeader>
           <CardTitle>Riwayat stage</CardTitle>
