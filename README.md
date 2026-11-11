@@ -18,7 +18,7 @@ Node.js 22+, npm, Docker (Compose).
 
 ```bash
 cp .env.example .env        # lalu sesuaikan nilainya
-docker compose up -d        # PostgreSQL di localhost:5434
+npm run infra:up           # PostgreSQL :5434, Redis :6380, MinIO :9100 (console :9101) + bucket
 npm ci
 npx prisma migrate dev      # terapkan migrasi
 npm run dev                 # http://localhost:3000
@@ -26,14 +26,17 @@ npm run dev                 # http://localhost:3000
 
 ## Script
 
-| Script                 | Fungsi                                |
-| ---------------------- | ------------------------------------- |
-| `npm run dev`          | Development server                    |
-| `npm run build`        | Build production                      |
-| `npm run lint`         | ESLint                                |
-| `npm run typecheck`    | Generate route types + `tsc --noEmit` |
-| `npm run format`       | Prettier (tulis)                      |
-| `npm run format:check` | Prettier (cek saja)                   |
+| Script                 | Fungsi                                   |
+| ---------------------- | ---------------------------------------- |
+| `npm run dev`          | Development server                       |
+| `npm run build`        | Build production                         |
+| `npm run lint`         | ESLint                                   |
+| `npm run typecheck`    | Generate route types + `tsc --noEmit`    |
+| `npm run format`       | Prettier (tulis)                         |
+| `npm run format:check` | Prettier (cek saja)                      |
+| `npm run infra:up`     | Nyalakan Postgres, Redis, MinIO + bucket |
+| `npm run infra:down`   | Matikan infrastruktur                    |
+| `npm run infra:reset`  | Hapus volume & nyalakan ulang            |
 
 ## Struktur folder
 
@@ -51,3 +54,13 @@ src/
 prisma/                # schema & migrasi
 docs/                  # PRD, phase, plan, progress
 ```
+
+## Infrastruktur lokal
+
+| Service    | Container      | Host port      |
+| ---------- | -------------- | -------------- |
+| PostgreSQL | `crm-postgres` | 5434           |
+| Redis      | `crm-redis`    | 6380           |
+| MinIO (S3) | `crm-minio`    | 9100 (UI 9101) |
+
+Port sengaja tidak standar agar tidak bentrok dengan project lain. Cek kesehatan: `GET /api/health`.

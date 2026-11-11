@@ -14,12 +14,12 @@ Seluruh dependency lokal (Redis untuk queue, S3-compatible untuk file/PDF) terse
 
 ## Tugas
 
-- [ ] Tambahkan service Redis 7 ke `docker-compose.yml` (host port unik, volume, healthcheck).
-- [ ] Tambahkan service MinIO (S3-compatible) + inisialisasi bucket `crm-files` otomatis.
-- [ ] Tambahkan variabel `REDIS_URL`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` ke `.env.example` dan skema env Zod.
-- [ ] Buat client singleton `src/lib/redis.ts` (ioredis) dan `src/lib/storage.ts` (`@aws-sdk/client-s3`) dengan prefix path per tenant.
-- [ ] Tambahkan endpoint `GET /api/health` yang memeriksa Postgres, Redis, dan storage.
-- [ ] Tambahkan script `npm run infra:up|down|reset`.
+- [x] Tambahkan service Redis 7 ke `docker-compose.yml` (host port unik, volume, healthcheck).
+- [x] Tambahkan service MinIO (S3-compatible) + inisialisasi bucket `crm-files` otomatis.
+- [x] Tambahkan variabel `REDIS_URL`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` ke `.env.example` dan skema env Zod.
+- [x] Buat client singleton `src/lib/redis.ts` (ioredis) dan `src/lib/storage.ts` (`@aws-sdk/client-s3`) dengan prefix path per tenant.
+- [x] Tambahkan endpoint `GET /api/health` yang memeriksa Postgres, Redis, dan storage.
+- [x] Tambahkan script `npm run infra:up|down|reset`.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,9 +27,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `ioredis`, `@aws
 
 ## Acceptance Criteria
 
-- [ ] `docker compose up -d` → semua service healthy.
-- [ ] `/api/health` mengembalikan status ketiga dependency.
-- [ ] Upload & download file uji ke bucket berhasil lewat helper storage.
+- [x] `docker compose up -d` → semua service healthy.
+- [x] `/api/health` mengembalikan status ketiga dependency.
+- [x] Upload & download file uji ke bucket berhasil lewat helper storage.
 
 ## Verifikasi
 
@@ -46,8 +46,8 @@ Jalankan juga verifikasi manual/E2E yang relevan dengan acceptance criteria di a
 
 Plan dianggap selesai hanya setelah kedua langkah ini dilakukan, berurutan:
 
-1. [ ] **Update progress** — ubah status plan 0.2 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
-2. [ ] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
+1. [x] **Update progress** — ubah status plan 0.2 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
+2. [x] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
 
 ```bash
 git add -A

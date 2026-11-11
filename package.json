@@ -9,12 +9,17 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "infra:up": "docker compose up -d --wait && node scripts/init-storage.mjs",
+    "infra:down": "docker compose down",
+    "infra:reset": "docker compose down -v && npm run infra:up"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1166.0",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "dotenv": "^18.0.10",
+    "ioredis": "^6.0.0",
     "next": "16.4.6",
     "pg": "^8.23.1",
     "react": "19.3.0",
