@@ -31,12 +31,12 @@ Menyiapkan fondasi teknis project (repo, tooling, infrastruktur dev, database, U
 
 ## Kriteria Selesai Phase (Exit Criteria)
 
-- [ ] `docker compose up -d` menyalakan seluruh dependency lokal dalam keadaan healthy.
-- [ ] `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build` lulus.
-- [ ] Migrasi + seed Prisma berjalan dari database kosong.
-- [ ] App shell (sidebar, theme toggle, halaman placeholder) tampil di browser.
-- [ ] CI menjalankan lint + typecheck + test + build pada setiap push.
-- [ ] Semua plan Phase 0 berstatus Done di `docs/PROGRESS.md` dan sudah di-commit.
+- [x] `docker compose up -d` menyalakan seluruh dependency lokal dalam keadaan healthy.
+- [x] `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build` lulus.
+- [x] Migrasi + seed Prisma berjalan dari database kosong.
+- [x] App shell (sidebar, theme toggle, halaman placeholder) tampil di browser.
+- [x] CI menjalankan lint + typecheck + test + build pada setiap push.
+- [x] Semua plan Phase 0 berstatus Done di `docs/PROGRESS.md` dan sudah di-commit.
 
 ## Product Decisions yang Diusulkan (PRD §14.1)
 

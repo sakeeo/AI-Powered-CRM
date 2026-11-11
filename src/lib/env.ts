@@ -14,6 +14,8 @@ const schema = z.object({
 export type Env = z.infer<typeof schema>;
 
 function load(): Env {
+  // Hanya untuk build Docker/CI tanpa env runtime. Jangan dipakai saat menjalankan aplikasi.
+  if (process.env.SKIP_ENV_VALIDATION === "1") return process.env as unknown as Env;
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
     const issues = parsed.error.issues

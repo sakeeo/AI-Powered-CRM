@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { checkStorage } from "@/lib/storage";
@@ -7,7 +8,8 @@ async function probe(fn: () => Promise<unknown>) {
   try {
     await fn();
     return "ok";
-  } catch {
+  } catch (err) {
+    logger.warn({ err }, "health probe gagal");
     return "error";
   }
 }

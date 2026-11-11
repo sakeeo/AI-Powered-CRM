@@ -14,13 +14,13 @@ Kualitas otomatis berjalan sejak awal: unit/integration/E2E test, logging terstr
 
 ## Tugas
 
-- [ ] Pasang Vitest (unit + integration) dan Testing Library; contoh test untuk helper env dan tenant scope.
-- [ ] Pasang Playwright untuk E2E; satu smoke test (halaman utama termuat).
-- [ ] Pasang Pino (`src/lib/logger.ts`) dengan request id dan redaksi field sensitif (password, token, API key).
-- [ ] Siapkan penanganan error terpusat dan titik integrasi error tracking (mis. Sentry) — dapat dinonaktifkan via env.
-- [ ] Buat `Dockerfile` multi-stage production untuk aplikasi Next.js (standalone output).
-- [ ] Buat workflow GitHub Actions: install → lint → typecheck → test (service Postgres/Redis) → build.
-- [ ] Opsional: husky + lint-staged untuk pre-commit.
+- [x] Pasang Vitest (unit + integration) dan Testing Library; contoh test untuk helper env dan tenant scope.
+- [x] Pasang Playwright untuk E2E; satu smoke test (halaman utama termuat).
+- [x] Pasang Pino (`src/lib/logger.ts`) dengan request id dan redaksi field sensitif (password, token, API key).
+- [x] Siapkan penanganan error terpusat dan titik integrasi error tracking (mis. Sentry) — dapat dinonaktifkan via env.
+- [x] Buat `Dockerfile` multi-stage production untuk aplikasi Next.js (standalone output).
+- [x] Buat workflow GitHub Actions: install → lint → typecheck → test (service Postgres/Redis) → build.
+- [x] Opsional: husky + lint-staged untuk pre-commit.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Vitest`, `Playw
 
 ## Acceptance Criteria
 
-- [ ] CI hijau pada branch utama.
-- [ ] `docker build` menghasilkan image yang dapat dijalankan.
-- [ ] Log berformat JSON dan tidak membocorkan secret.
+- [x] CI hijau pada branch utama.
+- [x] `docker build` menghasilkan image yang dapat dijalankan.
+- [x] Log berformat JSON dan tidak membocorkan secret.
 
 ## Verifikasi
 
@@ -47,8 +47,8 @@ Jalankan juga verifikasi manual/E2E yang relevan dengan acceptance criteria di a
 
 Plan dianggap selesai hanya setelah kedua langkah ini dilakukan, berurutan:
 
-1. [ ] **Update progress** — ubah status plan 0.5 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
-2. [ ] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
+1. [x] **Update progress** — ubah status plan 0.5 di [`docs/PROGRESS.md`](../../PROGRESS.md) menjadi `Done`, isi tanggal selesai dan catatan singkat (dan centang acceptance criteria di atas).
+2. [x] **Commit** — jalankan verifikasi, lalu commit semua perubahan plan ini (termasuk `PROGRESS.md`):
 
 ```bash
 git add -A

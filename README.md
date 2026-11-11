@@ -36,6 +36,7 @@ npm run dev                 # http://localhost:3000
 | `npm run format`        | Prettier (tulis)                         |
 | `npm run format:check`  | Prettier (cek saja)                      |
 | `npm test`              | Vitest (unit + integration)              |
+| `npm run test:e2e`     | Playwright E2E (jalankan `npm run build` dulu; `npm run e2e:install` sekali) |
 | `npm run db:migrate`    | Migrasi dev (`prisma migrate dev`)       |
 | `npm run db:seed`       | Seed data demo                           |
 | `npm run db:test:setup` | Siapkan database `crm_test`              |
@@ -69,3 +70,20 @@ docs/                  # PRD, phase, plan, progress
 | MinIO (S3) | `crm-minio`    | 9100 (UI 9101) |
 
 Port sengaja tidak standar agar tidak bentrok dengan project lain. Cek kesehatan: `GET /api/health`.
+
+## Docker image
+
+```bash
+docker build -t crm:local .
+```
+
+Image multi-stage (Next.js standalone, user non-root, healthcheck `/api/health`). Env runtime wajib diberikan saat `docker run` (lihat `.env.example`); `docker --env-file` tidak menghapus tanda kutip, jadi tulis nilai tanpa kutip.
+
+## CI
+
+`.github/workflows/ci.yml`: install → prisma generate → migrate → lint → typecheck → format:check → test → build; job terpisah untuk E2E Playwright dan build Docker.
+
+## Logging & error
+
+- Logger Pino (`src/lib/logger.ts`): JSON, field sensitif (password/token/apiKey/cookie) disamarkan; `requestLogger(req)` menambahkan `requestId`.
+- Error API: gunakan `AppError` + `handleRouteError` (`src/lib/errors.ts`); error tak terduga dilaporkan lewat `reportError` (`src/lib/error-tracking.ts`, titik integrasi Sentry via `setErrorReporter`).
