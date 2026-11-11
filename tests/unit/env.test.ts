@@ -7,6 +7,7 @@ const VALID = {
   S3_BUCKET: "crm-files",
   S3_ACCESS_KEY: "key",
   S3_SECRET_KEY: "secret-12345",
+  ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
   BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret-12",
 };
 

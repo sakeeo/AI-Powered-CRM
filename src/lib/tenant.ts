@@ -6,6 +6,8 @@ import type { PrismaClient } from "@/generated/prisma/client";
  * memastikan daftar ini sinkron dengan prisma/schema.prisma.
  */
 export const TENANT_MODELS = new Set<string>([
+  "AiCallLog",
+  "TenantConnector",
   "Member",
   "Invitation",
   "Team",

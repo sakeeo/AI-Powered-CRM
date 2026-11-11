@@ -19,6 +19,7 @@ env:
   S3_SECRET_KEY: ci_secret_key_123
   BETTER_AUTH_SECRET: ci_better_auth_secret_at_least_32_chars_long
   BETTER_AUTH_URL: http://localhost:3000
+  ENCRYPTION_KEY: Y2lfZW5jcnlwdGlvbl9rZXlfMzJfYnl0ZXNfX19fX18=
 
 jobs:
   verify:

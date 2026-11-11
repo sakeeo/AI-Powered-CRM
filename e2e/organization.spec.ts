@@ -20,7 +20,7 @@ test("Owner mengundang anggota dan membuat tim", async ({ page }) => {
   const email = `invite-${Date.now()}@example.com`;
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Kirim undangan" }).click();
-  await expect(page.getByText(email)).toBeVisible();
+  await expect(page.locator("li", { hasText: new RegExp(`^${email}`) })).toBeVisible();
 
   const team = `Tim ${Date.now() % 10000}`;
   await page.getByLabel("Nama tim baru").fill(team);

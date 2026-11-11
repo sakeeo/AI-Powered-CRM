@@ -10,6 +10,10 @@ const schema = z.object({
   S3_ACCESS_KEY: z.string().min(1),
   S3_SECRET_KEY: z.string().min(8),
   BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET minimal 32 karakter"),
+  /** Master key AES-256-GCM untuk rahasia connector (BYOK): 32 byte, base64. `openssl rand -base64 32` */
+  ENCRYPTION_KEY: z
+    .string()
+    .refine((v) => Buffer.from(v, "base64").length === 32, "ENCRYPTION_KEY harus 32 byte (base64)"),
   BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
   /** "true" → pengguna wajib verifikasi email sebelum bisa login. */
   REQUIRE_EMAIL_VERIFICATION: z

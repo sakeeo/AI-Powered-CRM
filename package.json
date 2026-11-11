@@ -26,12 +26,16 @@
     "e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.102",
+    "@ai-sdk/google": "^4.0.117",
+    "@ai-sdk/openai": "^4.0.114",
     "@aws-sdk/client-s3": "^3.1166.0",
     "@casl/ability": "^7.1.2",
     "@hookform/resolvers": "^7.0.5",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@tanstack/react-table": "^9.3.1",
+    "ai": "^7.0.169",
     "better-auth": "^1.7.20",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",

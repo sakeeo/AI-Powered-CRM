@@ -108,6 +108,8 @@ model Organization {
   invitations Invitation[]
   teams       Team[]
   auditLogs   AuditLog[]
+  connectors  TenantConnector[]
+  aiCallLogs  AiCallLog[]
 
   @@map("organizations")
 }
@@ -202,4 +204,52 @@ model AuditLog {
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([organizationId, entityType, entityId])
   @@map("audit_logs")
+}
+
+/// Integrasi pihak ketiga per tenant (Connector Hub). Rahasia hanya di `configEncrypted`
+/// (AES-256-GCM, lihat src/lib/crypto.ts) dan TIDAK PERNAH dikirim ke client / log / audit.
+model TenantConnector {
+  id              String    @id @default(uuid(7)) @db.Uuid
+  organizationId  String    @map("organization_id") @db.Uuid
+  /// ai_gemini | ai_openai | ai_anthropic | ai_openrouter | email_resend | email_smtp | ...
+  type            String
+  configEncrypted String    @map("config_encrypted")
+  /// Petunjuk kunci yang aman ditampilkan, mis. `sk-...abcd`
+  maskedHint      String?   @map("masked_hint")
+  /// Pengaturan non-rahasia, mis. {"model": "gpt-4.1-mini"}
+  settings        Json?
+  /// active | error | disabled
+  status          String    @default("active")
+  isDefault       Boolean   @default(false) @map("is_default")
+  lastTestedAt    DateTime? @map("last_tested_at") @db.Timestamptz(3)
+  lastTestOk      Boolean?  @map("last_test_ok")
+  lastTestError   String?   @map("last_test_error")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy       String?   @map("created_by") @db.Uuid
+  updatedBy       String?   @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, type])
+  @@index([organizationId])
+  @@map("tenant_connectors")
+}
+
+/// Metadata pemanggilan AI saja (fitur, waktu, status) — isi prompt/response TIDAK disimpan (decisions.md #10).
+model AiCallLog {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String?  @map("user_id") @db.Uuid
+  feature        String
+  provider       String
+  model          String?
+  status         String
+  durationMs     Int      @map("duration_ms")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@map("ai_call_logs")
 }

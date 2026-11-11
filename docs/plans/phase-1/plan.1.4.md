@@ -14,13 +14,13 @@ Katalog Connector Hub dan manajemen API key AI mandiri (terenkripsi) berfungsi.
 
 ## Tugas
 
-- [ ] Util enkripsi AES-256-GCM (`src/lib/crypto.ts`) dengan master key dari env; test round-trip dan tamper detection.
-- [ ] Model `TenantConnector` (tipe, config terenkripsi, status, organization_id).
-- [ ] UI Settings → Connectors & Integrations: Card Grid (AI Models, Inbound Webhooks, WhatsApp, Email).
-- [ ] Form BYOK untuk Google Gemini, OpenAI, Anthropic, OpenRouter; key dimasking di UI (`sk-...xxxx`), tidak pernah dikirim balik ke client.
-- [ ] Tombol Test Connection (server-side, via Vercel AI SDK) dengan pesan error jelas.
-- [ ] Abstraksi `getAiModel(organizationId)` untuk dipakai fitur Safe AI berikutnya.
-- [ ] Audit log untuk perubahan connector; hanya Owner/Admin yang boleh mengelola.
+- [x] Util enkripsi AES-256-GCM (`src/lib/crypto.ts`) dengan master key dari env; test round-trip dan tamper detection.
+- [x] Model `TenantConnector` (tipe, config terenkripsi, status, organization_id).
+- [x] UI Settings → Connectors & Integrations: Card Grid (AI Models, Inbound Webhooks, WhatsApp, Email).
+- [x] Form BYOK untuk Google Gemini, OpenAI, Anthropic, OpenRouter; key dimasking di UI (`sk-...xxxx`), tidak pernah dikirim balik ke client.
+- [x] Tombol Test Connection (server-side, via Vercel AI SDK) dengan pesan error jelas.
+- [x] Abstraksi `getAiModel(organizationId)` untuk dipakai fitur Safe AI berikutnya.
+- [x] Audit log untuk perubahan connector; hanya Owner/Admin yang boleh mengelola.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Vercel AI SDK (
 
 ## Acceptance Criteria
 
-- [ ] API key tersimpan terenkripsi dan terisolasi per tenant.
-- [ ] Test Connection menunjukkan sukses/gagal untuk key valid/invalid.
-- [ ] Key tidak pernah muncul di response, log, atau audit log.
+- [x] API key tersimpan terenkripsi dan terisolasi per tenant.
+- [x] Test Connection menunjukkan sukses/gagal untuk key valid/invalid.
+- [x] Key tidak pernah muncul di response, log, atau audit log.
 
 ## Verifikasi
 
