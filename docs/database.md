@@ -43,3 +43,9 @@ Jangan mengedit migrasi yang sudah di-commit/diterapkan; buat migrasi baru. `npm
 - `npm run db:seed` — `prisma/seed.ts` (organisasi demo, idempoten via upsert).
 - `npm test` — Vitest memakai database terpisah `crm_test`; helper `resetDb()` di `tests/helpers/db.ts` mengosongkan tabel antar test.
 - `npm run db:studio` — Prisma Studio.
+
+## Akses data di module (plan 1.3)
+
+- Kode di `src/modules/**` memakai `ctx.db` (hasil `requireTenant()` / `tenantAction`) — ESLint (`no-restricted-imports`) melarang `@/lib/prisma` di sana. Pengecualian hanya `modules/organizations` dan `modules/audit` (akar tenant: keanggotaan, profil org, audit).
+- Izin: `assertCan(ctx, action, subject, record?)` untuk satu record, `scopeWhere(ctx, action, subject)` untuk query daftar (kondisi kepemilikan/tim dari CASL → filter Prisma). Definisi izin tunggal di `src/lib/abilities.ts`.
+- Perubahan penting dicatat dengan `writeAudit(ctx, …)`; before/after disamarkan otomatis untuk key bernama secret/token/password/api key.

@@ -5,7 +5,13 @@ import type { PrismaClient } from "@/generated/prisma/client";
  * WAJIB diperbarui setiap menambah model bisnis; tests/unit/tenant-models.test.ts
  * memastikan daftar ini sinkron dengan prisma/schema.prisma.
  */
-export const TENANT_MODELS = new Set<string>(["Member", "Invitation"]);
+export const TENANT_MODELS = new Set<string>([
+  "Member",
+  "Invitation",
+  "Team",
+  "TeamMember",
+  "AuditLog",
+]);
 
 const WHERE_OPS = new Set([
   "findMany",

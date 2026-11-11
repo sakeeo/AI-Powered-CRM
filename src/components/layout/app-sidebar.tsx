@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_GROUPS } from "@/components/layout/nav";
+import { OrgSwitcher, type OrgOption } from "@/components/layout/org-switcher";
 import { UserMenu, type SessionUser } from "@/components/layout/user-menu";
 import {
   Sidebar,
@@ -23,22 +24,20 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AppSidebar({ user }: { user: SessionUser }) {
+export function AppSidebar({
+  user,
+  organizations,
+  currentOrganizationId,
+}: {
+  user: SessionUser;
+  organizations: OrgOption[];
+  currentOrganizationId: string;
+}) {
   const pathname = usePathname();
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-sidebar-border border-b px-3.5 pt-5 pb-5 group-data-[collapsible=icon]:px-2">
-        <div className="px-2.5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:text-center">
-          <strong className="block truncate text-[17px] leading-tight font-bold tracking-tight group-data-[collapsible=icon]:hidden">
-            CRM
-          </strong>
-          <span className="text-sidebar-muted block truncate text-xs group-data-[collapsible=icon]:hidden">
-            Sales Workspace
-          </span>
-          <strong className="hidden text-lg font-bold group-data-[collapsible=icon]:block">
-            C
-          </strong>
-        </div>
+      <SidebarHeader className="border-sidebar-border border-b px-3.5 pt-5 pb-4 group-data-[collapsible=icon]:px-2">
+        <OrgSwitcher organizations={organizations} currentId={currentOrganizationId} />
       </SidebarHeader>
       <SidebarContent className="px-3.5 py-2">
         {NAV_GROUPS.map((group) => (

@@ -14,13 +14,13 @@ Workspace organisasi, keanggotaan, undangan pengguna, dan tim berfungsi.
 
 ## Tugas
 
-- [ ] Buat organisasi saat onboarding; pengguna pertama menjadi Owner.
-- [ ] Dukung satu pengguna di beberapa organisasi + switcher organisasi (sesuai keputusan di `docs/decisions.md`).
-- [ ] Organization profile: nama, timezone, mata uang default, format tanggal (SET-01).
-- [ ] Undang anggota via email dengan token (accept/expire/revoke); daftar & nonaktifkan anggota (SET-02).
-- [ ] Model Team + TeamMember dan UI manajemen tim (SET-04).
-- [ ] Tenant context ditentukan dari session + membership, bukan input client.
-- [ ] Test: undangan, penerimaan, pergantian organisasi.
+- [x] Buat organisasi saat onboarding; pengguna pertama menjadi Owner.
+- [x] Dukung satu pengguna di beberapa organisasi + switcher organisasi (sesuai keputusan di `docs/decisions.md`).
+- [x] Organization profile: nama, timezone, mata uang default, format tanggal (SET-01).
+- [x] Undang anggota via email dengan token (accept/expire/revoke); daftar & nonaktifkan anggota (SET-02).
+- [x] Model Team + TeamMember dan UI manajemen tim (SET-04).
+- [x] Tenant context ditentukan dari session + membership, bukan input client.
+- [x] Test: undangan, penerimaan, pergantian organisasi.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Better Auth Org
 
 ## Acceptance Criteria
 
-- [ ] Owner dapat mengundang, mengubah, dan menonaktifkan anggota.
-- [ ] Pengguna hanya melihat organisasi tempat ia menjadi anggota.
-- [ ] Tim dapat dibuat dan diisi anggota.
+- [x] Owner dapat mengundang, mengubah, dan menonaktifkan anggota.
+- [x] Pengguna hanya melihat organisasi tempat ia menjadi anggota.
+- [x] Tim dapat dibuat dan diisi anggota.
 
 ## Verifikasi
 

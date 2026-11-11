@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 1 / 20 | In progress |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 3 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **6 / 39** | |
+| **Total** | **8 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -36,8 +36,8 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Plan                               | Judul                                                  | Status      | Selesai | Catatan                                                                           |
 | ---------------------------------- | ------------------------------------------------------ | ----------- | ------- | --------------------------------------------------------------------------------- |
 | [1.1](plans/phase-1/plan.1.1.md)   | Authentication                                         | Done | 2026-11-11 | Better Auth (Prisma, UUIDv7, plugin Organization), 4 halaman auth, proxy.ts + requireSession(), rate limit via Redis, reset password via mailer log (connector email di plan 1.13). 20 test integrasi/unit + 6 E2E auth.
-| [1.2](plans/phase-1/plan.1.2.md)   | Organization, membership & user management             | Not started |         |                                                                                   |
-| [1.3](plans/phase-1/plan.1.3.md)   | RBAC, tenant isolation & audit log                     | Not started |         |                                                                                   |
+| [1.2](plans/phase-1/plan.1.2.md)   | Organization, membership & user management             | Done | 2026-11-11 | Plugin Organization (roles kustom), onboarding Owner, org switcher, profil org (SET-01), undangan + accept + revoke, nonaktifkan anggota, Team/TeamMember (SET-04). Tenant context dari membership (bukan input client). 13 test integrasi + 3 E2E. |
+| [1.3](plans/phase-1/plan.1.3.md)   | RBAC, tenant isolation & audit log                     | Done | 2026-11-11 | CASL (matriks 5 role, kondisi kepemilikan/tim), assertCan/scopeWhere, ESLint melarang prisma mentah di modul bisnis, UI Roles & Permissions + Audit Log, AuditLog append-only dengan redaksi secret. Test IDOR lintas tenant untuk semua model TENANT_MODELS + matriks permission. |
 | [1.4](plans/phase-1/plan.1.4.md)   | Connector Hub foundation & BYOK AI                     | Not started |         |                                                                                   |
 | [1.5](plans/phase-1/plan.1.5.md)   | Contacts & Companies                                   | Not started |         |                                                                                   |
 | [1.6](plans/phase-1/plan.1.6.md)   | Lead management core                                   | Not started |         |                                                                                   |

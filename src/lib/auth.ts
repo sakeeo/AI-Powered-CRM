@@ -6,6 +6,7 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { sendMail } from "@/lib/mailer";
 import { prisma } from "@/lib/prisma";
+import { orgPluginAc, orgPluginRoles } from "@/lib/roles";
 import { redis } from "@/lib/redis";
 
 const requireVerification = env.REQUIRE_EMAIL_VERIFICATION === true;
@@ -77,7 +78,40 @@ export const auth = betterAuth({
       }).catch((err) => logger.error({ err }, "Gagal mengirim email verifikasi"));
     },
   },
-  plugins: [organization(), nextCookies()],
+  databaseHooks: {
+    session: {
+      create: {
+        // Sesi baru langsung memakai organisasi aktif pertama milik pengguna (bila ada).
+        before: async (session) => {
+          const member = await prisma.member.findFirst({
+            where: { userId: session.userId, active: true },
+            orderBy: { createdAt: "asc" },
+            select: { organizationId: true },
+          });
+          return { data: { ...session, activeOrganizationId: member?.organizationId ?? null } };
+        },
+      },
+    },
+  },
+  plugins: [
+    organization({
+      ac: orgPluginAc,
+      roles: orgPluginRoles,
+      creatorRole: "owner",
+      requireEmailVerificationOnInvitation: requireVerification,
+      invitationExpiresIn: 60 * 60 * 24 * 7,
+      cancelPendingInvitationsOnReInvite: true,
+      sendInvitationEmail: async ({ id, email, role, organization, inviter }) => {
+        const url = `${env.BETTER_AUTH_URL}/accept-invitation/${id}`;
+        void sendMail({
+          to: email,
+          subject: `Undangan bergabung ke ${organization.name}`,
+          text: `${inviter.user.name} mengundang Anda bergabung ke ${organization.name} sebagai ${role}.\n\nTerima undangan (berlaku 7 hari): ${url}`,
+        }).catch((err) => logger.error({ err }, "Gagal mengirim email undangan"));
+      },
+    }),
+    nextCookies(),
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;

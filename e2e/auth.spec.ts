@@ -19,6 +19,10 @@ test("register → logout → login → akses privat", async ({ page }) => {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Konfirmasi password").fill(password);
   await page.getByRole("button", { name: "Daftar" }).click();
+  // Pengguna baru belum punya organisasi → onboarding.
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await page.getByLabel("Nama organisasi").fill("Flow Org");
+  await page.getByRole("button", { name: "Buat organisasi" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 
   await page.getByRole("button", { name: "Menu pengguna" }).click();

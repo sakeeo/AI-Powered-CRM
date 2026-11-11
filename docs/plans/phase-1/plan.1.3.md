@@ -14,12 +14,12 @@ Hak akses ditegakkan di backend, data antartenant terisolasi dan teruji, perubah
 
 ## Tugas
 
-- [ ] Definisikan role Owner/Admin/Sales Manager/Sales Rep/Viewer dan matriks permission (view/create/update/delete/export).
-- [ ] Implementasi CASL: ability per role + kondisi kepemilikan record/tim; dipakai di server (guard) dan UI (sembunyikan aksi).
-- [ ] Lengkapi tenant-scoped Prisma client dari plan 0.3 dan wajibkan penggunaannya di semua module server code.
-- [ ] UI Roles & Permissions (SET-03) sebatas melihat matriks dan menetapkan role anggota.
-- [ ] Model + helper `AuditLog` (siapa, apa, entitas, before/after, waktu, IP); UI daftar audit log (SET-10).
-- [ ] Test wajib: akses silang tenant (IDOR) gagal untuk read/update/delete; test matriks permission per role.
+- [x] Definisikan role Owner/Admin/Sales Manager/Sales Rep/Viewer dan matriks permission (view/create/update/delete/export).
+- [x] Implementasi CASL: ability per role + kondisi kepemilikan record/tim; dipakai di server (guard) dan UI (sembunyikan aksi).
+- [x] Lengkapi tenant-scoped Prisma client dari plan 0.3 dan wajibkan penggunaannya di semua module server code.
+- [x] UI Roles & Permissions (SET-03) sebatas melihat matriks dan menetapkan role anggota.
+- [x] Model + helper `AuditLog` (siapa, apa, entitas, before/after, waktu, IP); UI daftar audit log (SET-10).
+- [x] Test wajib: akses silang tenant (IDOR) gagal untuk read/update/delete; test matriks permission per role.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,9 +27,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `CASL (`@casl/ab
 
 ## Acceptance Criteria
 
-- [ ] Test cross-tenant lulus untuk semua entitas yang ada.
-- [ ] Aksi tanpa permission ditolak di API (403) dan disembunyikan di UI.
-- [ ] Perubahan role/anggota/organisasi tercatat di audit log.
+- [x] Test cross-tenant lulus untuk semua entitas yang ada.
+- [x] Aksi tanpa permission ditolak di API (403) dan disembunyikan di UI.
+- [x] Perubahan role/anggota/organisasi tercatat di audit log.
 
 ## Verifikasi
 
