@@ -113,6 +113,8 @@ model Organization {
   companies        Company[]
   contacts         Contact[]
   contactCompanies ContactCompany[]
+  leadSources      LeadSource[]
+  leads            Lead[]
 
   @@map("organizations")
 }
@@ -333,4 +335,64 @@ model ContactCompany {
   @@index([organizationId])
   @@index([companyId])
   @@map("contact_companies")
+}
+
+/// Sumber lead yang dapat dikonfigurasi organisasi (SET-06, LEAD-03).
+model LeadSource {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  isActive       Boolean  @default(true) @map("is_active")
+  /// Sumber sistem (mis. "Website" untuk webhook) tidak dapat dihapus.
+  isSystem       Boolean  @default(false) @map("is_system")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leads        Lead[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("lead_sources")
+}
+
+/// Calon pelanggan sebelum dikualifikasi/dikonversi (PRD §4.2). Status lead BUKAN tahap deal.
+model Lead {
+  id                 String    @id @default(uuid(7)) @db.Uuid
+  organizationId     String    @map("organization_id") @db.Uuid
+  name               String
+  email              String?
+  phone              String?
+  companyName        String?   @map("company_name")
+  /// Kebutuhan pelanggan (LEAD-06)
+  needs              String?
+  budget             Decimal?  @db.Decimal(18, 2)
+  currency           String    @default("IDR") @db.VarChar(3)
+  /// low | medium | high
+  urgency            String?
+  notes              String?
+  /// new | contacted | qualified | unqualified
+  status             String    @default("new")
+  unqualifiedReason  String?   @map("unqualified_reason")
+  sourceId           String?   @map("source_id") @db.Uuid
+  ownerId            String?   @map("owner_id") @db.Uuid
+  archivedAt         DateTime? @map("archived_at") @db.Timestamptz(3)
+  /// Diisi saat konversi (plan 1.7)
+  convertedAt        DateTime? @map("converted_at") @db.Timestamptz(3)
+  convertedContactId String?   @map("converted_contact_id") @db.Uuid
+  convertedCompanyId String?   @map("converted_company_id") @db.Uuid
+  convertedDealId    String?   @map("converted_deal_id") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy          String?   @map("created_by") @db.Uuid
+  updatedBy          String?   @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  source       LeadSource?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([organizationId, ownerId])
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([organizationId, email])
+  @@map("leads")
 }

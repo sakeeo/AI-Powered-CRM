@@ -14,13 +14,13 @@ Lead dapat dikelola dari pencatatan hingga kualifikasi dan penugasan.
 
 ## Tugas
 
-- [ ] Model Lead, LeadSource; status default New/Contacted/Qualified/Unqualified (konfigurasi terbatas).
-- [ ] CRUD + arsip lead; field: nama, kontak, perusahaan, kebutuhan, budget, urgency, catatan.
-- [ ] Konfigurasi Lead Source di Settings (SET-06).
-- [ ] Assignment ke sales (owner); filter berdasarkan owner/status/source.
-- [ ] Alur kualifikasi: ubah status + alasan Unqualified.
-- [ ] Halaman list + detail lead, Quick Add via Sheet; dukung search/filter/sort/pagination.
-- [ ] Test: CRUD, assignment, izin Sales Rep (hanya data yang dimiliki/diizinkan).
+- [x] Model Lead, LeadSource; status default New/Contacted/Qualified/Unqualified (konfigurasi terbatas).
+- [x] CRUD + arsip lead; field: nama, kontak, perusahaan, kebutuhan, budget, urgency, catatan.
+- [x] Konfigurasi Lead Source di Settings (SET-06).
+- [x] Assignment ke sales (owner); filter berdasarkan owner/status/source.
+- [x] Alur kualifikasi: ubah status + alasan Unqualified.
+- [x] Halaman list + detail lead, Quick Add via Sheet; dukung search/filter/sort/pagination.
+- [x] Test: CRUD, assignment, izin Sales Rep (hanya data yang dimiliki/diizinkan).
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `TanStack Table`
 
 ## Acceptance Criteria
 
-- [ ] Lead dapat dibuat, ditugaskan, dikualifikasi, diarsipkan.
-- [ ] Sales Rep hanya melihat lead sesuai izin.
-- [ ] Sumber lead dapat dikonfigurasi.
+- [x] Lead dapat dibuat, ditugaskan, dikualifikasi, diarsipkan.
+- [x] Sales Rep hanya melihat lead sesuai izin.
+- [x] Sumber lead dapat dikonfigurasi.
 
 ## Verifikasi
 

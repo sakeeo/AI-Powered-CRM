@@ -9,6 +9,7 @@ import { assertCan } from "@/lib/authz";
 import { AppError, ForbiddenError, UnauthorizedError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
 import { forTenant } from "@/lib/tenant";
+import { seedOrganizationDefaults } from "@/modules/organizations/server/defaults";
 import { getSession } from "@/lib/session";
 import {
   changeRoleSchema,
@@ -50,6 +51,7 @@ export async function createOrganizationAction(
       where: { id: org.id },
       data: { timezone: input.data.timezone, defaultCurrency: input.data.defaultCurrency },
     });
+    await seedOrganizationDefaults(org.id);
     await writeAudit(
       { db: forTenant(prisma, org.id), userId: session.user.id, ip: h.get("x-forwarded-for") },
       {

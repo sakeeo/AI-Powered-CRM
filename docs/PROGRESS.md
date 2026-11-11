@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 5 / 20 | In progress |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 6 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **10 / 39** | |
+| **Total** | **11 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -40,7 +40,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [1.3](plans/phase-1/plan.1.3.md)   | RBAC, tenant isolation & audit log                     | Done | 2026-11-11 | CASL (matriks 5 role, kondisi kepemilikan/tim), assertCan/scopeWhere, ESLint melarang prisma mentah di modul bisnis, UI Roles & Permissions + Audit Log, AuditLog append-only dengan redaksi secret. Test IDOR lintas tenant untuk semua model TENANT_MODELS + matriks permission. |
 | [1.4](plans/phase-1/plan.1.4.md)   | Connector Hub foundation & BYOK AI                     | Done | 2026-11-11 | AES-256-GCM (AAD per tenant+tipe, tamper terdeteksi), TenantConnector, Connector Hub (4 provider BYOK, key bermasker), Test Connection server-side via Vercel AI SDK, getAiModel/runAi (log metadata saja). Key tidak muncul di response/audit/log. 8 test integrasi + 6 test crypto + 1 E2E. |
 | [1.5](plans/phase-1/plan.1.5.md)   | Contacts & Companies                                   | Done | 2026-11-11 | Company/Contact/ContactCompany (relasi eksplisit), komponen reusable DataTable (TanStack v8, sort/filter/search/pagination server via URL) + EntitySheet + DeleteEntityButton, soft delete, owner assignment. 8 test integrasi (CRUD, relasi, izin, IDOR) + 1 E2E. |
-| [1.6](plans/phase-1/plan.1.6.md)   | Lead management core                                   | Not started |         |                                                                                   |
+| [1.6](plans/phase-1/plan.1.6.md)   | Lead management core                                   | Done | 2026-11-11 | Lead + LeadSource (SET-06, default + lazy seed), CRUD/arsip, alur kualifikasi (Unqualified wajib alasan), assignment, scoping Sales Rep (hanya miliknya), uang Decimal (money.ts pure + money-db.ts server). Status lead tetap 4 nilai (konfigurasi label per-org ditunda). 9 test integrasi + 1 E2E. |
 | [1.7](plans/phase-1/plan.1.7.md)   | Lead conversion & duplicate detection                  | Not started |         | Bila model Deal belum ada, kerjakan setelah plan 1.9 atau sertakan model minimal. |
 | [1.8](plans/phase-1/plan.1.8.md)   | Import/export, inbound webhook & AI Text-to-Lead       | Not started |         |                                                                                   |
 | [1.9](plans/phase-1/plan.1.9.md)   | Pipelines & Deal management                            | Not started |         |                                                                                   |
