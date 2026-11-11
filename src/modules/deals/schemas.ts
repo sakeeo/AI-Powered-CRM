@@ -51,3 +51,13 @@ export const renamePipelineSchema = z.object({
   id: z.uuid(),
   name: z.string().trim().min(2).max(60),
 });
+
+export const closeWonSchema = z.object({ id: z.uuid() });
+export const closeLostSchema = z.object({
+  id: z.uuid(),
+  reason: z
+    .string()
+    .trim()
+    .min(3, "Alasan kalah wajib diisi (min. 3 karakter)")
+    .max(500, "Maksimal 500 karakter"),
+});

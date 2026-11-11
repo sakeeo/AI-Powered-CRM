@@ -112,6 +112,7 @@ model Organization {
   aiCallLogs        AiCallLog[]
   inboundWebhook    InboundWebhook?
   webhookDeliveries WebhookDelivery[]
+  dealStageHistory  DealStageHistory[]
   companies         Company[]
   contacts          Contact[]
   contactCompanies  ContactCompany[]
@@ -483,11 +484,12 @@ model Deal {
   updatedBy         String?   @map("updated_by") @db.Uuid
   deletedAt         DateTime? @map("deleted_at") @db.Timestamptz(3)
 
-  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  pipeline     Pipeline      @relation(fields: [pipelineId], references: [id])
-  stage        PipelineStage @relation(fields: [stageId], references: [id])
-  contact      Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
-  company      Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pipeline     Pipeline           @relation(fields: [pipelineId], references: [id])
+  stage        PipelineStage      @relation(fields: [stageId], references: [id])
+  stageHistory DealStageHistory[]
+  contact      Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company      Company?           @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@index([organizationId, status, stageId])
   @@index([organizationId, ownerId])
@@ -534,4 +536,21 @@ model WebhookDelivery {
 
   @@index([organizationId, createdAt(sort: Desc)])
   @@map("webhook_deliveries")
+}
+
+/// Riwayat perpindahan stage deal (DEAL-10): siapa, kapan, dari → ke. Append-only.
+model DealStageHistory {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  dealId         String   @map("deal_id") @db.Uuid
+  fromStageId    String?  @map("from_stage_id") @db.Uuid
+  toStageId      String   @map("to_stage_id") @db.Uuid
+  changedBy      String?  @map("changed_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal         Deal         @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, dealId, createdAt(sort: Desc)])
+  @@map("deal_stage_history")
 }

@@ -2,7 +2,7 @@
 
 import { createMongoAbility, type RawRuleOf } from "@casl/ability";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { Action, AppAbility, SubjectName } from "@/lib/abilities";
+import { asSubject, type Action, type AppAbility, type SubjectName } from "@/lib/abilities";
 
 const Ctx = createContext<AppAbility | null>(null);
 
@@ -26,9 +26,7 @@ export function useCan() {
   return (action: Action, subject: SubjectName, record?: object) => {
     if (!ability) return false;
     if (!record) return ability.can(action, subject);
-    return ability.can(
-      action,
-      Object.assign({}, record, { __caslSubjectType__: subject }) as never,
-    );
+    // Salin agar objek asli tidak ikut ditandai; `subject()` CASL menandai tipe secara tepercaya.
+    return ability.can(action, asSubject(subject, { ...record }));
   };
 }

@@ -14,13 +14,13 @@ Pipeline dapat dipantau dan digerakkan lewat Kanban; hasil deal dicatat; riwayat
 
 ## Tugas
 
-- [ ] Kanban board dengan drag-and-drop antar stage (`@hello-pangea/dnd`), akses keyboard, update optimistik + rollback.
-- [ ] Model DealStageHistory; catat setiap perubahan stage (siapa, kapan, dari→ke).
-- [ ] Aksi Won/Lost; Lost wajib mencatat alasan (teks bebas + kategori, kategori otomatis di plan 1.18).
-- [ ] Ringkasan nilai per kolom dan filter board (owner, periode).
-- [ ] Safe AI Deal Risk badge pasif pada kartu: deal mandek tanpa interaksi mendekati closing date — hanya peringatan, tidak memindahkan stage.
-- [ ] Peringatan (non-blocking) bila deal aktif tanpa next activity.
-- [ ] Test: pindah stage mencatat history; AI tidak pernah mengubah stage.
+- [x] Kanban board dengan drag-and-drop antar stage (`@hello-pangea/dnd`), akses keyboard, update optimistik + rollback.
+- [x] Model DealStageHistory; catat setiap perubahan stage (siapa, kapan, dari→ke).
+- [x] Aksi Won/Lost; Lost wajib mencatat alasan (teks bebas + kategori, kategori otomatis di plan 1.18).
+- [x] Ringkasan nilai per kolom dan filter board (owner, periode).
+- [x] Safe AI Deal Risk badge pasif pada kartu: deal mandek tanpa interaksi mendekati closing date — hanya peringatan, tidak memindahkan stage.
+- [x] Peringatan (non-blocking) bila deal aktif tanpa next activity. _(dikerjakan di plan 1.11 karena bergantung pada model Activity)_
+- [x] Test: pindah stage mencatat history; AI tidak pernah mengubah stage.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `@hello-pangea/d
 
 ## Acceptance Criteria
 
-- [ ] Drag-and-drop memperbarui stage dan history.
-- [ ] Won/Lost mensyaratkan alasan Lost.
-- [ ] Badge risiko hanya informatif.
+- [x] Drag-and-drop memperbarui stage dan history.
+- [x] Won/Lost mensyaratkan alasan Lost.
+- [x] Badge risiko hanya informatif.
 
 ## Verifikasi
 

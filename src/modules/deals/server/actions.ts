@@ -8,6 +8,8 @@ import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
 import { idInput } from "@/lib/schema-helpers";
 import {
+  closeLostSchema,
+  closeWonSchema,
   dealSchema,
   moveStageSchema,
   renamePipelineSchema,
@@ -117,7 +119,7 @@ export const updateDeal = tenantAction(updateDealSchema, async (ctx, input) => {
   revalidatePath(`/deals/${id}`);
 });
 
-/** Pindah stage deal terbuka (riwayat stage ditambahkan di plan 1.10). */
+/** Pindah stage deal terbuka; setiap perpindahan dicatat di DealStageHistory (siapa, kapan, dari → ke). */
 export const moveDealStage = tenantAction(moveStageSchema, async (ctx, { id, stageId }) => {
   const deal = await ctx.db.deal.findFirst({ where: { id, deletedAt: null } });
   if (!deal) throw NotFoundError("Deal");
@@ -129,13 +131,93 @@ export const moveDealStage = tenantAction(moveStageSchema, async (ctx, { id, sta
   });
   if (!stage) throw new AppError("Stage tidak valid untuk pipeline deal ini");
   if (stage.id === deal.stageId) return;
-  await ctx.db.deal.update({ where: { id }, data: { stageId, updatedBy: ctx.userId } });
+  await ctx.db.$transaction([
+    ctx.db.deal.update({ where: { id }, data: { stageId, updatedBy: ctx.userId } }),
+    ctx.db.dealStageHistory.create({
+      data: {
+        dealId: id,
+        fromStageId: deal.stageId,
+        toStageId: stageId,
+        changedBy: ctx.userId,
+        organizationId: ctx.organizationId,
+      },
+    }),
+  ]);
   await writeAudit(ctx, {
     action: "deal.stage_changed",
     entityType: "Deal",
     entityId: id,
     before: { stageId: deal.stageId },
     after: { stageId },
+  });
+  revalidatePath("/deals");
+  revalidatePath(`/deals/${id}`);
+});
+
+async function loadOpenDeal(ctx: ActionContext, id: string) {
+  const deal = await ctx.db.deal.findFirst({ where: { id, deletedAt: null } });
+  if (!deal) throw NotFoundError("Deal");
+  assertCan(ctx, "update", "Deal", deal);
+  return deal;
+}
+
+/** Tandai deal Won (outcome terminal; bukan stage). */
+export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
+  const deal = await loadOpenDeal(ctx, id);
+  if (deal.status !== "open") throw new AppError("Deal sudah ditutup");
+  await ctx.db.deal.update({
+    where: { id },
+    data: { status: "won", closedAt: new Date(), lostReason: null, updatedBy: ctx.userId },
+  });
+  await writeAudit(ctx, {
+    action: "deal.won",
+    entityType: "Deal",
+    entityId: id,
+    before: { status: "open" },
+    after: { status: "won", value: deal.value.toFixed(2), currency: deal.currency },
+  });
+  revalidatePath("/deals");
+  revalidatePath(`/deals/${id}`);
+});
+
+/** Tandai deal Lost — alasan wajib (kategori diisi otomatis di plan 1.18). */
+export const markDealLost = tenantAction(closeLostSchema, async (ctx, { id, reason }) => {
+  const deal = await loadOpenDeal(ctx, id);
+  if (deal.status !== "open") throw new AppError("Deal sudah ditutup");
+  await ctx.db.deal.update({
+    where: { id },
+    data: { status: "lost", closedAt: new Date(), lostReason: reason, updatedBy: ctx.userId },
+  });
+  await writeAudit(ctx, {
+    action: "deal.lost",
+    entityType: "Deal",
+    entityId: id,
+    before: { status: "open" },
+    after: { status: "lost", reason },
+  });
+  revalidatePath("/deals");
+  revalidatePath(`/deals/${id}`);
+});
+
+/** Buka kembali deal yang sudah ditutup (mis. salah klik). */
+export const reopenDeal = tenantAction(closeWonSchema, async (ctx, { id }) => {
+  const deal = await loadOpenDeal(ctx, id);
+  if (deal.status === "open") throw new AppError("Deal masih terbuka");
+  await ctx.db.deal.update({
+    where: { id },
+    data: {
+      status: "open",
+      closedAt: null,
+      lostReason: null,
+      lostCategory: null,
+      updatedBy: ctx.userId,
+    },
+  });
+  await writeAudit(ctx, {
+    action: "deal.reopened",
+    entityType: "Deal",
+    entityId: id,
+    before: { status: deal.status },
   });
   revalidatePath("/deals");
   revalidatePath(`/deals/${id}`);

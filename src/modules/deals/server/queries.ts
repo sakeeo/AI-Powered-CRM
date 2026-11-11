@@ -4,6 +4,7 @@ import type { TenantContext } from "@/lib/context";
 import { NotFoundError } from "@/lib/errors";
 import type { ListParams } from "@/lib/list-params";
 import { decimalToString } from "@/lib/money-db";
+import { dealRisk } from "@/modules/deals/risk";
 import { ensureDefaultPipeline } from "@/modules/deals/server/pipeline";
 
 type Where = Prisma.DealWhereInput;
@@ -19,6 +20,9 @@ export type DealFilters = {
   owner?: string;
   contactId?: string;
   companyId?: string;
+  /** Rentang perkiraan closing (YYYY-MM-DD), inklusif. */
+  closeFrom?: string;
+  closeTo?: string;
 };
 
 const include = {
@@ -42,6 +46,16 @@ export function dealWhere(ctx: TenantContext, filters: DealFilters, q?: string):
       scopeWhere(ctx, "view", "Deal") as Where,
       ...(filters.stageId ? [{ stageId: filters.stageId }] : []),
       ...(filters.status ? [{ status: filters.status }] : []),
+      ...(filters.closeFrom || filters.closeTo
+        ? [
+            {
+              expectedCloseDate: {
+                ...(filters.closeFrom ? { gte: new Date(`${filters.closeFrom}T00:00:00Z`) } : {}),
+                ...(filters.closeTo ? { lte: new Date(`${filters.closeTo}T00:00:00Z`) } : {}),
+              },
+            },
+          ]
+        : []),
       ...(filters.contactId ? [{ contactId: filters.contactId }] : []),
       ...(filters.companyId ? [{ companyId: filters.companyId }] : []),
       ...(filters.owner
@@ -154,4 +168,45 @@ export async function pipelineSummary(
   return out;
 }
 
+export const KANBAN_MAX_DEALS = 300;
+
+/** Data papan Kanban: deal terbuka per stage (dengan indikator risiko pasif) + ringkasan nilai penuh. */
+export async function getKanban(ctx: TenantContext, pipelineId: string, filters: DealFilters = {}) {
+  const [summary, deals] = await Promise.all([
+    pipelineSummary(ctx, pipelineId, filters),
+    ctx.db.deal.findMany({
+      where: { AND: [dealWhere(ctx, { ...filters, status: "open" }), { pipelineId }] },
+      orderBy: [{ expectedCloseDate: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
+      take: KANBAN_MAX_DEALS,
+      include,
+    }),
+  ]);
+  const now = new Date();
+  const cards = deals.map((d) => ({
+    ...serialize(d),
+    risk: dealRisk(d, d.updatedAt, now),
+  }));
+  return { summary, cards, truncated: cards.length >= KANBAN_MAX_DEALS };
+}
+export type KanbanCard = Awaited<ReturnType<typeof getKanban>>["cards"][number];
+
+/** Riwayat stage deal (terbaru dulu). */
+export async function listStageHistory(ctx: TenantContext, dealId: string) {
+  const rows = await ctx.db.dealStageHistory.findMany({
+    where: { dealId },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  return rows;
+}
+
 export { decimalToString };
+
+/** Preset periode closing papan Kanban → rentang tanggal (YYYY-MM-DD). */
+export function periodRange(period?: string): Pick<DealFilters, "closeFrom" | "closeTo"> {
+  const day = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+  if (period === "overdue") return { closeTo: day(-1) };
+  if (period === "30d") return { closeFrom: day(0), closeTo: day(30) };
+  if (period === "90d") return { closeFrom: day(0), closeTo: day(90) };
+  return {};
+}

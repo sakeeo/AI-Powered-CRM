@@ -10,8 +10,10 @@ import { formatMoney } from "@/lib/money";
 import { orNotFound } from "@/lib/not-found";
 import { listCompanyOptions, listContactOptions } from "@/modules/contacts/server/queries";
 import { DEAL_STATUS_LABEL, DEAL_STATUS_TONE, type DealStatus } from "@/modules/deals/constants";
+import { DealCloseButtons } from "@/modules/deals/components/deal-close-buttons";
 import { DealActions } from "@/modules/deals/components/deal-actions";
 import { getDealOrThrow } from "@/modules/deals/server/detail";
+import { listStageHistory } from "@/modules/deals/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
 export const metadata: Metadata = { title: "Detail deal" };
@@ -29,6 +31,8 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
   const subject = asSubject("Deal", deal);
   const status = deal.status as DealStatus;
   const owner = owners.find((o) => o.userId === deal.ownerId)?.name;
+  const history = await listStageHistory(ctx, deal.id);
+  const stageName = new Map(pipeline.stages.map((s) => [s.id, s.name]));
   const stages = pipeline.stages.map((s) => ({ id: s.id, name: s.name }));
   return (
     <div className="space-y-4">
@@ -57,6 +61,11 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
             defaultCurrency={org.defaultCurrency}
             canEdit={ctx.ability.can("update", subject)}
             canDelete={ctx.ability.can("delete", subject)}
+            extra={
+              ctx.ability.can("update", subject) ? (
+                <DealCloseButtons id={deal.id} status={deal.status} />
+              ) : null
+            }
             canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
             defaults={{
               title: deal.title,
@@ -100,6 +109,14 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
                 </Link>
               )}
             </DetailField>
+            {deal.status === "lost" && (
+              <DetailField label="Alasan kalah">{deal.lostReason}</DetailField>
+            )}
+            {deal.closedAt && (
+              <DetailField label="Ditutup">
+                {new Date(deal.closedAt).toLocaleDateString("id-ID")}
+              </DetailField>
+            )}
             <DetailField label="Dibuat">
               {new Date(deal.createdAt).toLocaleDateString("id-ID")}
             </DetailField>
@@ -114,6 +131,27 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           <p className="text-label whitespace-pre-wrap">
             {deal.notes || <span className="text-muted-foreground">Belum ada catatan.</span>}
           </p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Riwayat stage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {history.length === 0 ? (
+            <p className="text-muted-foreground text-xs">Belum ada perpindahan stage.</p>
+          ) : (
+            <ul className="space-y-1 text-xs" data-testid="stage-history">
+              {history.map((h) => (
+                <li key={h.id}>
+                  {h.fromStageId ? (stageName.get(h.fromStageId) ?? "—") : "—"} →{" "}
+                  <strong>{stageName.get(h.toStageId) ?? "—"}</strong> ·{" "}
+                  {new Date(h.createdAt).toLocaleString("id-ID")} ·{" "}
+                  {owners.find((o) => o.userId === h.changedBy)?.name ?? "—"}
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
       <PlaceholderCard title="Aktivitas" description="Timeline dan next activity deal." />
