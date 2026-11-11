@@ -3,7 +3,7 @@ import { Worker, type ConnectionOptions } from "bullmq";
 import { logger } from "@/lib/logger";
 import { deliverMail, type MailJob } from "@/lib/mailer";
 import { createQueueConnection, getQueue, QUEUES } from "@/lib/queue";
-import { scanReminders } from "@/lib/reminders";
+import { scanQuotations, scanReminders } from "@/lib/reminders";
 
 /**
  * Proses worker terpisah dari aplikasi web: `npm run worker`.
@@ -16,10 +16,18 @@ export function startWorkers() {
     connection,
     concurrency: 5,
   });
-  const reminders = new Worker(QUEUES.reminders, () => scanReminders(new Date()), {
-    connection,
-    concurrency: 1,
-  });
+  const reminders = new Worker(
+    QUEUES.reminders,
+    async () => {
+      const now = new Date();
+      await scanReminders(now);
+      await scanQuotations(now);
+    },
+    {
+      connection,
+      concurrency: 1,
+    },
+  );
   for (const w of [mail, reminders]) {
     w.on("failed", (job, err) =>
       logger.error(

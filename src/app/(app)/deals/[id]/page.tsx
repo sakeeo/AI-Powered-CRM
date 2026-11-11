@@ -13,6 +13,7 @@ import { DEAL_STATUS_LABEL, DEAL_STATUS_TONE, type DealStatus } from "@/modules/
 import { DealCloseButtons } from "@/modules/deals/components/deal-close-buttons";
 import { DealActions } from "@/modules/deals/components/deal-actions";
 import { getDealOrThrow } from "@/modules/deals/server/detail";
+import { listQuotationsForDeal } from "@/modules/quotations/server/queries";
 import { DealProductsCard } from "@/modules/products/components/deal-products-card";
 import { listActiveProducts, listDealProducts } from "@/modules/products/server/queries";
 import { listStageHistory } from "@/modules/deals/server/queries";
@@ -33,10 +34,11 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
   const subject = asSubject("Deal", deal);
   const status = deal.status as DealStatus;
   const owner = owners.find((o) => o.userId === deal.ownerId)?.name;
-  const [history, dealItems, productOptions] = await Promise.all([
+  const [history, dealItems, productOptions, dealQuotations] = await Promise.all([
     listStageHistory(ctx, deal.id),
     listDealProducts(ctx, deal.id),
     listActiveProducts(ctx),
+    listQuotationsForDeal(ctx, deal.id),
   ]);
   const stageName = new Map(pipeline.stages.map((s) => [s.id, s.name]));
   const stages = pipeline.stages.map((s) => ({ id: s.id, name: s.name }));
@@ -145,6 +147,27 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
         products={productOptions}
         canEdit={ctx.ability.can("update", subject) && deal.status === "open"}
       />
+      <Card>
+        <CardHeader>
+          <CardTitle>Quotation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {dealQuotations.length === 0 ? (
+            <p className="text-muted-foreground text-xs">Belum ada quotation untuk deal ini.</p>
+          ) : (
+            <ul className="space-y-1 text-sm" data-testid="deal-quotations">
+              {dealQuotations.map((q) => (
+                <li key={q.id}>
+                  <Link className="text-primary hover:underline" href={`/quotations/${q.id}`}>
+                    {q.number}
+                  </Link>{" "}
+                  — {q.title} · {q.status} · {formatMoney(q.total, q.currency)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Riwayat stage</CardTitle>

@@ -127,6 +127,9 @@ model Organization {
   productCategories       ProductCategory[]
   products                Product[]
   dealProducts            DealProduct[]
+  quotationSettings       QuotationSettings?
+  quotations              Quotation[]
+  quotationItems          QuotationItem[]
 
   @@map("organizations")
 }
@@ -301,6 +304,8 @@ model Company {
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
 
+  quotations Quotation[]
+
   @@index([organizationId, name])
   @@index([organizationId, ownerId])
   @@map("companies")
@@ -334,6 +339,8 @@ model Contact {
   deals        Deal[]
 
   activities Activity[]
+
+  quotations Quotation[]
 
   @@index([organizationId, name])
   @@index([organizationId, email])
@@ -508,6 +515,8 @@ model Deal {
   activities Activity[]
 
   products DealProduct[]
+
+  quotations Quotation[]
 
   @@index([organizationId, status, stageId])
   @@index([organizationId, ownerId])
@@ -713,4 +722,89 @@ model DealProduct {
 
   @@index([organizationId, dealId])
   @@map("deal_products")
+}
+
+/// Konfigurasi quotation per organisasi (pajak, masa berlaku, syarat default). CRM bukan sistem perpajakan.
+model QuotationSettings {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @unique @map("organization_id") @db.Uuid
+  taxLabel       String   @default("PPN") @map("tax_label")
+  taxRate        Decimal  @default(11) @map("tax_rate") @db.Decimal(5, 2)
+  /// true = harga sudah termasuk pajak
+  taxInclusive   Boolean  @default(false) @map("tax_inclusive")
+  validityDays   Int      @default(14) @map("validity_days")
+  terms          String?
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("quotation_settings")
+}
+
+/// Penawaran harga (QUO-01…07). Angka total adalah snapshot hasil calculateQuotation di server.
+model Quotation {
+  id                    String    @id @default(uuid(7)) @db.Uuid
+  organizationId        String    @map("organization_id") @db.Uuid
+  /// QUO-2026-0001, unik per organisasi
+  number                String
+  title                 String
+  /// draft | sent | accepted | rejected | expired
+  status                String    @default("draft")
+  dealId                String?   @map("deal_id") @db.Uuid
+  contactId             String?   @map("contact_id") @db.Uuid
+  companyId             String?   @map("company_id") @db.Uuid
+  ownerId               String?   @map("owner_id") @db.Uuid
+  currency              String    @default("IDR") @db.VarChar(3)
+  issueDate             DateTime  @map("issue_date") @db.Date
+  validUntil            DateTime  @map("valid_until") @db.Date
+  taxLabel              String    @map("tax_label")
+  taxRate               Decimal   @map("tax_rate") @db.Decimal(5, 2)
+  taxInclusive          Boolean   @default(false) @map("tax_inclusive")
+  globalDiscountPercent Decimal   @default(0) @map("global_discount_percent") @db.Decimal(5, 2)
+  subtotal              Decimal   @default(0) @db.Decimal(18, 2)
+  discountTotal         Decimal   @default(0) @map("discount_total") @db.Decimal(18, 2)
+  taxTotal              Decimal   @default(0) @map("tax_total") @db.Decimal(18, 2)
+  total                 Decimal   @default(0) @db.Decimal(18, 2)
+  notes                 String?
+  terms                 String?
+  pdfKey                String?   @map("pdf_key")
+  pdfGeneratedAt        DateTime? @map("pdf_generated_at") @db.Timestamptz(3)
+  sentAt                DateTime? @map("sent_at") @db.Timestamptz(3)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy             String?   @map("created_by") @db.Uuid
+  updatedBy             String?   @map("updated_by") @db.Uuid
+  deletedAt             DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal         Deal?           @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  contact      Contact?        @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company      Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  items        QuotationItem[]
+
+  @@unique([organizationId, number])
+  @@index([organizationId, status, validUntil])
+  @@index([organizationId, dealId])
+  @@index([organizationId, ownerId])
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id              String  @id @default(uuid(7)) @db.Uuid
+  organizationId  String  @map("organization_id") @db.Uuid
+  quotationId     String  @map("quotation_id") @db.Uuid
+  position        Int
+  productId       String? @map("product_id") @db.Uuid
+  name            String
+  description     String?
+  quantity        Decimal @db.Decimal(12, 2)
+  unitPrice       Decimal @map("unit_price") @db.Decimal(18, 2)
+  discountPercent Decimal @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  lineTotal       Decimal @map("line_total") @db.Decimal(18, 2)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  quotation    Quotation    @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, quotationId, position])
+  @@map("quotation_items")
 }

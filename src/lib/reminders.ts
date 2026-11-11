@@ -1,6 +1,9 @@
 import { logger } from "@/lib/logger";
 import { sendMail } from "@/lib/mailer";
+import { writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { forTenant } from "@/lib/tenant";
+import { dateInTz, zonedToUtc } from "@/lib/timezone";
 
 export const DUE_SOON_MS = 30 * 60_000;
 const OVERDUE_WINDOW_MS = 7 * 86_400_000;
@@ -81,4 +84,89 @@ export async function scanReminders(now = new Date()) {
   }
   logger.info({ created: created.length, emailed }, "Reminder dipindai");
   return { created: created.length, emailed };
+}
+
+export const QUOTATION_EXPIRY_WARN_DAYS = 3;
+
+/**
+ * Quotation: (1) otomatis Expired bila masa berlaku lewat, (2) pengingat mendekati expiry → notifikasi
+ * + task follow-up untuk pemilik. Idempoten lewat dedupeKey notifikasi (task hanya dibuat saat
+ * notifikasinya baru dibuat). "Hari ini" mengikuti zona waktu organisasi.
+ */
+export async function scanQuotations(now = new Date()) {
+  const rows = await prisma.quotation.findMany({
+    where: { status: "sent", deletedAt: null },
+    select: {
+      id: true,
+      organizationId: true,
+      number: true,
+      ownerId: true,
+      validUntil: true,
+      dealId: true,
+      contactId: true,
+      companyId: true,
+      organization: { select: { timezone: true } },
+    },
+    take: 1000,
+  });
+  let expired = 0;
+  let reminded = 0;
+  for (const q of rows) {
+    const tz = q.organization.timezone;
+    const today = dateInTz(now, tz);
+    const until = q.validUntil.toISOString().slice(0, 10);
+    if (until < today) {
+      const res = await prisma.quotation.updateMany({
+        where: { id: q.id, organizationId: q.organizationId, status: "sent" },
+        data: { status: "expired" },
+      });
+      if (res.count) {
+        expired++;
+        await writeAudit(
+          { db: forTenant(prisma, q.organizationId), userId: null },
+          {
+            action: "quotation.expired",
+            entityType: "Quotation",
+            entityId: q.id,
+            before: { status: "sent" },
+            after: { status: "expired" },
+          },
+        );
+      }
+      continue;
+    }
+    const daysLeft = Math.round((Date.parse(until) - Date.parse(today)) / 86_400_000);
+    if (daysLeft > QUOTATION_EXPIRY_WARN_DAYS || !q.ownerId) continue;
+    const made = await prisma.notification.createManyAndReturn({
+      data: [
+        {
+          organizationId: q.organizationId,
+          userId: q.ownerId,
+          type: "quotation_expiring",
+          title: `Quotation ${q.number} berakhir ${daysLeft === 0 ? "hari ini" : `${daysLeft} hari lagi`}`,
+          link: `/quotations/${q.id}`,
+          dedupeKey: `quotation:${q.id}:expiring:${until}`,
+        },
+      ],
+      skipDuplicates: true,
+      select: { id: true },
+    });
+    if (!made.length) continue;
+    reminded++;
+    await prisma.activity.create({
+      data: {
+        organizationId: q.organizationId,
+        type: "task",
+        subject: `Follow up quotation ${q.number} (berakhir ${until})`,
+        status: "open",
+        dueAt: zonedToUtc(until, tz),
+        ownerId: q.ownerId,
+        dealId: q.dealId,
+        contactId: q.contactId,
+        companyId: q.companyId,
+      },
+    });
+  }
+  if (expired || reminded) logger.info({ expired, reminded }, "Quotation dipindai");
+  return { expired, reminded };
 }

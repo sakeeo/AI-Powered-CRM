@@ -14,12 +14,12 @@ Quotation dibuat dari deal dengan perhitungan deterministik dan PDF.
 
 ## Tugas
 
-- [ ] Model Quotation + QuotationItem; status Draft/Sent/Accepted/Rejected/Expired; masa berlaku.
-- [ ] Quotation builder: item dari katalog, quantity, diskon, pajak (konfigurasi jelas per organisasi).
-- [ ] Fungsi perhitungan subtotal/diskon/pajak/total deterministik (`Decimal`, tanpa floating point) dengan unit test menyeluruh — tidak boleh melibatkan LLM.
-- [ ] Generate PDF dengan `@react-pdf/renderer`; simpan ke object storage per tenant; unduh dari UI.
-- [ ] Hubungkan quotation dengan deal dan customer; pengingat quotation mendekati expiry (membuat follow-up).
-- [ ] Test: perhitungan (pembulatan, diskon, pajak), transisi status, PDF terbentuk.
+- [x] Model Quotation + QuotationItem; status Draft/Sent/Accepted/Rejected/Expired; masa berlaku.
+- [x] Quotation builder: item dari katalog, quantity, diskon, pajak (konfigurasi jelas per organisasi).
+- [x] Fungsi perhitungan subtotal/diskon/pajak/total deterministik (`Decimal`, tanpa floating point) dengan unit test menyeluruh — tidak boleh melibatkan LLM.
+- [x] Generate PDF dengan `@react-pdf/renderer`; simpan ke object storage per tenant; unduh dari UI.
+- [x] Hubungkan quotation dengan deal dan customer; pengingat quotation mendekati expiry (membuat follow-up).
+- [x] Test: perhitungan (pembulatan, diskon, pajak), transisi status, PDF terbentuk.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,9 +27,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `@react-pdf/rend
 
 ## Acceptance Criteria
 
-- [ ] Total quotation akurat pada semua test case.
-- [ ] PDF dapat dihasilkan dan diunduh.
-- [ ] Disclaimer: bukan sistem perpajakan/akuntansi.
+- [x] Total quotation akurat pada semua test case.
+- [x] PDF dapat dihasilkan dan diunduh.
+- [x] Disclaimer: bukan sistem perpajakan/akuntansi.
 
 ## Verifikasi
 

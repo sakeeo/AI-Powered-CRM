@@ -30,6 +30,9 @@ export const TENANT_MODELS = new Set<string>([
   "ProductCategory",
   "Product",
   "DealProduct",
+  "QuotationSettings",
+  "Quotation",
+  "QuotationItem",
 ]);
 
 const WHERE_OPS = new Set([
