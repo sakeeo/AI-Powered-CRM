@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 16 / 20 | In progress |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 17 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **22 / 39** | |
+| **Total** | **23 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -51,7 +51,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [1.14](plans/phase-1/plan.1.14.md) | Product & service catalog                              | Done | 2026-11-11 | Product/ProductCategory (harga Decimal, SKU unik per org, kategori otomatis, soft delete), halaman /products (DataTable, cari, filter, aktif/nonaktif), produk acuan pada deal (snapshot nama & harga, tidak mengubah nilai deal), tanpa stok/inventory. 6 test integrasi + 1 E2E. |
 | [1.15](plans/phase-1/plan.1.15.md) | Quotation builder & PDF                                | Done | 2026-11-11 | Quotation + QuotationItem + QuotationSettings (pajak/masa berlaku/syarat per org); calculateQuotation deterministik (decimal.js, HALF_UP, pajak eksklusif/inklusif, diskon baris+global) dipakai server & pratinjau UI, 9 unit test; builder (katalog/kustom), transisi status (item terkunci setelah Sent), PDF @react-pdf/renderer disimpan ke storage tenant + unduh, disclaimer bukan sistem pajak/akuntansi, quotation di deal; worker: auto-Expired + notifikasi & task follow-up mendekati expiry (idempoten). 7 test integrasi + 1 E2E. |
 | [1.16](plans/phase-1/plan.1.16.md) | Customer retention & Customer 360                      | Done | 2026-11-11 | Customer diturunkan dari deal Won (contact/company dengan ≥1 deal Won; decisions.md #11) — tanpa tabel customer, status mengikuti deal otomatis; halaman Customers + Customer 360 (deal/pembelian, quotation, aktivitas, feedback, segmen); segmen sederhana; follow-up pasca-penjualan & renewal reminder (task terjadwal); Feedback/complaint (halaman + per customer); Safe AI Briefing 3 butir — total belanja dihitung kode, LLM hanya isu & peluang. 6 test integrasi + 1 E2E. |
-| [1.17](plans/phase-1/plan.1.17.md) | Dashboard                                              | Not started |         |                                                                                   |
+| [1.17](plans/phase-1/plan.1.17.md) | Dashboard                                              | Done | 2026-11-11 | Dashboard: KPI (lead, lead baru + tren, deal aktif, nilai pipeline, nilai Won, customer), ringkasan pipeline, aktivitas mendatang/terlambat/terbaru, panel Action Required (4 kelompok), performa sales & lead source (cohort), grafik Recharts bertoken warna, filter periode/tim/pengguna yang menyempit di atas izin; agregasi database (count/groupBy). Definisi metrik di docs/metrics.md. 3 test integrasi (angka = data seed, filter, permission/tenant) + 1 E2E. |
 | [1.18](plans/phase-1/plan.1.18.md) | Reports, export & Lost Reason categorizer              | Not started |         |                                                                                   |
 | [1.19](plans/phase-1/plan.1.19.md) | QA, security & performance hardening                   | Not started |         |                                                                                   |
 | [1.20](plans/phase-1/plan.1.20.md) | Release: backup/restore, monitoring, deployment & docs | Not started |         |                                                                                   |

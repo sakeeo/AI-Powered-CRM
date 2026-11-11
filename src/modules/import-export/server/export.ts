@@ -17,7 +17,7 @@ import { listLeadsForExport } from "@/modules/leads/server/queries";
 
 export const EXPORT_MAX_ROWS = 20_000;
 
-type Dataset = { columns: string[]; rows: (string | number | boolean)[][] };
+export type Dataset = { columns: string[]; rows: (string | number | boolean)[][] };
 
 const date = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 10) : "");
 

@@ -14,13 +14,13 @@ Dashboard menampilkan KPI aktual dan panel Action Required.
 
 ## Tugas
 
-- [ ] Kartu KPI: total lead, deal aktif, customer, nilai deal (DASH-01); lead baru per periode (DASH-02); ringkasan pipeline (DASH-03).
-- [ ] Aktivitas mendatang & terlambat (DASH-04, 05); aktivitas terbaru (DASH-06).
-- [ ] Panel Action Required: lead baru belum ditindaklanjuti, follow-up terlambat, deal aktif tanpa next activity, quotation perlu tindak lanjut.
-- [ ] Performa sales dan lead source; filter periode/tim/pengguna (DASH-07–09).
-- [ ] Grafik dengan shadcn/ui Charts (Recharts); query teragregasi dengan index yang tepat.
-- [ ] Dokumentasikan definisi tiap metrik (periode, cohort, denominator) di `docs/metrics.md`.
-- [ ] Test: angka dashboard cocok dengan data seed.
+- [x] Kartu KPI: total lead, deal aktif, customer, nilai deal (DASH-01); lead baru per periode (DASH-02); ringkasan pipeline (DASH-03).
+- [x] Aktivitas mendatang & terlambat (DASH-04, 05); aktivitas terbaru (DASH-06).
+- [x] Panel Action Required: lead baru belum ditindaklanjuti, follow-up terlambat, deal aktif tanpa next activity, quotation perlu tindak lanjut.
+- [x] Performa sales dan lead source; filter periode/tim/pengguna (DASH-07–09).
+- [x] Grafik dengan shadcn/ui Charts (Recharts); query teragregasi dengan index yang tepat.
+- [x] Dokumentasikan definisi tiap metrik (periode, cohort, denominator) di `docs/metrics.md`.
+- [x] Test: angka dashboard cocok dengan data seed.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,8 +28,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `shadcn/ui Chart
 
 ## Acceptance Criteria
 
-- [ ] Dashboard memakai data aktual dan menghormati permission.
-- [ ] Definisi metrik terdokumentasi dan konsisten.
+- [x] Dashboard memakai data aktual dan menghormati permission.
+- [x] Definisi metrik terdokumentasi dan konsisten.
 
 ## Verifikasi
 
