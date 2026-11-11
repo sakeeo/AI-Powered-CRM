@@ -14,6 +14,10 @@ import {
   type LeadStatus,
   type Urgency,
 } from "@/modules/leads/constants";
+import { DuplicatesCard } from "@/modules/duplicates/components/duplicates-card";
+import { findLeadDuplicates } from "@/modules/duplicates/server/detect";
+import { ConvertLeadDialog } from "@/modules/leads/components/convert-lead-dialog";
+import { getConversionSuggestions } from "@/modules/leads/server/conversion";
 import { LeadActions } from "@/modules/leads/components/lead-actions";
 import { getLead, listLeadSources } from "@/modules/leads/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
@@ -30,6 +34,23 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
     getOrganization(ctx),
   ]);
   const subject = asSubject("Lead", lead);
+  const canConvert =
+    lead.status === "qualified" &&
+    !lead.archivedAt &&
+    !lead.convertedAt &&
+    ctx.ability.can("update", subject);
+  const [suggestions, dups] = await Promise.all([
+    canConvert ? getConversionSuggestions(ctx, lead.id) : null,
+    lead.convertedAt || lead.archivedAt
+      ? []
+      : findLeadDuplicates(ctx, {
+          name: lead.name,
+          email: lead.email ?? undefined,
+          phone: lead.phone ?? undefined,
+          companyName: lead.companyName ?? undefined,
+          excludeId: lead.id,
+        }),
+  ]);
   const status = lead.status as LeadStatus;
   const owner = owners.find((o) => o.userId === lead.ownerId)?.name;
   return (
@@ -60,6 +81,21 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
             canEdit={ctx.ability.can("update", subject)}
             canArchive={ctx.ability.can("delete", subject)}
             canAssign={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
+            extra={
+              suggestions && (
+                <ConvertLeadDialog
+                  leadId={lead.id}
+                  leadName={lead.name}
+                  hasCompanyName={!!lead.companyName}
+                  companyName={lead.companyName}
+                  suggestions={suggestions}
+                  defaults={{
+                    title: `${lead.name} — ${lead.needs?.slice(0, 40) || "Peluang baru"}`,
+                    value: lead.budget ?? "",
+                  }}
+                />
+              )
+            }
             defaults={{
               name: lead.name,
               email: lead.email ?? "",
@@ -130,6 +166,46 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
           </CardContent>
         </Card>
       </div>
+      {lead.convertedAt && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Hasil konversi</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-4 text-sm">
+            {lead.convertedContactId && (
+              <a
+                className="text-primary hover:underline"
+                href={`/contacts/${lead.convertedContactId}`}
+              >
+                Contact
+              </a>
+            )}
+            {lead.convertedCompanyId && (
+              <a
+                className="text-primary hover:underline"
+                href={`/companies/${lead.convertedCompanyId}`}
+              >
+                Company
+              </a>
+            )}
+            {lead.convertedDealId && (
+              <a className="text-primary hover:underline" href={`/deals/${lead.convertedDealId}`}>
+                Deal
+              </a>
+            )}
+            <span className="text-muted-foreground">
+              pada {new Date(lead.convertedAt).toLocaleDateString("id-ID")}
+            </span>
+          </CardContent>
+        </Card>
+      )}
+      <DuplicatesCard
+        entity="lead"
+        currentId={lead.id}
+        currentName={lead.name}
+        matches={dups}
+        canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
+      />
       <PlaceholderCard title="Aktivitas" description="Timeline aktivitas lead." />
     </div>
   );

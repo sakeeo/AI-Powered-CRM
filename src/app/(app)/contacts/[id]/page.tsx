@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireTenant } from "@/lib/context";
 import { orNotFound } from "@/lib/not-found";
 import { asSubject } from "@/lib/abilities";
+import { DuplicatesCard } from "@/modules/duplicates/components/duplicates-card";
+import { findContactDuplicates } from "@/modules/duplicates/server/detect";
 import { ContactActions } from "@/modules/contacts/components/contact-actions";
 import { getContact, listCompanyOptions } from "@/modules/contacts/server/queries";
 import { listOwnerOptions } from "@/modules/organizations/server/queries";
@@ -24,6 +26,13 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
   ]);
   const owner = owners.find((o) => o.userId === contact.ownerId)?.name;
   const subject = asSubject("Contact", contact);
+  const dups = await findContactDuplicates(ctx, {
+    name: contact.name,
+    email: contact.email ?? undefined,
+    phone: contact.phone ?? undefined,
+    companyIds: contact.companies.map((c) => c.company.id),
+    excludeId: contact.id,
+  });
   return (
     <div className="space-y-4">
       <Card>
@@ -115,6 +124,13 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
         </Card>
       </div>
       <RelatedDeals deals={await listRelatedDeals(ctx, { contactId: contact.id })} />
+      <DuplicatesCard
+        entity="contact"
+        currentId={contact.id}
+        currentName={contact.name}
+        matches={dups}
+        canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
+      />
       <PlaceholderCard title="Aktivitas" description="Timeline aktivitas contact." />
     </div>
   );

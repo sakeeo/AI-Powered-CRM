@@ -44,3 +44,27 @@ export const leadSourceSchema = z.object({
 });
 export const renameLeadSourceSchema = leadSourceSchema.extend({ id: z.uuid() });
 export const toggleLeadSourceSchema = z.object({ id: z.uuid(), isActive: z.boolean() });
+
+// --- Konversi lead (plan 1.7) ---
+const party = (key: string) =>
+  z.discriminatedUnion("mode", [
+    z.object({ mode: z.literal("create") }),
+    z.object({ mode: z.literal("link"), [key]: z.uuid() }),
+    z.object({ mode: z.literal("none") }),
+  ]);
+
+export const convertLeadSchema = z.object({
+  leadId: z.uuid(),
+  contact: party("contactId"),
+  company: party("companyId"),
+  deal: z.object({
+    create: z.boolean(),
+    title: optionalText(160),
+    value: optionalMoney,
+    currency: currencySchema.optional(),
+    stageId: optionalUuid,
+    expectedCloseDate: optionalText(10),
+  }),
+});
+export type ConvertLeadInput = z.input<typeof convertLeadSchema>;
+export type ConvertLeadData = z.output<typeof convertLeadSchema>;

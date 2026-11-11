@@ -16,17 +16,17 @@ Lead terkualifikasi dapat dikonversi menjadi contact/company/deal tanpa duplikas
 
 ## Tugas
 
-- [ ] Deteksi duplikat dasar (email, telepon, nama+perusahaan) saat membuat/mengimpor lead/contact; hanya menampilkan peringatan.
-- [ ] Alur Convert Lead: cocokkan atau buat Contact & Company, buat Deal (stub sampai plan 1.9, atau gunakan model Deal jika sudah ada).
-- [ ] Tampilkan hasil konversi dan tautkan riwayat lead ke record baru.
-- [ ] Pastikan konversi berjalan dalam satu transaksi database.
-- [ ] Workflow merge duplikat manual (user memutuskan; tidak ada auto-merge).
-- [ ] Test: konversi sukses, rollback bila gagal, duplikat terdeteksi.
+- [x] Deteksi duplikat dasar (email, telepon, nama+perusahaan) saat membuat/mengimpor lead/contact; hanya menampilkan peringatan.
+- [x] Alur Convert Lead: cocokkan atau buat Contact & Company, buat Deal (stub sampai plan 1.9, atau gunakan model Deal jika sudah ada).
+- [x] Tampilkan hasil konversi dan tautkan riwayat lead ke record baru.
+- [x] Pastikan konversi berjalan dalam satu transaksi database.
+- [x] Workflow merge duplikat manual (user memutuskan; tidak ada auto-merge).
+- [x] Test: konversi sukses, rollback bila gagal, duplikat terdeteksi.
 
 ## Acceptance Criteria
 
-- [ ] Konversi membuat/menautkan contact, company, deal secara atomik.
-- [ ] Duplikat potensial ditandai tanpa penggabungan otomatis.
+- [x] Konversi membuat/menautkan contact, company, deal secara atomik.
+- [x] Duplikat potensial ditandai tanpa penggabungan otomatis.
 
 ## Verifikasi
 

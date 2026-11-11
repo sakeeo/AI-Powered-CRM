@@ -5,6 +5,7 @@ import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
+import { normalizePhone } from "@/lib/phone";
 import { idInput } from "@/lib/schema-helpers";
 import { contactSchema, updateContactSchema } from "@/modules/contacts/schemas";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
@@ -31,7 +32,13 @@ export const createContact = tenantAction(contactSchema, async (ctx, input) => {
   await assertCompanies(ctx, companyIds);
   const contact = await ctx.db.$transaction(async (tx) => {
     const c = await tx.contact.create({
-      data: { ...data, ownerId, createdBy: ctx.userId, organizationId: ctx.organizationId },
+      data: {
+        ...data,
+        phoneNormalized: normalizePhone(data.phone),
+        ownerId,
+        createdBy: ctx.userId,
+        organizationId: ctx.organizationId,
+      },
     });
     if (companyIds.length) {
       await tx.contactCompany.createMany({
@@ -59,7 +66,15 @@ export const updateContact = tenantAction(updateContactSchema, async (ctx, input
   if (ownerId && ownerId !== existing.ownerId) await assertActiveMember(ctx, ownerId);
   await assertCompanies(ctx, companyIds);
   await ctx.db.$transaction(async (tx) => {
-    await tx.contact.update({ where: { id }, data: { ...data, ownerId, updatedBy: ctx.userId } });
+    await tx.contact.update({
+      where: { id },
+      data: {
+        ...data,
+        phoneNormalized: normalizePhone(data.phone),
+        ownerId,
+        updatedBy: ctx.userId,
+      },
+    });
     await tx.contactCompany.deleteMany({ where: { contactId: id } });
     if (companyIds.length) {
       await tx.contactCompany.createMany({

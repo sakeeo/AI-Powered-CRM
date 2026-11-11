@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
@@ -11,6 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { CURRENCY_CODES } from "@/lib/money";
 import { URGENCIES, URGENCY_LABEL } from "@/modules/leads/constants";
 import { leadSchema, type LeadData, type LeadInput } from "@/modules/leads/schemas";
+import { DuplicateWarning } from "@/modules/duplicates/components/duplicate-warning";
+import { checkDuplicates } from "@/modules/duplicates/server/actions";
+import type { DuplicateMatch } from "@/modules/duplicates/server/detect";
 import { createLead, updateLead } from "@/modules/leads/server/actions";
 
 export type SourceOption = { id: string; name: string };
@@ -44,7 +48,23 @@ export function LeadForm({
     defaultValues: { name: "", currency: defaultCurrency as LeadInput["currency"], ...defaults },
   });
 
-  async function onSubmit(values: LeadData) {
+  const [dups, setDups] = useState<DuplicateMatch[]>([]);
+
+  async function onSubmit(values: LeadData, confirmed = false) {
+    if (!confirmed) {
+      const chk = await checkDuplicates({
+        entity: "lead",
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        companyName: values.companyName,
+        excludeId: leadId,
+      });
+      if (chk.ok && chk.data.length) {
+        setDups(chk.data);
+        return;
+      }
+    }
     const res = leadId ? await updateLead({ ...values, id: leadId }) : await createLead(values);
     if (!res.ok) {
       for (const [k, msg] of Object.entries(res.fieldErrors ?? {}))
@@ -57,7 +77,15 @@ export function LeadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit((v) => onSubmit(v))} noValidate className="space-y-4">
+      {dups.length > 0 && (
+        <DuplicateWarning
+          matches={dups}
+          busy={isSubmitting}
+          onCancel={() => setDups([])}
+          onConfirm={handleSubmit((v) => onSubmit(v, true))}
+        />
+      )}
       <FormField id="name" label="Nama lead" error={errors.name?.message}>
         <Input id="name" aria-invalid={!!errors.name} {...register("name")} />
       </FormField>

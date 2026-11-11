@@ -6,9 +6,11 @@ import { writeAudit } from "@/lib/audit";
 import { assertCan } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
+import { normalizePhone } from "@/lib/phone";
 import { idInput } from "@/lib/schema-helpers";
 import {
   assignLeadSchema,
+  convertLeadSchema,
   leadSchema,
   leadSourceSchema,
   leadStatusSchema,
@@ -16,6 +18,7 @@ import {
   toggleLeadSourceSchema,
   updateLeadSchema,
 } from "@/modules/leads/schemas";
+import { convertLeadService } from "@/modules/leads/server/conversion";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
 async function assertSource(ctx: ActionContext, sourceId?: string) {
@@ -32,7 +35,13 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
   if (ownerId && ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
   await assertSource(ctx, data.sourceId);
   const lead = await ctx.db.lead.create({
-    data: { ...data, budget: toDecimal(budget), ownerId, createdBy: ctx.userId } as never,
+    data: {
+      ...data,
+      phoneNormalized: normalizePhone(data.phone),
+      budget: toDecimal(budget),
+      ownerId,
+      createdBy: ctx.userId,
+    } as never,
   });
   await writeAudit(ctx, {
     action: "lead.created",
@@ -55,7 +64,13 @@ export const updateLead = tenantAction(updateLeadSchema, async (ctx, input) => {
   await assertSource(ctx, data.sourceId);
   await ctx.db.lead.update({
     where: { id },
-    data: { ...data, budget: toDecimal(budget), ownerId, updatedBy: ctx.userId },
+    data: {
+      ...data,
+      phoneNormalized: normalizePhone(data.phone),
+      budget: toDecimal(budget),
+      ownerId,
+      updatedBy: ctx.userId,
+    },
   });
   await writeAudit(ctx, {
     action: "lead.updated",
@@ -194,3 +209,14 @@ export const toggleLeadSource = tenantAction(
     revalidatePath("/settings/lead-sources");
   },
 );
+
+/** Konversi lead (plan 1.7): contact/company/deal dibuat atau ditautkan secara atomik. */
+export const convertLead = tenantAction(convertLeadSchema, async (ctx, input) => {
+  const result = await convertLeadService(ctx, input);
+  revalidatePath("/leads");
+  revalidatePath(`/leads/${input.leadId}`);
+  revalidatePath("/contacts");
+  revalidatePath("/companies");
+  revalidatePath("/deals");
+  return result;
+});

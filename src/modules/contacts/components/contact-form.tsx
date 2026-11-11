@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
@@ -17,6 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSchema, type ContactData, type ContactInput } from "@/modules/contacts/schemas";
+import { DuplicateWarning } from "@/modules/duplicates/components/duplicate-warning";
+import { checkDuplicates } from "@/modules/duplicates/server/actions";
+import type { DuplicateMatch } from "@/modules/duplicates/server/detect";
 import { createContact, updateContact } from "@/modules/contacts/server/actions";
 
 export type Option = { id: string; name: string };
@@ -49,7 +53,23 @@ export function ContactForm({
     formState: { errors, isSubmitting },
   } = form;
 
-  async function onSubmit(values: ContactData) {
+  const [dups, setDups] = useState<DuplicateMatch[]>([]);
+
+  async function onSubmit(values: ContactData, confirmed = false) {
+    if (!confirmed) {
+      const chk = await checkDuplicates({
+        entity: "contact",
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        companyIds: values.companyIds,
+        excludeId: contactId,
+      });
+      if (chk.ok && chk.data.length) {
+        setDups(chk.data);
+        return;
+      }
+    }
     const res = contactId
       ? await updateContact({ ...values, id: contactId })
       : await createContact(values);
@@ -65,7 +85,15 @@ export function ContactForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit((v) => onSubmit(v))} noValidate className="space-y-4">
+      {dups.length > 0 && (
+        <DuplicateWarning
+          matches={dups}
+          busy={isSubmitting}
+          onCancel={() => setDups([])}
+          onConfirm={handleSubmit((v) => onSubmit(v, true))}
+        />
+      )}
       <FormField id="name" label="Nama" error={errors.name?.message}>
         <Input id="name" aria-invalid={!!errors.name} {...register("name")} />
       </FormField>

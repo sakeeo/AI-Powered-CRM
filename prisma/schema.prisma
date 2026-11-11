@@ -277,6 +277,7 @@ model Company {
   /// Catatan internal (CONT-10)
   notes          String?
   ownerId        String?   @map("owner_id") @db.Uuid
+  mergedIntoId   String?   @map("merged_into_id") @db.Uuid
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy      String?   @map("created_by") @db.Uuid
@@ -294,22 +295,26 @@ model Company {
 
 /// Individu yang berhubungan dengan bisnis (CONT-01).
 model Contact {
-  id             String    @id @default(uuid(7)) @db.Uuid
-  organizationId String    @map("organization_id") @db.Uuid
-  name           String
-  email          String?
-  phone          String?
-  jobTitle       String?   @map("job_title")
-  address        String?
-  city           String?
-  country        String?
-  notes          String?
-  ownerId        String?   @map("owner_id") @db.Uuid
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy      String?   @map("created_by") @db.Uuid
-  updatedBy      String?   @map("updated_by") @db.Uuid
-  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+  id              String    @id @default(uuid(7)) @db.Uuid
+  organizationId  String    @map("organization_id") @db.Uuid
+  name            String
+  email           String?
+  phone           String?
+  /// Telepon dinormalisasi (hanya digit, 0→62) untuk deteksi duplikat
+  phoneNormalized String?   @map("phone_normalized")
+  jobTitle        String?   @map("job_title")
+  address         String?
+  city            String?
+  country         String?
+  notes           String?
+  ownerId         String?   @map("owner_id") @db.Uuid
+  /// Diisi bila record ini digabung ke record lain (merge manual)
+  mergedIntoId    String?   @map("merged_into_id") @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy       String?   @map("created_by") @db.Uuid
+  updatedBy       String?   @map("updated_by") @db.Uuid
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   companies    ContactCompany[]
@@ -317,6 +322,7 @@ model Contact {
 
   @@index([organizationId, name])
   @@index([organizationId, email])
+  @@index([organizationId, phoneNormalized])
   @@index([organizationId, ownerId])
   @@map("contacts")
 }
@@ -368,6 +374,7 @@ model Lead {
   name               String
   email              String?
   phone              String?
+  phoneNormalized    String?   @map("phone_normalized")
   companyName        String?   @map("company_name")
   /// Kebutuhan pelanggan (LEAD-06)
   needs              String?
@@ -387,6 +394,7 @@ model Lead {
   convertedContactId String?   @map("converted_contact_id") @db.Uuid
   convertedCompanyId String?   @map("converted_company_id") @db.Uuid
   convertedDealId    String?   @map("converted_deal_id") @db.Uuid
+  mergedIntoId       String?   @map("merged_into_id") @db.Uuid
   createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy          String?   @map("created_by") @db.Uuid
@@ -399,6 +407,7 @@ model Lead {
   @@index([organizationId, ownerId])
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([organizationId, email])
+  @@index([organizationId, phoneNormalized])
   @@map("leads")
 }
 
