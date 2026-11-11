@@ -14,13 +14,13 @@ Pengguna dapat mendaftar, login, logout, dan reset password dengan session aman.
 
 ## Tugas
 
-- [ ] Integrasikan Better Auth (adapter Prisma) dengan plugin Organization; migrasi schema auth.
-- [ ] Halaman: Sign up, Login, Logout, Forgot password, Reset password (form RHF + Zod).
-- [ ] Session cookie HTTP-only, password hashing kuat, verifikasi email opsional via env.
-- [ ] Rate limiting pada endpoint auth (login, reset password).
-- [ ] Proteksi route: middleware/guard yang mengalihkan pengguna belum login ke `/login`.
-- [ ] Email transaksional untuk reset password (dev: log/mailpit; production: connector email di plan 1.13).
-- [ ] Test: alur login/logout, reset password, akses ditolak tanpa session.
+- [x] Integrasikan Better Auth (adapter Prisma) dengan plugin Organization; migrasi schema auth.
+- [x] Halaman: Sign up, Login, Logout, Forgot password, Reset password (form RHF + Zod).
+- [x] Session cookie HTTP-only, password hashing kuat, verifikasi email opsional via env.
+- [x] Rate limiting pada endpoint auth (login, reset password).
+- [x] Proteksi route: middleware/guard yang mengalihkan pengguna belum login ke `/login`.
+- [x] Email transaksional untuk reset password (dev: log/mailpit; production: connector email di plan 1.13).
+- [x] Test: alur login/logout, reset password, akses ditolak tanpa session.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -28,9 +28,9 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Better Auth`, `
 
 ## Acceptance Criteria
 
-- [ ] Pengguna dapat register → login → logout → reset password.
-- [ ] Route privat tidak dapat diakses tanpa session.
-- [ ] Rate limit aktif pada endpoint sensitif.
+- [x] Pengguna dapat register → login → logout → reset password.
+- [x] Route privat tidak dapat diakses tanpa session.
+- [x] Rate limit aktif pada endpoint sensitif.
 
 ## Verifikasi
 

@@ -8,12 +8,19 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
-  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure" },
+  globalSetup: "./e2e/global-setup.ts",
+  use: {
+    baseURL: `http://localhost:${PORT}`,
+    trace: "retain-on-failure",
+    // Session pengguna e2e dibuat sekali di global-setup agar tidak terkena rate limit sign-up.
+    storageState: "e2e/.auth/user.json",
+  },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     // Memakai build production; jalankan `npm run build` lebih dulu (CI melakukannya).
     command: `npm run start -- -p ${PORT}`,
-    url: `http://localhost:${PORT}/dashboard`,
+    url: `http://localhost:${PORT}/login`,
+    env: { BETTER_AUTH_URL: `http://localhost:${PORT}` },
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },

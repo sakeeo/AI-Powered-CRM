@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_GROUPS } from "@/components/layout/nav";
+import { UserMenu, type SessionUser } from "@/components/layout/user-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +23,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AppSidebar() {
+export function AppSidebar({ user }: { user: SessionUser }) {
   const pathname = usePathname();
   return (
     <Sidebar collapsible="icon">
@@ -67,20 +68,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter className="border-sidebar-border border-t px-3.5 pt-4 group-data-[collapsible=icon]:px-2">
-        <div className="flex items-center gap-2.5 px-1 group-data-[collapsible=icon]:justify-center">
-          <div
-            aria-hidden
-            className="text-primary grid size-[34px] shrink-0 place-items-center rounded-full bg-white/90 font-extrabold"
-          >
-            A
-          </div>
-          <div className="min-w-0 text-[13px] leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="block truncate">Admin User</span>
-            <small className="text-sidebar-muted text-micro block truncate">
-              admin@example.com
-            </small>
-          </div>
-        </div>
+        <UserMenu user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

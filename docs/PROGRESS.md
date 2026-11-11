@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 0 / 20 | Not started |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 1 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **5 / 39** | |
+| **Total** | **6 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -35,7 +35,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 
 | Plan                               | Judul                                                  | Status      | Selesai | Catatan                                                                           |
 | ---------------------------------- | ------------------------------------------------------ | ----------- | ------- | --------------------------------------------------------------------------------- |
-| [1.1](plans/phase-1/plan.1.1.md)   | Authentication                                         | Not started |         |                                                                                   |
+| [1.1](plans/phase-1/plan.1.1.md)   | Authentication                                         | Done | 2026-11-11 | Better Auth (Prisma, UUIDv7, plugin Organization), 4 halaman auth, proxy.ts + requireSession(), rate limit via Redis, reset password via mailer log (connector email di plan 1.13). 20 test integrasi/unit + 6 E2E auth.
 | [1.2](plans/phase-1/plan.1.2.md)   | Organization, membership & user management             | Not started |         |                                                                                   |
 | [1.3](plans/phase-1/plan.1.3.md)   | RBAC, tenant isolation & audit log                     | Not started |         |                                                                                   |
 | [1.4](plans/phase-1/plan.1.4.md)   | Connector Hub foundation & BYOK AI                     | Not started |         |                                                                                   |

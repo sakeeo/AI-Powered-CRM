@@ -17,6 +17,8 @@ env:
   S3_BUCKET: crm-files
   S3_ACCESS_KEY: ci_access_key
   S3_SECRET_KEY: ci_secret_key_123
+  BETTER_AUTH_SECRET: ci_better_auth_secret_at_least_32_chars_long
+  BETTER_AUTH_URL: http://localhost:3000
 
 jobs:
   verify:

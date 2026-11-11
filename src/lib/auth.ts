@@ -1,0 +1,83 @@
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { organization } from "better-auth/plugins";
+import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { sendMail } from "@/lib/mailer";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+
+const requireVerification = env.REQUIRE_EMAIL_VERIFICATION === true;
+
+/** Batas khusus endpoint sensitif (PRD §9.1): [jendela detik, maksimum request] per IP. */
+export const AUTH_RATE_LIMITS = {
+  "/sign-in/email": { window: 60, max: 5 },
+  "/sign-up/email": { window: 60, max: 5 },
+  "/request-password-reset": { window: 600, max: 3 },
+  "/forget-password": { window: 600, max: 3 },
+  "/reset-password": { window: 600, max: 5 },
+} as const;
+
+export const auth = betterAuth({
+  baseURL: env.BETTER_AUTH_URL,
+  secret: env.BETTER_AUTH_SECRET,
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  // Redis dipakai untuk rate limit; sesi tetap disimpan di PostgreSQL (sumber kebenaran).
+  secondaryStorage: {
+    get: (key) => redis.get(key),
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, "EX", ttl);
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+    getAndDelete: (key) => redis.getdel(key),
+    // INCR atomik; TTL hanya dipasang saat counter dibuat (jendela rate limit tetap).
+    increment: async (key, ttl) => {
+      const value = await redis.incr(key);
+      if (value === 1) await redis.expire(key, ttl);
+      return value;
+    },
+  },
+  session: { storeSessionInDatabase: true, expiresIn: 60 * 60 * 24 * 7 },
+  rateLimit: {
+    enabled: true,
+    storage: "secondary-storage",
+    window: 60,
+    max: 100,
+    customRules: { ...AUTH_RATE_LIMITS },
+  },
+  // Id dibuat database (UUID v7, lihat docs/database.md).
+  advanced: { database: { generateId: false } },
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    autoSignIn: true,
+    requireEmailVerification: requireVerification,
+    resetPasswordTokenExpiresIn: 60 * 60,
+    sendResetPassword: async ({ user, url }) => {
+      // Tidak di-await agar waktu respons tidak membocorkan apakah email terdaftar.
+      void sendMail({
+        to: user.email,
+        subject: "Reset password CRM",
+        text: `Halo ${user.name},\n\nBuka tautan berikut untuk mengatur ulang password (berlaku 1 jam):\n${url}\n\nAbaikan email ini bila Anda tidak memintanya.`,
+      }).catch((err) => logger.error({ err }, "Gagal mengirim email reset password"));
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: requireVerification,
+    sendVerificationEmail: async ({ user, url }) => {
+      void sendMail({
+        to: user.email,
+        subject: "Verifikasi email CRM",
+        text: `Halo ${user.name},\n\nVerifikasi email Anda: ${url}`,
+      }).catch((err) => logger.error({ err }, "Gagal mengirim email verifikasi"));
+    },
+  },
+  plugins: [organization(), nextCookies()],
+});
+
+export type Session = typeof auth.$Infer.Session;

@@ -7,6 +7,7 @@ const VALID = {
   S3_BUCKET: "crm-files",
   S3_ACCESS_KEY: "key",
   S3_SECRET_KEY: "secret-12345",
+  BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret-12",
 };
 
 afterEach(() => {
