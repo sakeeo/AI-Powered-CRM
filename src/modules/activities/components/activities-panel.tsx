@@ -2,12 +2,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TenantContext } from "@/lib/context";
 import type { ActivityLink } from "@/modules/activities/constants";
 import { ActivityComposer } from "@/modules/activities/components/activity-composer";
+import { FollowUpGhostwriter } from "@/modules/activities/components/followup-ghostwriter";
 import { ActivityItem } from "@/modules/activities/components/activity-item";
 import { listTimeline } from "@/modules/activities/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
 /** Panel aktivitas untuk halaman detail lead/contact/company/deal: composer + timeline. */
-export async function ActivitiesPanel({ ctx, link }: { ctx: TenantContext; link: ActivityLink }) {
+export async function ActivitiesPanel({
+  ctx,
+  link,
+  phone,
+}: {
+  ctx: TenantContext;
+  link: ActivityLink;
+  /** Nomor tujuan untuk shortcut wa.me pada draf follow-up. */
+  phone?: string | null;
+}) {
   const [items, owners, org] = await Promise.all([
     listTimeline(ctx, link),
     listOwnerOptions(ctx),
@@ -26,6 +36,9 @@ export async function ActivitiesPanel({ ctx, link }: { ctx: TenantContext; link:
             owners={owners}
             canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
           />
+        )}
+        {(link.leadId || link.contactId || link.dealId) && (
+          <FollowUpGhostwriter link={link} phone={phone} />
         )}
         {items.length === 0 ? (
           <p className="text-muted-foreground text-xs">Belum ada aktivitas.</p>

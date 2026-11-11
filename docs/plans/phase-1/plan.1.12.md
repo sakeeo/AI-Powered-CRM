@@ -14,11 +14,11 @@ Kalender aktivitas dan asisten AI untuk catatan/follow-up dengan human-in-the-lo
 
 ## Tugas
 
-- [ ] Tampilan kalender dasar aktivitas (FullCalendar) dengan filter user.
-- [ ] Safe AI Meeting & Call Summarizer: coretan → ringkasan terstruktur 2 paragraf (draf, bisa diedit).
-- [ ] Safe AI Action Item Extractor: deteksi komitmen tanggal → draf next activity yang harus dikonfirmasi user.
-- [ ] Safe AI Follow-up Ghostwriter: 3 opsi draf pesan (WA/Email) berdasar riwayat terakhir; tombol salin + shortcut wa.me click-to-chat; tidak ada auto-send.
-- [ ] Guardrail & test: tidak ada pengiriman/penyimpanan otomatis dari output AI.
+- [x] Tampilan kalender dasar aktivitas (FullCalendar) dengan filter user.
+- [x] Safe AI Meeting & Call Summarizer: coretan → ringkasan terstruktur 2 paragraf (draf, bisa diedit).
+- [x] Safe AI Action Item Extractor: deteksi komitmen tanggal → draf next activity yang harus dikonfirmasi user.
+- [x] Safe AI Follow-up Ghostwriter: 3 opsi draf pesan (WA/Email) berdasar riwayat terakhir; tombol salin + shortcut wa.me click-to-chat; tidak ada auto-send.
+- [x] Guardrail & test: tidak ada pengiriman/penyimpanan otomatis dari output AI.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -26,8 +26,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `@fullcalendar/r
 
 ## Acceptance Criteria
 
-- [ ] Kalender menampilkan aktivitas sesuai filter.
-- [ ] Semua output AI berupa draf yang wajib disetujui user.
+- [x] Kalender menampilkan aktivitas sesuai filter.
+- [x] Semua output AI berupa draf yang wajib disetujui user.
 
 ## Verifikasi
 

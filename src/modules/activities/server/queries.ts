@@ -86,3 +86,35 @@ export async function dealActivityInfo(ctx: TenantContext, dealIds: string[]) {
   }
   return out;
 }
+
+/** Aktivitas berjadwal (punya tenggat) pada rentang waktu — untuk kalender. Dibatasi 500 event. */
+export async function listCalendarActivities(
+  ctx: TenantContext,
+  range: { from: Date; to: Date },
+  owner?: string,
+) {
+  assertCan(ctx, "view", "Activity");
+  return ctx.db.activity.findMany({
+    where: {
+      AND: [
+        { dueAt: { gte: range.from, lt: range.to }, status: { not: "cancelled" } },
+        scopeWhere(ctx, "view", "Activity") as Where,
+        ...(owner ? [{ ownerId: owner }] : []),
+      ],
+    },
+    orderBy: { dueAt: "asc" },
+    take: 500,
+    include,
+  });
+}
+
+/** Rentang kalender: dari query string (maks. 100 hari) atau bulan berjalan ± margin. */
+export function calendarRange(fromStr?: string, toStr?: string) {
+  const DAY = 86_400_000;
+  const parse = (v?: string) =>
+    v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00Z`) : undefined;
+  const from = parse(fromStr) ?? new Date(Date.now() - 14 * DAY);
+  let to = parse(toStr) ?? new Date(Date.now() + 45 * DAY);
+  if (to.getTime() - from.getTime() > 100 * DAY) to = new Date(from.getTime() + 100 * DAY);
+  return { from, to };
+}

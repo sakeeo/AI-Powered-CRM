@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
-import { assertCan, scopeWhere } from "@/lib/authz";
-import { AppError, NotFoundError } from "@/lib/errors";
+import { assertCan } from "@/lib/authz";
+import { NotFoundError } from "@/lib/errors";
 import { idInput } from "@/lib/schema-helpers";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { zonedToUtc } from "@/lib/timezone";
@@ -13,54 +13,10 @@ import {
   setActivityStatusSchema,
   updateActivitySchema,
 } from "@/modules/activities/schemas";
+import { assertLinks } from "@/modules/activities/server/links";
 import { assertActiveMember, getOrganization } from "@/modules/organizations/server/queries";
 
 const toDue = (local: string | undefined, tz: string) => (local ? zonedToUtc(local, tz) : null);
-
-/** Pastikan record yang ditautkan ada di tenant ini DAN boleh dilihat pengguna (Sales Rep: hanya miliknya). */
-async function assertLinks(
-  ctx: ActionContext,
-  l: { leadId?: string; contactId?: string; companyId?: string; dealId?: string },
-) {
-  const checks: [string | undefined, () => Promise<unknown>][] = [
-    [
-      l.leadId,
-      () =>
-        ctx.db.lead.findFirst({
-          where: { AND: [{ id: l.leadId }, scopeWhere(ctx, "view", "Lead")] } as never,
-        }),
-    ],
-    [
-      l.contactId,
-      () =>
-        ctx.db.contact.findFirst({
-          where: {
-            AND: [{ id: l.contactId, deletedAt: null }, scopeWhere(ctx, "view", "Contact")],
-          } as never,
-        }),
-    ],
-    [
-      l.companyId,
-      () =>
-        ctx.db.company.findFirst({
-          where: {
-            AND: [{ id: l.companyId, deletedAt: null }, scopeWhere(ctx, "view", "Company")],
-          } as never,
-        }),
-    ],
-    [
-      l.dealId,
-      () =>
-        ctx.db.deal.findFirst({
-          where: {
-            AND: [{ id: l.dealId, deletedAt: null }, scopeWhere(ctx, "view", "Deal")],
-          } as never,
-        }),
-    ],
-  ];
-  for (const [id, find] of checks)
-    if (id && !(await find())) throw new AppError("Record terkait tidak ditemukan");
-}
 
 function revalidateLinks(a: {
   leadId?: string | null;

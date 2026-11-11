@@ -14,6 +14,7 @@ import {
   type ActivityLink,
   type ActivityType,
 } from "@/modules/activities/constants";
+import { AiAssist } from "@/modules/activities/components/ai-assist";
 import { createActivity } from "@/modules/activities/server/actions";
 
 export type OwnerOption = { userId: string; name: string };
@@ -73,6 +74,13 @@ export function ActivityComposer({
           </Button>
         ))}
       </div>
+      <AiAssist
+        link={link}
+        onSummary={(html) => {
+          setBody(html);
+          setEditorKey((k) => k + 1);
+        }}
+      />
       <FormField id="act-subject" label="Judul" error={errors.subject}>
         <Input id="act-subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
       </FormField>

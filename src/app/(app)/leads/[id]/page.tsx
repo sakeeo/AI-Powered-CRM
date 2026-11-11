@@ -206,7 +206,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
         matches={dups}
         canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
       />
-      <ActivitiesPanel ctx={ctx} link={{ leadId: lead.id }} />
+      <ActivitiesPanel ctx={ctx} link={{ leadId: lead.id }} phone={lead.phone} />
     </div>
   );
 }
