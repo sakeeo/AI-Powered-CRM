@@ -21,6 +21,8 @@ export async function listConnectors(ctx: TenantContext) {
     type: r.type,
     maskedHint: r.maskedHint,
     model: (r.settings as { model?: string } | null)?.model ?? null,
+    /** Pengaturan non-rahasia (mis. host/from email); rahasia tidak pernah dipilih. */
+    settings: r.settings,
     status: r.status,
     isDefault: r.isDefault,
     lastTestedAt: r.lastTestedAt,

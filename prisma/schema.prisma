@@ -104,24 +104,26 @@ model Organization {
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
 
-  members           Member[]
-  invitations       Invitation[]
-  teams             Team[]
-  auditLogs         AuditLog[]
-  connectors        TenantConnector[]
-  aiCallLogs        AiCallLog[]
-  inboundWebhook    InboundWebhook?
-  webhookDeliveries WebhookDelivery[]
-  dealStageHistory  DealStageHistory[]
-  activities        Activity[]
-  companies         Company[]
-  contacts          Contact[]
-  contactCompanies  ContactCompany[]
-  leadSources       LeadSource[]
-  leads             Lead[]
-  pipelines         Pipeline[]
-  pipelineStages    PipelineStage[]
-  deals             Deal[]
+  members                 Member[]
+  invitations             Invitation[]
+  teams                   Team[]
+  auditLogs               AuditLog[]
+  connectors              TenantConnector[]
+  aiCallLogs              AiCallLog[]
+  inboundWebhook          InboundWebhook?
+  webhookDeliveries       WebhookDelivery[]
+  dealStageHistory        DealStageHistory[]
+  activities              Activity[]
+  companies               Company[]
+  contacts                Contact[]
+  contactCompanies        ContactCompany[]
+  leadSources             LeadSource[]
+  leads                   Lead[]
+  pipelines               Pipeline[]
+  pipelineStages          PipelineStage[]
+  deals                   Deal[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
 
   @@map("organizations")
 }
@@ -292,7 +294,9 @@ model Company {
   contacts     ContactCompany[]
   deals        Deal[]
 
-  activities Activity[]
+  activities              Activity[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
 
   @@index([organizationId, name])
   @@index([organizationId, ownerId])
@@ -601,4 +605,44 @@ model Activity {
   @@index([organizationId, companyId, createdAt(sort: Desc)])
   @@index([organizationId, dealId, createdAt(sort: Desc)])
   @@map("activities")
+}
+
+/// Notifikasi in-app (ACT-09). `dedupeKey` unik per user → job reminder idempoten (tidak ada notifikasi ganda).
+model Notification {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  /// activity_due_soon | activity_overdue | ...
+  type           String
+  title          String
+  body           String?
+  link           String?
+  dedupeKey      String    @map("dedupe_key")
+  readAt         DateTime? @map("read_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company?     @relation(fields: [companyId], references: [id])
+  companyId    String?      @db.Uuid
+
+  @@unique([organizationId, userId, dedupeKey])
+  @@index([organizationId, userId, readAt, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+/// Preferensi notifikasi dasar per pengguna per organisasi (SET-09). Default: in-app & email aktif.
+model NotificationPreference {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  inApp          Boolean  @default(true) @map("in_app")
+  email          Boolean  @default(true)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company?     @relation(fields: [companyId], references: [id])
+  companyId    String?      @db.Uuid
+
+  @@unique([organizationId, userId])
+  @@map("notification_preferences")
 }

@@ -4,6 +4,8 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppTopbar } from "@/components/layout/app-topbar";
 import { AbilityProvider } from "@/components/providers/ability-provider";
 import { requireTenant } from "@/lib/context";
+import { NotificationBell } from "@/modules/notifications/components/notification-bell";
+import { countUnread, listMyNotifications } from "@/modules/notifications/server/queries";
 import { listMyOrganizations } from "@/modules/organizations/server/queries";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -11,7 +13,11 @@ async function Shell({ children }: { children: React.ReactNode }) {
   // Status sidebar (collapse) disimpan di cookie oleh komponen shadcn.
   // Guard server-side: validasi session ke database; tanpa session → /login.
   const ctx = await requireTenant();
-  const organizations = await listMyOrganizations(ctx.userId);
+  const [organizations, notifications, unread] = await Promise.all([
+    listMyOrganizations(ctx.userId),
+    listMyNotifications(ctx),
+    countUnread(ctx),
+  ]);
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
 
@@ -24,7 +30,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
           currentOrganizationId={ctx.organizationId}
         />
         <SidebarInset className="min-w-0">
-          <AppTopbar />
+          <AppTopbar bell={<NotificationBell unread={unread} items={notifications} />} />
           <div className="flex-1 p-3 sm:p-4 lg:p-6">{children}</div>
         </SidebarInset>
       </SidebarProvider>

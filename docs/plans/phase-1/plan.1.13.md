@@ -14,12 +14,12 @@ Reminder berjalan di background, notifikasi in-app tampil, dan email delivery da
 
 ## Tugas
 
-- [ ] Pasang BullMQ worker (proses terpisah) dengan retry exponential backoff dan logging.
-- [ ] Model Notification + UI bell/inbox in-app, tandai dibaca; preferensi notifikasi dasar.
-- [ ] Job reminder task mendekati/lewat due date; pencegahan reminder ganda (idempotency key).
-- [ ] Connector Email Delivery (Resend SDK atau SMTP kustom) di Connector Hub + Test Connection.
-- [ ] Gunakan connector email untuk undangan pengguna dan reset password (menggantikan stub di 1.1/1.2).
-- [ ] Test: job retry, tidak duplikat, email terkirim via mock.
+- [x] Pasang BullMQ worker (proses terpisah) dengan retry exponential backoff dan logging.
+- [x] Model Notification + UI bell/inbox in-app, tandai dibaca; preferensi notifikasi dasar.
+- [x] Job reminder task mendekati/lewat due date; pencegahan reminder ganda (idempotency key).
+- [x] Connector Email Delivery (Resend SDK atau SMTP kustom) di Connector Hub + Test Connection.
+- [x] Gunakan connector email untuk undangan pengguna dan reset password (menggantikan stub di 1.1/1.2).
+- [x] Test: job retry, tidak duplikat, email terkirim via mock.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -27,8 +27,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `BullMQ`, `iored
 
 ## Acceptance Criteria
 
-- [ ] Reminder terkirim tepat waktu sekali saja.
-- [ ] Email delivery dapat dikonfigurasi dan diuji oleh Owner/Admin.
+- [x] Reminder terkirim tepat waktu sekali saja.
+- [x] Email delivery dapat dikonfigurasi dan diuji oleh Owner/Admin.
 
 ## Verifikasi
 

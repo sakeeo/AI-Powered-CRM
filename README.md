@@ -38,6 +38,7 @@ npm run dev                 # http://localhost:3000
 | `npm run format:check`  | Prettier (cek saja)                                                          |
 | `npm test`              | Vitest (unit + integration)                                                  |
 | `npm run test:e2e`      | Playwright E2E (jalankan `npm run build` dulu; `npm run e2e:install` sekali) |
+| `npm run worker`        | Worker BullMQ (email + reminder task); jalankan bersama `npm run dev`        |
 | `npm run db:migrate`    | Migrasi dev (`prisma migrate dev`)                                           |
 | `npm run db:seed`       | Seed data demo                                                               |
 | `npm run db:test:setup` | Siapkan database `crm_test`                                                  |

@@ -15,7 +15,7 @@ function currentItem(pathname: string) {
 }
 
 /** Topbar mockup: 64px, sticky, blur; judul halaman (satu-satunya h1) + subjudul di kiri. */
-export function AppTopbar() {
+export function AppTopbar({ bell }: { bell?: React.ReactNode }) {
   const item = currentItem(usePathname());
   return (
     <header className="bg-card/85 border-border sticky top-0 z-20 flex h-[58px] shrink-0 items-center gap-3 border-b px-4 backdrop-blur-md sm:h-16 md:px-6">
@@ -31,6 +31,7 @@ export function AppTopbar() {
       </div>
       <div className="ml-auto flex items-center gap-1.5">
         <CommandPalette />
+        {bell}
         <ThemeToggle />
       </div>
     </header>

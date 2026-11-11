@@ -16,10 +16,10 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Phase                                                         | Plan Done / Total | Status      |
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
-| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 12 / 20 | In progress |
+| [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 13 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 0 / 7 | Not started |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **18 / 39** | |
+| **Total** | **19 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -47,7 +47,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [1.10](plans/phase-1/plan.1.10.md) | Kanban board, Won/Lost & Deal Risk advisor             | Done | 2026-11-11 | DealStageHistory (setiap perpindahan tercatat), Kanban @hello-pangea/dnd (mouse/sentuh/keyboard, optimistik + rollback), filter owner & periode, Won/Lost/Buka kembali (Lost wajib alasan), badge risiko pasif deterministik (tidak mengubah data). Peringatan 'tanpa next activity' dikerjakan di 1.11 (butuh Activity). Perbaikan useCan dengan record. 8 test + 1 E2E. |
 | [1.11](plans/phase-1/plan.1.11.md) | Activities, tasks & timeline                           | Done | 2026-11-11 | Activity (FK eksplisit ke lead/contact/company/deal, ownerId = assignee), task + log call/meeting/email/note, composer Tiptap (HTML disanitasi di server), timeline di 4 halaman detail, halaman Activities (Terlambat/Mendatang/Selesai) akurat terhadap timezone organisasi (tenggat tanggal-saja = akhir hari), aktivitas ikut berpindah saat konversi lead, peringatan 'tanpa next activity' di Kanban + aktivitas menyegarkan indikator risiko. 13 test + 1 E2E. |
 | [1.12](plans/phase-1/plan.1.12.md) | Calendar & AI notes assistant                          | Done | 2026-11-11 | Kalender FullCalendar (bulan/minggu, filter user, rentang dimuat via URL, waktu dinding zona org); Safe AI Summarizer, Action Item Extractor (draf dikonfirmasi per item), Follow-up Ghostwriter (3 opsi, salin + wa.me, tanpa kirim otomatis); input AI diperlakukan sebagai data; log AI metadata saja. 5 test integrasi + 1 E2E. |
-| [1.13](plans/phase-1/plan.1.13.md) | Notifications, email delivery & reminder jobs          | Not started |         |                                                                                   |
+| [1.13](plans/phase-1/plan.1.13.md) | Notifications, email delivery & reminder jobs          | Done | 2026-11-11 | BullMQ worker terpisah (npm run worker): antrean mail (retry exponential backoff 5x) + pemindaian reminder tiap menit; Notification (dedupeKey unik → reminder sekali saja, due_soon/overdue), bell + inbox + preferensi in-app/email; connector Email Delivery SMTP/Resend (terenkripsi, test = email uji ke diri sendiri); sendMail memakai connector organisasi penerima (undangan, reset password). 8 test integrasi (retry nyata via BullMQ + Redis) + 1 E2E. |
 | [1.14](plans/phase-1/plan.1.14.md) | Product & service catalog                              | Not started |         |                                                                                   |
 | [1.15](plans/phase-1/plan.1.15.md) | Quotation builder & PDF                                | Not started |         |                                                                                   |
 | [1.16](plans/phase-1/plan.1.16.md) | Customer retention & Customer 360                      | Not started |         |                                                                                   |

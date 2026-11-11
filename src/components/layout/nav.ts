@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Bell,
   Building2,
   CalendarDays,
   CheckSquare,
@@ -126,4 +127,14 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export const ALL_NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
+/** Halaman yang tidak ada di sidebar tetapi perlu judul topbar & muncul di command palette. */
+const EXTRA_PAGES: NavItem[] = [
+  {
+    title: "Notifikasi",
+    href: "/notifications",
+    icon: Bell,
+    description: "Inbox notifikasi dan preferensi reminder.",
+  },
+];
+
+export const ALL_NAV_ITEMS = [...NAV_GROUPS.flatMap((g) => g.items), ...EXTRA_PAGES];
