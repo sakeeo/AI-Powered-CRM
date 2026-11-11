@@ -4,12 +4,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Design tokens — SATU-SATUNYA sumber nilai visual.
+ * Spesifikasi & alasan: docs/design-system.md. Referensi visual: docs/mockup-dasboard.html.
+ * Jangan menulis hex/shadow langsung di komponen; tambahkan token di sini.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -17,7 +23,9 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar: var(--sidebar);
+
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -35,86 +43,215 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-brand-navy: var(--brand-navy);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Tone semantik: solid / soft / border / ink (design-system §2.3) */
+  --color-tone-blue: var(--tone-blue);
+  --color-tone-blue-soft: var(--tone-blue-soft);
+  --color-tone-blue-border: var(--tone-blue-border);
+  --color-tone-blue-ink: var(--tone-blue-ink);
+  --color-tone-green: var(--tone-green);
+  --color-tone-green-soft: var(--tone-green-soft);
+  --color-tone-green-border: var(--tone-green-border);
+  --color-tone-green-ink: var(--tone-green-ink);
+  --color-tone-orange: var(--tone-orange);
+  --color-tone-orange-soft: var(--tone-orange-soft);
+  --color-tone-orange-border: var(--tone-orange-border);
+  --color-tone-orange-ink: var(--tone-orange-ink);
+  --color-tone-purple: var(--tone-purple);
+  --color-tone-purple-soft: var(--tone-purple-soft);
+  --color-tone-purple-border: var(--tone-purple-border);
+  --color-tone-purple-ink: var(--tone-purple-ink);
+  --color-tone-red: var(--tone-red);
+  --color-tone-red-soft: var(--tone-red-soft);
+  --color-tone-red-border: var(--tone-red-border);
+  --color-tone-red-ink: var(--tone-red-ink);
+
+  /* Radius (design-system §2.6): kontrol 9, tile 12, kartu 15, hero 18 */
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 15px;
+  --radius-2xl: 18px;
+  --radius-3xl: 22px;
+  --radius-4xl: 26px;
+
+  --shadow-card: 0 2px 8px rgb(18 39 66 / 0.06), 0 1px 2px rgb(18 39 66 / 0.05);
+  --shadow-hero: 0 12px 24px rgb(18 79 128 / 0.125);
+
+  --spacing-card: var(--card-padding);
+
+  /* Skala tipografi (design-system §2.5). Ukuran responsif lewat variabel --fs-*. */
+  --text-hero: var(--fs-hero);
+  --text-hero--line-height: 1.2;
+  --text-hero--letter-spacing: -0.6px;
+  --text-kpi: var(--fs-kpi);
+  --text-kpi--line-height: 1.2;
+  --text-kpi--letter-spacing: -0.5px;
+  --text-kpi-sm: var(--fs-kpi-sm);
+  --text-kpi-sm--line-height: 1.3;
+  --text-page-title: var(--fs-page-title);
+  --text-page-title--line-height: 1.25;
+  --text-page-title--letter-spacing: -0.5px;
+  --text-panel-title: var(--fs-panel-title);
+  --text-panel-title--line-height: 1.3;
+  --text-panel-title--letter-spacing: -0.2px;
+  --text-md: 0.9375rem;
+  --text-md--line-height: 1.4;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.5;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.4;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --fs-hero: 1.75rem;
+  --fs-kpi: 1.6875rem;
+  --fs-kpi-sm: 1.5rem;
+  --fs-page-title: 1.3125rem;
+  --fs-panel-title: 1.0625rem;
+  --card-padding: 17px;
+  --page-padding: 24px;
+
+  --background: #f6f8fb;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --popover: #ffffff;
+  --popover-foreground: #172033;
+  --primary: #1269a8;
+  --primary-strong: #0d5b96;
+  --primary-foreground: #ffffff;
+  --brand-navy: #104f80;
+  --secondary: #eff6ff;
+  --secondary-foreground: #104f80;
+  --muted: #f0f2f5;
+  --muted-foreground: #7d8796;
+  --accent: #eff6ff;
+  --accent-foreground: #104f80;
+  --destructive: #ef3c4b;
+  --border: #e8edf3;
+  --input: #e2e7ed;
+  --ring: #1269a8;
+
+  --chart-1: #1269a8;
+  --chart-2: #0eaa7c;
+  --chart-3: #f47708;
+  --chart-4: #913ce8;
+  --chart-5: #ef3342;
+
+  --tone-blue: #1269a8;
+  --tone-blue-soft: #eff6ff;
+  --tone-blue-border: #c9e0ff;
+  --tone-blue-ink: #1670b5;
+  --tone-green: #0eaa7c;
+  --tone-green-soft: #ecfbf4;
+  --tone-green-border: #bfeedd;
+  --tone-green-ink: #0c9d72;
+  --tone-orange: #f47708;
+  --tone-orange-soft: #fff8e9;
+  --tone-orange-border: #ffdfb8;
+  --tone-orange-ink: #b45f06;
+  --tone-purple: #913ce8;
+  --tone-purple-soft: #f6f0ff;
+  --tone-purple-border: #e2cdfb;
+  --tone-purple-ink: #7a2fd0;
+  --tone-red: #ef3342;
+  --tone-red-soft: #fff0f1;
+  --tone-red-border: #ffd1d5;
+  --tone-red-ink: #d92a39;
+
+  /* Sidebar biru: sama di light & dark (identitas merek) */
+  --sidebar-gradient: linear-gradient(180deg, #126baa, #105b94);
+  --sidebar: #126baa;
+  --sidebar-foreground: #e3f1fb;
+  --sidebar-muted: #c8e2f5;
+  --sidebar-primary: #3485f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #3485f6;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.15);
+  --sidebar-ring: #ffffff;
+
+  /* Gradien hero & aksi cepat */
+  --gradient-hero: linear-gradient(110deg, #176eae, #0e4e7d);
+  --gradient-quick-blue: linear-gradient(120deg, #176fae, #0e5790);
+  --gradient-quick-green: linear-gradient(120deg, #0dbb8a, #079b88);
+  --gradient-quick-orange: linear-gradient(120deg, #ff9b00, #f0520a);
+  --gradient-quick-purple: linear-gradient(120deg, #994af3, #7c1ce4);
+  --gradient-medal-gold: linear-gradient(135deg, #ffc400, #e89a00);
+  --gradient-medal-silver: linear-gradient(135deg, #c9d4df, #77889b);
+  --gradient-medal-bronze: linear-gradient(135deg, #ff9c21, #f45c45);
+
+  --radius: 15px;
 }
 
+/* Dark mode: DITURUNKAN dari hue mockup (mockup hanya light) — design-system §2.4 */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0e1522;
+  --foreground: #e6edf6;
+  --card: #151f30;
+  --card-foreground: #e6edf6;
+  --popover: #151f30;
+  --popover-foreground: #e6edf6;
+  --primary: #4a9ad8;
+  --primary-strong: #6bb0e6;
+  --primary-foreground: #0b1320;
+  --brand-navy: #9cc9ee;
+  --secondary: #1b2a40;
+  --secondary-foreground: #cfe3f6;
+  --muted: #1b2638;
+  --muted-foreground: #94a1b3;
+  --accent: #1b2a40;
+  --accent-foreground: #cfe3f6;
+  --destructive: #ff6b78;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.15);
+  --ring: #4a9ad8;
+
+  --tone-blue: #4a9ad8;
+  --tone-blue-soft: color-mix(in oklab, #4a9ad8 15%, transparent);
+  --tone-blue-border: color-mix(in oklab, #4a9ad8 30%, transparent);
+  --tone-blue-ink: #8cc4f2;
+  --tone-green: #22c796;
+  --tone-green-soft: color-mix(in oklab, #22c796 15%, transparent);
+  --tone-green-border: color-mix(in oklab, #22c796 30%, transparent);
+  --tone-green-ink: #4fdcb1;
+  --tone-orange: #ff9230;
+  --tone-orange-soft: color-mix(in oklab, #ff9230 15%, transparent);
+  --tone-orange-border: color-mix(in oklab, #ff9230 30%, transparent);
+  --tone-orange-ink: #ffb066;
+  --tone-purple: #ad6bf3;
+  --tone-purple-soft: color-mix(in oklab, #ad6bf3 15%, transparent);
+  --tone-purple-border: color-mix(in oklab, #ad6bf3 30%, transparent);
+  --tone-purple-ink: #c79af7;
+  --tone-red: #ff5a68;
+  --tone-red-soft: color-mix(in oklab, #ff5a68 15%, transparent);
+  --tone-red-border: color-mix(in oklab, #ff5a68 30%, transparent);
+  --tone-red-ink: #ff8a94;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --fs-hero: 1.5625rem;
+    --fs-kpi: 1.5rem;
+    --fs-kpi-sm: 1.375rem;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --fs-hero: 1.4375rem;
+    --fs-kpi: 1.375rem;
+    --fs-page-title: 1.1875rem;
+    --fs-panel-title: 1rem;
+    --card-padding: 14px;
+  }
 }
 
 @layer base {
@@ -122,9 +259,21 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-sm;
   }
   html {
     @apply font-sans;
+  }
+  /* Sidebar memakai gradien vertikal, bukan warna datar (desktop & drawer mobile). */
+  [data-sidebar="sidebar"] {
+    background-image: var(--sidebar-gradient);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
   }
 }

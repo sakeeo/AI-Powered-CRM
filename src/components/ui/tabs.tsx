@@ -21,12 +21,14 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none",
+  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none data-[variant=segment]:rounded-none",
   {
     variants: {
       variant: {
         default: "bg-muted",
         line: "gap-1 bg-transparent",
+        // Tab segmen ala mockup: tombol terpisah, aktif = biru penuh.
+        segment: "h-auto! gap-1.5 bg-transparent p-0",
       },
     },
     defaultVariants: {
@@ -59,6 +61,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
         "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
         "after:bg-foreground after:absolute after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
+        "group-data-[variant=segment]/tabs-list:border-input group-data-[variant=segment]/tabs-list:bg-card group-data-[variant=segment]/tabs-list:text-foreground group-data-[variant=segment]/tabs-list:data-active:border-primary group-data-[variant=segment]/tabs-list:data-active:bg-primary group-data-[variant=segment]/tabs-list:data-active:text-primary-foreground dark:group-data-[variant=segment]/tabs-list:data-active:bg-primary dark:group-data-[variant=segment]/tabs-list:data-active:border-primary dark:group-data-[variant=segment]/tabs-list:data-active:text-primary-foreground group-data-[variant=segment]/tabs-list:h-8 group-data-[variant=segment]/tabs-list:rounded-[8px] group-data-[variant=segment]/tabs-list:px-3 group-data-[variant=segment]/tabs-list:text-xs group-data-[variant=segment]/tabs-list:after:hidden group-data-[variant=segment]/tabs-list:data-active:shadow-[0_2px_5px_rgb(18_105_168/0.2)]",
         className,
       )}
       {...props}

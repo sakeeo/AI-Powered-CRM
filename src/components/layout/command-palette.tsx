@@ -35,14 +35,13 @@ export function CommandPalette() {
     <>
       <Button
         variant="outline"
-        size="sm"
-        className="text-muted-foreground w-9 justify-center gap-2 px-0 sm:w-56 sm:justify-start sm:px-3"
+        className="bg-muted hover:bg-muted/70 text-muted-foreground border-border w-9 justify-center gap-2 px-0 text-[13px] font-normal sm:w-[220px] sm:justify-start sm:px-3"
         onClick={() => setOpen(true)}
         aria-label="Buka pencarian"
       >
         <Search className="size-4" />
         <span className="hidden sm:inline">Cari…</span>
-        <kbd className="bg-muted ml-auto hidden rounded px-1.5 text-[10px] font-medium sm:inline">
+        <kbd className="bg-card text-micro ml-auto hidden rounded px-1.5 font-medium sm:inline">
           Ctrl K
         </kbd>
       </Button>

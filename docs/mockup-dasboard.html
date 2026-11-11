@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Afghan Product — Admin Dashboard</title>
+<style>
+:root{--blue:#1269a8;--blue2:#0d5b96;--navy:#104f80;--ink:#172033;--muted:#7d8796;--line:#e8edf3;--bg:#f6f8fb;--green:#13a779;--orange:#f28a12;--purple:#8b45e8;--red:#ef3c4b;--radius:15px;--shadow:0 2px 8px rgba(18,39,66,.06),0 1px 2px rgba(18,39,66,.05)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.app{min-height:100vh;display:flex}.sidebar{width:220px;background:linear-gradient(180deg,#126baa,#105b94);color:#fff;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;padding:20px 13px;z-index:5}.brand{padding:0 10px 22px;border-bottom:1px solid #ffffff25}.brand strong{font-size:16px;display:block;letter-spacing:-.3px}.brand span{font-size:11px;color:#c8e2f5}.nav{display:grid;gap:6px;margin-top:18px}.nav a{color:#e3f1fb;text-decoration:none;padding:11px 12px;border-radius:9px;display:flex;align-items:center;gap:12px;font-size:13px}.nav a.active,.nav a:hover{background:#3485f6;color:#fff}.nav svg{width:17px;height:17px;opacity:.95}.side-bottom{margin-top:auto;border-top:1px solid #ffffff25;padding:15px 5px 0;display:flex;gap:10px;align-items:center;font-size:12px}.avatar{width:34px;height:34px;border-radius:50%;background:#e7f1fb;color:#1269a8;display:grid;place-items:center;font-weight:800}.side-bottom small{display:block;color:#c5dced;font-size:10px}.main{margin-left:220px;width:calc(100% - 220px);padding:0 24px 30px}.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin:0 -24px 18px;padding:0 26px;background:#ffffffd9;position:sticky;top:0;z-index:4;backdrop-filter:blur(12px)}.page-title{font-weight:750;font-size:19px;letter-spacing:-.5px}.page-title small{display:block;font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0}.top-actions{display:flex;align-items:center;gap:15px}.search{width:220px;background:#f3f5f8;border:1px solid #edf0f4;border-radius:9px;padding:9px 12px;color:#87909c;display:flex;gap:8px;font-size:12px}.icon-btn{border:0;background:transparent;color:#5c6674;font-size:18px;cursor:pointer}.user-dot{width:27px;height:27px;border-radius:50%;background:#1765e9;color:white;display:grid;place-items:center;font-size:11px}.welcome{background:radial-gradient(circle at 95% 10%,#ffffff16 0 110px,transparent 111px),linear-gradient(110deg,#176eae,#0e4e7d);color:white;border-radius:18px;padding:22px 22px 20px;box-shadow:0 12px 24px #124f8020;position:relative;overflow:hidden}.welcome:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #ffffff15;border-radius:50%;right:-90px;bottom:-150px;box-shadow:0 0 0 25px #ffffff08,0 0 0 55px #ffffff06}.welcome-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.welcome h1{font-size:25px;line-height:1.2;margin:0;font-weight:750;letter-spacing:-.6px}.date-pill{background:#ffffff28;border:1px solid #ffffff22;border-radius:20px;padding:4px 10px;font-size:10px;color:#e4f2fc}.welcome p{margin:6px 0 19px;color:#d7eafa;font-size:13px}.welcome-actions{position:absolute;right:22px;top:20px;display:flex;gap:8px}.outline-btn{border:1px solid #ffffff48;background:#ffffff14;color:white;border-radius:9px;padding:8px 11px;font-size:11px;cursor:pointer}.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;z-index:1}.hero-stat{background:#ffffff17;border:1px solid #ffffff2b;border-radius:12px;padding:12px 13px;min-width:0}.stat-label{font-size:10px;color:#d6eafa;display:flex;align-items:center;gap:8px}.stat-icon{width:27px;height:27px;border-radius:8px;background:#ffffff26;display:grid;place-items:center;font-size:15px}.hero-stat strong{display:block;font-size:21px;line-height:1.3;margin:7px 0 1px}.hero-stat small{font-size:10px;color:#d0e5f5}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.metric{padding:16px 17px 14px}.metric-top{display:flex;align-items:center;justify-content:space-between}.metric-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px}.blue{background:#eff6ff;color:#1670b5}.green{background:#ecfbf4;color:#0eaa7c}.orange{background:#fff8e9;color:#e88a08}.purple{background:#f6f0ff;color:#873ee4}.trend{font-size:10px;color:#109a70;background:#edfbf5;border-radius:20px;padding:4px 8px;font-weight:650}.metric h2{font-size:22px;margin:12px 0 0;letter-spacing:-.5px}.metric p{margin:0;color:#707b8a;font-size:11px}.metric .sub{font-size:10px;color:#9aa2ad;margin-top:2px}.progress-head{display:flex;justify-content:space-between;color:#7c8592;font-size:10px;margin:11px 0 5px}.progress{height:5px;background:#edf0f4;border-radius:9px;overflow:hidden}.progress i{display:block;height:100%;border-radius:9px;background:var(--blue)}.metric-foot{display:flex;justify-content:space-between;color:#9aa2ad;font-size:9px;margin-top:8px}.content-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.8fr);gap:15px}.panel{padding:17px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.panel h3{margin:0;font-size:14px;letter-spacing:-.2px}.panel-head p{font-size:10px;color:#89919d;margin:3px 0 0}.tabs{display:flex;gap:5px}.tab{border:1px solid #e2e7ed;background:#fff;color:#394352;border-radius:8px;padding:7px 11px;font-size:10px;cursor:pointer}.tab.active{background:#1269a8;border-color:#1269a8;color:#fff;box-shadow:0 2px 5px #1269a833}.month-row{margin:0 0 13px}.month-meta{display:flex;align-items:center;justify-content:space-between;font-size:10px;margin-bottom:6px}.month-meta b{font-size:11px}.month-meta span{color:#929ba7}.month-right{display:flex;gap:10px;align-items:center}.month-right em{font-style:normal;color:#11966e;background:#effbf5;border-radius:15px;padding:3px 7px;font-size:9px}.bar-track{height:36px;background:#f0f2f5;border-radius:11px;overflow:hidden}.bar-fill{height:100%;border-radius:11px;background:linear-gradient(90deg,#1672b5,#0e5c96);display:flex;align-items:center;justify-content:flex-end;padding-right:11px;color:white;font-size:9px;font-weight:700;transition:width .35s}.analytics-summary{border-top:1px solid #edf0f3;margin-top:16px;padding-top:15px;display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.summary-tile{text-align:center;border-radius:10px;padding:10px 5px;background:#eff6ff}.summary-tile:nth-child(2){background:#effbf4}.summary-tile:nth-child(3){background:#f8f2ff}.summary-tile:nth-child(4){background:#fff9ec}.summary-tile .symbol{font-size:15px;color:#176eae}.summary-tile strong{display:block;font-size:16px;margin:1px 0}.summary-tile small{font-size:9px;color:#7e8793}.activity-list{display:grid}.activity{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #f0f2f5}.activity:last-child{border:0}.activity-icon{width:27px;height:27px;border-radius:9px;background:#eff6ff;color:#176db0;display:grid;place-items:center;flex:none}.activity:nth-child(2) .activity-icon{background:#edfbf4;color:#12a275}.activity:nth-child(3) .activity-icon{background:#f7f0ff;color:#8848db}.activity:nth-child(4) .activity-icon{background:#fff8e9;color:#e49a1c}.activity p{margin:1px 0 3px;font-size:10px;color:#586271}.activity strong{color:#202938}.activity small{font-size:9px;color:#a0a7b1}.activity .amount{color:#0c9d72;font-weight:700;display:block;font-size:10px}.live{color:#12a56f;font-size:9px;font-weight:700}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#12b879;margin-right:5px}.view-all{display:block;text-align:center;color:#1269a8;text-decoration:none;font-size:10px;padding:13px 0 0}.lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{min-height:88px;border:0;border-radius:12px;color:#fff;text-align:left;padding:13px 14px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}.quick:hover{transform:translateY(-2px)}.quick:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:#ffffff13;right:-40px;top:-48px}.quick .qicon{font-size:19px;display:block;margin-bottom:9px}.quick strong{display:block;font-size:10px}.quick small{font-size:9px;opacity:.82}.qblue{background:linear-gradient(120deg,#176fae,#0e5790)}.qgreen{background:linear-gradient(120deg,#0dbb8a,#079b88)}.qorange{background:linear-gradient(120deg,#ff9b00,#f0520a)}.qpurple{background:linear-gradient(120deg,#994af3,#7c1ce4)}.seller{display:flex;align-items:center;gap:10px;background:#fafbfd;border-radius:11px;padding:9px 10px;margin-bottom:8px}.seller-badge{width:39px;height:39px;border-radius:11px;display:grid;place-items:center;color:white;font-weight:800;box-shadow:0 2px 5px #0002;position:relative;flex:none}.seller-badge:after{content:attr(data-rank);position:absolute;right:-4px;top:-6px;background:white;color:#4b5563;border:1px solid #e7eaf0;border-radius:50%;width:16px;height:16px;display:grid;place-items:center;font-size:9px}.seller-info{min-width:0;flex:1}.seller-info strong{display:block;font-size:10px}.seller-info small{font-size:9px;color:#89919d}.seller-info em{font-style:normal;color:#0c9d72}.seller-revenue{text-align:right;font-weight:700;font-size:11px;white-space:nowrap}.seller-revenue small{display:block;color:#8d96a2;font-size:9px;font-weight:400}.pending{margin-top:15px;padding:17px}.pending-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.pending-card{border-radius:13px;padding:15px;border:1px solid}.pending-card.orange-bg{background:#fff5e8;border-color:#ffdfb8}.pending-card.blue-bg{background:#edf5ff;border-color:#c9e0ff}.pending-card.red-bg{background:#fff0f1;border-color:#ffd1d5}.pending-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.pending-icon{width:34px;height:34px;border-radius:10px;background:#f47708;color:#fff;display:grid;place-items:center;font-size:16px;box-shadow:0 2px 5px #0002}.blue-bg .pending-icon{background:#126ba9}.red-bg .pending-icon{background:#ef3342}.count{border-radius:30px;background:#f47708;color:#fff;padding:5px 10px;font-weight:750;font-size:12px}.blue-bg .count{background:#126ba9}.red-bg .count{background:#ef3342}.pending-card strong{font-size:12px;display:block}.pending-card p{font-size:10px;color:#596372;margin:5px 0 12px}.pending-card button{width:100%;border:0;border-radius:9px;padding:9px;background:#f47708;color:#fff;font-weight:650;font-size:10px;cursor:pointer;box-shadow:0 2px 4px #0002}.blue-bg button{background:#126ba9}.red-bg button{background:#ef3342}.mobile-menu{display:none}
+@media(max-width:1050px){.sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px);padding-inline:17px}.topbar{margin-inline:-17px}.metrics{gap:10px}.content-grid{grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr)}}
+@media(max-width:780px){.sidebar{width:65px;padding:17px 9px}.brand{padding:0 0 18px;text-align:center}.brand strong{font-size:0}.brand strong:first-letter{font-size:18px}.brand span,.nav a span,.side-bottom div:last-child{display:none}.nav a{justify-content:center;padding:12px 8px}.nav svg{width:19px;height:19px}.side-bottom{justify-content:center}.main{margin-left:65px;width:calc(100% - 65px);padding-inline:13px}.topbar{padding-inline:15px;margin-inline:-13px}.search{width:145px}.hero-stats,.metrics{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}.lower-grid{grid-template-columns:1fr}.pending-grid{grid-template-columns:1fr}.welcome-actions{position:static;margin:0 0 12px}.welcome-head{gap:9px}.welcome h1{font-size:22px}}
+@media(max-width:480px){.topbar{height:58px}.page-title{font-size:16px}.page-title small{font-size:9px}.search{display:none}.welcome{padding:17px}.welcome h1{font-size:20px}.hero-stat{padding:10px}.hero-stat strong{font-size:19px}.metric{padding:13px}.metric h2{font-size:19px}.analytics-summary{grid-template-columns:repeat(2,1fr)}.panel{padding:14px}.panel-head{flex-wrap:wrap}.tabs{width:100%}.tab{flex:1}.bar-track{height:31px}.quick{min-height:85px;padding:11px}.pending-card{padding:13px}}
+
+/* Dashboard typography scale: readable, balanced, and responsive */
+:root{
+  --font-xs:12px;
+  --font-sm:13px;
+  --font-base:14px;
+  --font-md:16px;
+  --font-lg:18px;
+  --font-xl:22px;
+  --font-kpi:28px;
+}
+body{font-size:var(--font-base);line-height:1.5}
+.brand strong{font-size:17px}
+.brand span{font-size:12px}
+.nav a{font-size:14px}
+.side-bottom{font-size:13px}
+.side-bottom small{font-size:11px}
+.page-title{font-size:21px}
+.page-title small{font-size:12px}
+.search{font-size:13px}
+.user-dot{font-size:12px}
+.welcome h1{font-size:28px}
+.date-pill{font-size:12px}
+.welcome p{font-size:14px}
+.outline-btn{font-size:12px}
+.stat-label{font-size:12px}
+.hero-stat strong{font-size:24px}
+.hero-stat small{font-size:12px}
+.trend{font-size:12px}
+.metric h2{font-size:27px}
+.metric p{font-size:13px}
+.metric .sub{font-size:12px}
+.progress-head{font-size:12px}
+.metric-foot{font-size:11px}
+.panel h3{font-size:17px}
+.panel-head p{font-size:12px}
+.tab{font-size:12px}
+.month-meta{font-size:12px}
+.month-meta b{font-size:13px}
+.month-right em{font-size:11px}
+.bar-fill{font-size:11px}
+.summary-tile strong{font-size:18px}
+.summary-tile small{font-size:11px}
+.activity p{font-size:12px;line-height:1.5}
+.activity small{font-size:11px}
+.activity .amount{font-size:12px}
+.live{font-size:11px}
+.view-all{font-size:12px}
+.quick strong{font-size:13px}
+.quick small{font-size:11px}
+.seller-info strong{font-size:13px}
+.seller-info small{font-size:11px}
+.seller-revenue{font-size:13px}
+.seller-revenue small{font-size:11px}
+.pending-card strong{font-size:15px}
+.pending-card p{font-size:13px;line-height:1.5}
+.pending-card button{font-size:13px}
+@media(max-width:900px){
+  :root{--font-base:14px;--font-kpi:26px}
+  .welcome h1{font-size:25px}
+  .hero-stat strong{font-size:22px}
+  .metric h2{font-size:24px}
+}
+@media(max-width:600px){
+  .page-title{font-size:19px}
+  .welcome h1{font-size:23px}
+  .panel h3{font-size:16px}
+  .metric h2{font-size:22px}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><strong>Afghan Product</strong><span>Admin Panel</span></div>
+  <nav class="nav">
+    <a class="active" href="#dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="8" height="7" rx="1"/></svg><span>Dashboard</span></a>
+    <a href="#users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM20 8v6m3-3h-6"/></svg><span>Users</span></a>
+    <a href="#products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 7 9 5 9-5M3 7v10l9 5 9-5V7M12 12v10"/></svg><span>Products</span></a>
+    <a href="#orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14l1 18H4L5 3Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Orders</span></a>
+    <a href="#categories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Categories</span></a>
+    <a href="#messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg><span>Messages</span></a>
+    <a href="#analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18M7 14l4-4 4 3 6-7"/></svg><span>Analytics</span></a>
+    <a href="#settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4L5.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1L9 7.4h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4-1.4 1.1a8 8 0 0 1-.1 2Z" transform="translate(1 0)"/></svg><span>Settings</span></a>
+  </nav>
+  <div class="side-bottom"><div class="avatar">A</div><div>Admin User<small>admin@afghan.com</small></div></div>
+</aside>
+<main class="main" id="dashboard">
+  <header class="topbar"><div class="page-title">Dashboard<small>Manage your dashboard here</small></div><div class="top-actions"><div class="search">⌕ <span>Search...</span></div><button class="icon-btn" aria-label="Notifications">♧</button><div class="user-dot">A</div><span style="font-size:11px;color:#77808c">⌄</span></div></header>
+  <section class="welcome">
+    <div class="welcome-actions"><button class="outline-btn" onclick="window.print()">⇩ &nbsp;Export</button><button class="outline-btn" onclick="location.reload()">↻</button></div>
+    <div class="welcome-head"><h1>Welcome back, Admin</h1><span class="date-pill">Wednesday, April 1, 2026</span></div>
+    <p>Here's your platform performance overview</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="stat-label"><span class="stat-icon">🛒</span>Today's Orders</div><strong>47</strong><small>↗ +12% from yesterday</small></div>
+      <div class="hero-stat"><div class="stat-label"><span class="stat-icon">♙</span>New Users</div><strong>23</strong><small>↗ +8% from yesterday</small></div>
+      <div class="hero-stat"><div class="stat-label"><span class="stat-icon">＄</span>Revenue Today</div><strong>PKR 84K</strong><small>↗ +18% from yesterday</small></div>
+      <div class="hero-stat"><div class="stat-label"><span class="stat-icon">⌁</span>Conversion Rate</div><strong>3.24%</strong><small>↗ +0.4% from yesterday</small></div>
+    </div>
+  </section>
+  <section class="metrics">
+    <article class="card metric"><div class="metric-top"><span class="metric-icon blue">♙</span><span class="trend">↗ +12.5%</span></div><h2>12,543</h2><p>Total Users</p><div class="sub">Active users</div><div class="progress-head"><span>Progress</span><b>75%</b></div><div class="progress"><i style="width:75%"></i></div><div class="metric-foot"><span>vs last month:</span><b>11,156</b></div></article>
+    <article class="card metric"><div class="metric-top"><span class="metric-icon green">⬡</span><span class="trend">↗ +8.2%</span></div><h2>3,842</h2><p>Total Products</p><div class="sub">Listed items</div><div class="progress-head"><span>Progress</span><b>62%</b></div><div class="progress"><i style="width:62%;background:#0da486"></i></div><div class="metric-foot"><span>vs last month:</span><b>3,551</b></div></article>
+    <article class="card metric"><div class="metric-top"><span class="metric-icon orange">🛒</span><span class="trend">↗ +15.3%</span></div><h2>9,238</h2><p>Total Orders</p><div class="sub">This month</div><div class="progress-head"><span>Progress</span><b>85%</b></div><div class="progress"><i style="width:85%;background:#f47708"></i></div><div class="metric-foot"><span>vs last month:</span><b>8,012</b></div></article>
+    <article class="card metric"><div class="metric-top"><span class="metric-icon purple">＄</span><span class="trend">↗ +23.1%</span></div><h2>PKR 2.4M</h2><p>Total Revenue</p><div class="sub">Net income</div><div class="progress-head"><span>Progress</span><b>90%</b></div><div class="progress"><i style="width:90%;background:#913ce8"></i></div><div class="metric-foot"><span>vs last month:</span><b>PKR 1.95M</b></div></article>
+  </section>
+  <section class="content-grid">
+    <article class="card panel" id="analytics"><div class="panel-head"><div><h3>Revenue Analytics</h3><p>Comprehensive revenue performance metrics</p></div><div class="tabs"><button class="tab active" data-period="month">This Month</button><button class="tab" data-period="year">This Year</button></div></div>
+      <div id="bars"><div class="month-row"><div class="month-meta"><div><b>January</b> <span> · 842 orders</span></div><div class="month-right"><em>+12.5%</em><b>PKR 180K</b></div></div><div class="bar-track"><div class="bar-fill" style="width:60%">60%</div></div></div>
+      <div class="month-row"><div class="month-meta"><div><b>February</b> <span> · 1,024 orders</span></div><div class="month-right"><em>+22.2%</em><b>PKR 220K</b></div></div><div class="bar-track"><div class="bar-fill" style="width:73%">73%</div></div></div>
+      <div class="month-row"><div class="month-meta"><div><b>March</b> <span> · 1,156 orders</span></div><div class="month-right"><em>+9.1%</em><b>PKR 240K</b></div></div><div class="bar-track"><div class="bar-fill" style="width:80%">80%</div></div></div></div>
+      <div class="analytics-summary"><div class="summary-tile"><span class="symbol">＄</span><strong>PKR 640K</strong><small>Total Revenue</small></div><div class="summary-tile"><span class="symbol">↗</span><strong>+18.5%</strong><small>Growth Rate</small></div><div class="summary-tile"><span class="symbol">▥</span><strong>PKR 213K</strong><small>Avg/Month</small></div><div class="summary-tile"><span class="symbol">🛒</span><strong>3,022</strong><small>Total Orders</small></div></div>
+    </article>
+    <article class="card panel"><div class="panel-head"><div><h3>Live Activity</h3><p>Real-time updates</p></div><span class="live">Live</span></div><div class="activity-list">
+      <div class="activity"><span class="activity-icon">▣</span><div><p><strong>Ahmad Sharif</strong> placed a new order</p><span class="amount">PKR 4,500</span><small>2 minutes ago</small></div></div>
+      <div class="activity"><span class="activity-icon">♙</span><div><p><strong>Fatima Nazari</strong> registered as a seller</p><small>15 minutes ago</small></div></div>
+      <div class="activity"><span class="activity-icon">⬡</span><div><p><strong>Hamid Karimi</strong> added a new product listing</p><small>32 minutes ago</small></div></div>
+      <div class="activity"><span class="activity-icon">✓</span><div><p><strong>Sara Ahmadi</strong> left a 5-star review</p><small>1 hour ago</small></div></div>
+    </div><a class="view-all" href="#activity">View All Activities</a></article>
+  </section>
+  <section class="lower-grid">
+    <article class="card panel"><div class="panel-head"><div><h3>Quick Actions</h3><p>Frequently used admin tasks</p></div></div><div class="quick-grid"><button class="quick qblue" onclick="alert('Add Product action')"><span class="qicon">⬡</span><strong>Add Product</strong><small>Create new listing</small></button><button class="quick qgreen" onclick="alert('Approve Users action')"><span class="qicon">♙</span><strong>Approve Users</strong><small>Review pending</small></button><button class="quick qorange" onclick="alert('View Reports action')"><span class="qicon">▥</span><strong>View Reports</strong><small>Analytics data</small></button><button class="quick qpurple" onclick="alert('Settings action')"><span class="qicon">⚙</span><strong>Settings</strong><small>Configure system</small></button></div></article>
+    <article class="card panel"><div class="panel-head"><div><h3>Top Sellers</h3><p>This month's leaders</p></div><a class="view-all" href="#sellers" style="padding:4px 0">View All ›</a></div>
+      <div class="seller"><span class="seller-badge" data-rank="1" style="background:linear-gradient(135deg,#ffc400,#e89a00)">KH</span><div class="seller-info"><strong>Kabul Handicrafts</strong><small>1,245 orders · <em>+24.5%</em></small></div><div class="seller-revenue">PKR 245K<small>Revenue</small></div></div>
+      <div class="seller"><span class="seller-badge" data-rank="2" style="background:linear-gradient(135deg,#c9d4df,#77889b)">AC</span><div class="seller-info"><strong>Afghan Carpets Co.</strong><small>876 orders · <em>+18.2%</em></small></div><div class="seller-revenue">PKR 198K<small>Revenue</small></div></div>
+      <div class="seller"><span class="seller-badge" data-rank="3" style="background:linear-gradient(135deg,#ff9c21,#f45c45)">HT</span><div class="seller-info"><strong>Herat Textiles</strong><small>654 orders · <em>+15.7%</em></small></div><div class="seller-revenue">PKR 167K<small>Revenue</small></div></div>
+    </article>
+  </section>
+  <section class="card pending"><div class="panel-head"><div><h3>Pending Actions</h3><p>Items requiring your immediate attention</p></div><span class="trend" style="color:#e83e4c;background:#fff0f1">● &nbsp;25 Pending</span></div><div class="pending-grid">
+    <div class="pending-card orange-bg"><div class="pending-top"><span class="pending-icon">♙</span><span class="count">12</span></div><strong>Seller Verifications</strong><p>New sellers awaiting approval and verification</p><button onclick="alert('Review seller verifications')">Review Now &nbsp;›</button></div>
+    <div class="pending-card blue-bg"><div class="pending-top"><span class="pending-icon">⬡</span><span class="count">8</span></div><strong>Product Approvals</strong><p>New product listings pending review</p><button onclick="alert('Review product approvals')">Review Now &nbsp;›</button></div>
+    <div class="pending-card red-bg"><div class="pending-top"><span class="pending-icon">⊗</span><span class="count">5</span></div><strong>Reported Issues</strong><p>Urgent disputes and flagged content</p><button onclick="alert('View reported issues')">View Issues &nbsp;›</button></div>
+  </div></section>
+</main>
+</div>
+<script>
+const tabs=document.querySelectorAll('.tab');
+tabs.forEach(tab=>tab.addEventListener('click',()=>{
+  tabs.forEach(t=>t.classList.remove('active'));tab.classList.add('active');
+  const yearly=tab.dataset.period==='year';
+  const data=yearly?[
+    ['Q1','3,022 orders','+18.5%','PKR 640K',65],['Q2','3,418 orders','+14.2%','PKR 720K',74],['Q3','3,760 orders','+10.8%','PKR 810K',83]
+  ]:[['January','842 orders','+12.5%','PKR 180K',60],['February','1,024 orders','+22.2%','PKR 220K',73],['March','1,156 orders','+9.1%','PKR 240K',80]];
+  document.getElementById('bars').innerHTML=data.map(d=>`<div class="month-row"><div class="month-meta"><div><b>${d[0]}</b> <span> · ${d[1]}</span></div><div class="month-right"><em>${d[2]}</em><b>${d[3]}</b></div></div><div class="bar-track"><div class="bar-fill" style="width:${d[4]}%">${d[4]}%</div></div></div>`).join('');
+}));
+</script>
+</body>
+</html>

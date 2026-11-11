@@ -26,22 +26,27 @@ export function AppSidebar() {
   const pathname = usePathname();
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded text-xs font-bold">
-            C
-          </div>
-          <span className="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
+      <SidebarHeader className="border-sidebar-border border-b px-3.5 pt-5 pb-5 group-data-[collapsible=icon]:px-2">
+        <div className="px-2.5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:text-center">
+          <strong className="block truncate text-[17px] leading-tight font-bold tracking-tight group-data-[collapsible=icon]:hidden">
             CRM
+          </strong>
+          <span className="text-sidebar-muted block truncate text-xs group-data-[collapsible=icon]:hidden">
+            Sales Workspace
           </span>
+          <strong className="hidden text-lg font-bold group-data-[collapsible=icon]:block">
+            C
+          </strong>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-3.5 py-2">
         {NAV_GROUPS.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+          <SidebarGroup key={group.label} className="p-0 pt-3">
+            <SidebarGroupLabel className="text-sidebar-muted text-micro px-3 font-semibold tracking-wide uppercase">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-1.5">
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
@@ -61,7 +66,22 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter className="border-sidebar-border border-t px-3.5 pt-4 group-data-[collapsible=icon]:px-2">
+        <div className="flex items-center gap-2.5 px-1 group-data-[collapsible=icon]:justify-center">
+          <div
+            aria-hidden
+            className="text-primary grid size-[34px] shrink-0 place-items-center rounded-full bg-white/90 font-extrabold"
+          >
+            A
+          </div>
+          <div className="min-w-0 text-[13px] leading-tight group-data-[collapsible=icon]:hidden">
+            <span className="block truncate">Admin User</span>
+            <small className="text-sidebar-muted text-micro block truncate">
+              admin@example.com
+            </small>
+          </div>
+        </div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
