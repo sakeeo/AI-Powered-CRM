@@ -1,7 +1,7 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { assertCan, scopeWhere } from "@/lib/authz";
 import type { TenantContext } from "@/lib/context";
-import type { ActivityBucket, ActivityLink } from "@/modules/activities/constants";
+import type { ActivityBucket, ActivityLink, ActivityType } from "@/modules/activities/constants";
 
 type Where = Prisma.ActivityWhereInput;
 
@@ -117,4 +117,21 @@ export function calendarRange(fromStr?: string, toStr?: string) {
   let to = parse(toStr) ?? new Date(Date.now() + 45 * DAY);
   if (to.getTime() - from.getTime() > 100 * DAY) to = new Date(from.getTime() + 100 * DAY);
   return { from, to };
+}
+
+/** Template aktivitas aktif untuk composer (nama, tipe, judul, isi, tenggat relatif). */
+export async function listActivityTemplates(ctx: TenantContext, opts: { all?: boolean } = {}) {
+  const rows = await ctx.db.activityTemplate.findMany({
+    where: opts.all ? {} : { isActive: true },
+    orderBy: { name: "asc" },
+  });
+  return rows.map((t) => ({
+    id: t.id,
+    name: t.name,
+    type: t.type as ActivityType,
+    subject: t.subject,
+    body: t.body,
+    dueInDays: t.dueInDays,
+    isActive: t.isActive,
+  }));
 }

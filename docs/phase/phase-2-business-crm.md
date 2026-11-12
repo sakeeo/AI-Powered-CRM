@@ -35,6 +35,6 @@ Memperluas MVP menjadi CRM bisnis penuh: kustomisasi data, automation, komunikas
 
 ## Kriteria Selesai Phase (Exit Criteria)
 
-- [ ] Semua plan Phase 2 Done di `docs/PROGRESS.md`.
-- [ ] Red Zone Policy tetap terpenuhi untuk seluruh fitur AI baru.
-- [ ] Tidak ada regresi pada kriteria MVP (test suite Phase 1 tetap hijau).
+- [x] Semua plan Phase 2 Done di `docs/PROGRESS.md`.
+- [x] Red Zone Policy tetap terpenuhi untuk seluruh fitur AI baru.
+- [x] Tidak ada regresi pada kriteria MVP (test suite Phase 1 tetap hijau).

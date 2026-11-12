@@ -50,6 +50,7 @@ const PAGES = [
   "/inbox",
   "/insights",
   "/reports/builder",
+  "/settings/activity-templates",
   "/settings/integrations",
 ];
 for (const [name, width, height] of [
@@ -63,10 +64,16 @@ for (const [name, width, height] of [
       await page.goto(path);
       await page.waitForLoadState("networkidle");
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-      );
-      expect(overflow, `${path} overflow di ${width}px`).toBe(false);
+      // Polling singkat: animasi/hidrasi saat server sibuk bisa sesaat melebarkan dokumen.
+      await expect
+        .poll(
+          () =>
+            page.evaluate(
+              () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+            ),
+          { message: `${path} overflow di ${width}px`, timeout: 3000 },
+        )
+        .toBe(false);
     }
   });
 }

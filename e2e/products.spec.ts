@@ -32,7 +32,7 @@ test("produk: buat di katalog lalu pilih pada deal", async ({ page }) => {
 
   await page.locator("#deal-product").click();
   await page.getByRole("option", { name: new RegExp(product) }).click();
-  await page.getByLabel("Jumlah").fill("2");
+  await page.getByLabel("Jumlah", { exact: true }).fill("2");
   await page.getByRole("button", { name: "Tambah", exact: true }).click();
   await expect(page.getByTestId("deal-products")).toContainText(product);
   await expect(page.getByText(/Total:/)).toContainText("5.000.000");

@@ -17,9 +17,9 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
 | [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 19 / 20 | In progress |
-| [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 6 / 7 | In progress |
+| [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 7 / 7 | Done |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **31 / 39** | |
+| **Total** | **32 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -66,7 +66,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [2.4](plans/phase-2/plan.2.4.md) | Calendar, email sync & Zapier/Make                          | Done | 2026-11-12 | Webhook keluar Zapier/Make/kustom (event whitelist, HMAC bertanda waktu, BullMQ retry, idempoten, anti-SSRF, log pengiriman, kirim uji); Google OAuth per pengguna (state HMAC, token terenkripsi, refresh/revoked), Calendar dua arah (push idempoten ID deterministik, pull inkremental syncToken, anti-gema ETag, last-writer, isolasi org, handle 429/410), Gmail read-only ke timeline. UI: Connectors + Settings → Integrasi Saya. decisions.md #16. 22 test integrasi (mock fetch) + 1 E2E. **Catatan:** belum diuji ke Google/Zapier sungguhan (butuh kredensial). |
 | [2.5](plans/phase-2/plan.2.5.md) | AI: Quotation Narrative Drafter & Natural Language Insights | Done | 2026-11-12 | Narrative Drafter (prompt tanpa harga, `checkNarrative` menandai nominal/persen/angka asing, draf bisa diedit & baru tersimpan lewat Simpan → kolom `narrative`, tampil di PDF). NL Insights `/insights`: pertanyaan → rencana kueri whitelist/strict → eksekusi read-only dengan scope tenant + izin (count/sum per mata uang/group by/bulanan/daftar, periode per zona waktu org); LLM tak melihat data; pertanyaan tak disimpan. Red Zone: snapshot seluruh tabel tak berubah + pemindaian sumber diperluas. decisions.md #17. 11 test integrasi (injeksi prompt, rep hanya miliknya, lintas tenant, rate limit). |
 | [2.6](plans/phase-2/plan.2.6.md) | Advanced reporting & customer segmentation                  | Done | 2026-11-12 | Report Builder (`/reports/builder`: data × jumlah/total/daftar × kelompok × periode × filter, pratinjau + grafik, simpan pribadi/organisasi, export CSV/XLSX beraudit); segmen dinamis berbasis aturan (tag, total, jumlah deal, recency; dievaluasi tiap query, tampil di filter Customers/Customer 360) + laporan baru "Segmen Pelanggan"; laporan terjadwal harian/mingguan/bulanan via worker (klaim atomik → tanpa email ganda; penerima menerima data sesuai izinnya sendiri). Refactor `getMemberContext`. decisions.md #18. 16 test unit/integrasi + 1 E2E. |
-| [2.7](plans/phase-2/plan.2.7.md) | Quotation versioning, approval & repeat purchase            | Not started |         |         |
+| [2.7](plans/phase-2/plan.2.7.md) | Quotation versioning, approval & repeat purchase            | Done | 2026-11-12 | Riwayat versi quotation (snapshot tiap perubahan isi & pengiriman, bandingkan header/item/selisih total, pulihkan Draft); approval opsional berbasis ambang total (ajukan/tarik/setujui/tolak, kunci isi saat pending, reset bila isi berubah, notifikasi, manager tak menyetujui sendiri, gate saat kirim); template aktivitas (CRUD manager+, dipakai di composer, isi disanitasi); peluang repeat purchase deterministik + buat follow-up (tanpa ganda). decisions.md #7 diputuskan, #19. 15 test unit/integrasi + 1 E2E. |
 
 ## Phase 3 — Intelligent CRM
 

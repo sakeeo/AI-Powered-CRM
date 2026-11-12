@@ -14,6 +14,7 @@ export const SETTINGS_LINKS: { href: string; label: string; subject?: SubjectNam
   { href: "/settings/tags", label: "Tags", subject: "Tag" },
   { href: "/settings/custom-fields", label: "Custom Fields", subject: "CustomField" },
   { href: "/settings/quotations", label: "Quotation" },
+  { href: "/settings/activity-templates", label: "Template Aktivitas" },
   { href: "/settings/automation", label: "Automation", subject: "Automation" },
   { href: "/settings/integrations", label: "Integrasi Saya" },
   { href: "/settings/connectors", label: "Connectors", subject: "Connector" },

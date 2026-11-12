@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CURRENCY_CODES, requiredMoney } from "@/lib/money";
+import { CURRENCY_CODES, optionalMoney, requiredMoney } from "@/lib/money";
 import { optionalText, optionalUuid } from "@/lib/schema-helpers";
 import { QUOTATION_STATUSES } from "@/modules/quotations/calc";
 
@@ -69,4 +69,6 @@ export const quotationSettingsSchema = z.object({
   taxInclusive: z.boolean(),
   validityDays: z.coerce.number().int("Bilangan bulat").min(1).max(365),
   terms: optionalText(5000),
+  /** Kosong = tanpa approval; total ≥ nilai ini perlu persetujuan sebelum dikirim */
+  approvalThreshold: optionalMoney,
 });

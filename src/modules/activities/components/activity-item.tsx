@@ -27,7 +27,14 @@ import {
 } from "@/modules/activities/constants";
 import { deleteActivity, setActivityStatus } from "@/modules/activities/server/actions";
 
-const ICON = { task: ListTodo, call: Phone, meeting: Users, email: Mail, note: FileText, whatsapp: MessageCircle } as const;
+const ICON = {
+  task: ListTodo,
+  call: Phone,
+  meeting: Users,
+  email: Mail,
+  note: FileText,
+  whatsapp: MessageCircle,
+} as const;
 
 export type ActivityView = {
   id: string;

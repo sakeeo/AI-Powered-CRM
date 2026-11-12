@@ -50,6 +50,8 @@ export const TENANT_MODELS = new Set<string>([
   "CalendarEventLink",
   "EmailSyncLog",
   "SavedReport",
+  "QuotationVersion",
+  "ActivityTemplate",
 ]);
 
 const WHERE_OPS = new Set([

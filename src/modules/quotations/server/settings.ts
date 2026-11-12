@@ -10,5 +10,6 @@ export async function getQuotationSettings(db: TenantContext["db"]) {
     taxInclusive: row.taxInclusive,
     validityDays: row.validityDays,
     terms: row.terms,
+    approvalThreshold: row.approvalThreshold ? row.approvalThreshold.toFixed(2) : null,
   };
 }

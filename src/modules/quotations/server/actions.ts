@@ -19,6 +19,8 @@ import {
   setQuotationStatusSchema,
 } from "@/modules/quotations/schemas";
 import { getQuotationSettings } from "@/modules/quotations/server/settings";
+import { recordVersion } from "@/modules/quotations/server/versions";
+import { requiresApproval } from "@/modules/quotations/approval";
 
 const addDays = (date: string, days: number) =>
   new Date(Date.parse(`${date}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
@@ -176,6 +178,8 @@ export const saveQuotation = tenantAction(saveQuotationSchema, async (ctx, input
   const q = await load(ctx, input.id);
   assertCan(ctx, "update", "Quotation", q);
   if (q.status !== "draft") throw new AppError("Hanya quotation berstatus Draft yang dapat diubah");
+  if (q.approvalStatus === "pending")
+    throw new AppError("Quotation menunggu persetujuan. Tarik pengajuan dulu untuk mengubahnya.");
   if (input.validUntil < q.issueDate.toISOString().slice(0, 10))
     throw new AppError("Masa berlaku tidak boleh sebelum tanggal terbit");
   await assertParties(ctx, input.contactId, input.companyId);
@@ -210,6 +214,17 @@ export const saveQuotation = tenantAction(saveQuotationSchema, async (ctx, input
         taxTotal: toDecimal(calc.taxTotal)!,
         total: toDecimal(calc.total)!,
         updatedBy: ctx.userId,
+        // Isi berubah → persetujuan sebelumnya tidak berlaku lagi.
+        ...(q.approvalStatus !== "none"
+          ? {
+              approvalStatus: "none",
+              approvalRequestedBy: null,
+              approvalRequestedAt: null,
+              approvedBy: null,
+              approvedAt: null,
+              approvalNote: null,
+            }
+          : {}),
         items: {
           create: itemRows(input.items as Item[], calc).map((r) => ({
             ...r,
@@ -219,6 +234,7 @@ export const saveQuotation = tenantAction(saveQuotationSchema, async (ctx, input
       } as never,
     }),
   ]);
+  await recordVersion(ctx.db, q.id, { label: "Disimpan", userId: ctx.userId });
   await writeAudit(ctx, {
     action: "quotation.updated",
     entityType: "Quotation",
@@ -241,6 +257,16 @@ export const setQuotationStatus = tenantAction(
     if (status === "sent") {
       const count = await ctx.db.quotationItem.count({ where: { quotationId: id } });
       if (count === 0) throw new AppError("Tambahkan item sebelum menandai terkirim");
+      const { approvalThreshold } = await getQuotationSettings(ctx.db);
+      if (
+        requiresApproval(q.total.toFixed(2), approvalThreshold) &&
+        q.approvalStatus !== "approved"
+      )
+        throw new AppError(
+          "Quotation ini perlu persetujuan sebelum dikirim",
+          409,
+          "approval_required",
+        );
     }
     await ctx.db.quotation.update({
       where: { id },
@@ -254,6 +280,7 @@ export const setQuotationStatus = tenantAction(
       after: { status },
     });
     if (status === "sent") {
+      await recordVersion(ctx.db, id, { label: "Dikirim", userId: ctx.userId, force: true });
       await emitBusinessEvent(
         ctx.organizationId,
         "quotation.sent",
@@ -287,7 +314,12 @@ export const deleteQuotation = tenantAction(idInput, async (ctx, { id }) => {
 export const saveQuotationSettings = tenantAction(quotationSettingsSchema, async (ctx, input) => {
   assertCan(ctx, "update", "Organization");
   const existing = await ctx.db.quotationSettings.findFirst();
-  const data = { ...input, taxRate: toDecimal(input.taxRate)!, terms: input.terms ?? null };
+  const data = {
+    ...input,
+    taxRate: toDecimal(input.taxRate)!,
+    terms: input.terms ?? null,
+    approvalThreshold: toDecimal(input.approvalThreshold) ?? null,
+  };
   if (existing) await ctx.db.quotationSettings.update({ where: { id: existing.id }, data });
   else await ctx.db.quotationSettings.create({ data: data as never });
   await writeAudit(ctx, {

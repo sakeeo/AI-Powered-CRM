@@ -4,6 +4,8 @@ import { requireTenant } from "@/lib/context";
 import { parseListParams, pickParam, type SearchParams } from "@/lib/list-params";
 import { CustomersTable } from "@/modules/customers/components/customers-table";
 import { CUSTOMER_SORTS } from "@/modules/customers/schemas";
+import { RepeatCard } from "@/modules/customers/components/repeat-card";
+import { listRepeatOpportunities } from "@/modules/customers/server/repeat";
 import { DynamicSegmentsPanel } from "@/modules/customers/components/dynamic-segments-panel";
 import {
   listCustomers,
@@ -18,7 +20,7 @@ export default async function Page(props: PageProps<"/customers">) {
   if (!ctx.ability.can("view", "Customer")) return <Forbidden what="customer" />;
   const sp = (await props.searchParams) as SearchParams;
   const params = parseListParams(sp, CUSTOMER_SORTS, "lastWonAt");
-  const [data, segments, dynamic, tags] = await Promise.all([
+  const [data, segments, dynamic, tags, repeat] = await Promise.all([
     listCustomers(ctx, params, {
       type: pickParam(sp, "type"),
       segmentId: pickParam(sp, "segment"),
@@ -26,9 +28,11 @@ export default async function Page(props: PageProps<"/customers">) {
     listSegments(ctx),
     listDynamicSegments(ctx),
     ctx.db.tag.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    listRepeatOpportunities(ctx),
   ]);
   return (
     <div className="space-y-4">
+      <RepeatCard items={repeat} canCreate={ctx.ability.can("create", "Activity")} />
       <DynamicSegmentsPanel
         segments={dynamic}
         tags={tags}

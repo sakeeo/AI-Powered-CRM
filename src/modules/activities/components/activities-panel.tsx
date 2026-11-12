@@ -4,7 +4,7 @@ import type { ActivityLink } from "@/modules/activities/constants";
 import { ActivityComposer } from "@/modules/activities/components/activity-composer";
 import { FollowUpGhostwriter } from "@/modules/activities/components/followup-ghostwriter";
 import { ActivityItem } from "@/modules/activities/components/activity-item";
-import { listTimeline } from "@/modules/activities/server/queries";
+import { listActivityTemplates, listTimeline } from "@/modules/activities/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
 /** Panel aktivitas untuk halaman detail lead/contact/company/deal: composer + timeline. */
@@ -18,10 +18,11 @@ export async function ActivitiesPanel({
   /** Nomor tujuan untuk shortcut wa.me pada draf follow-up. */
   phone?: string | null;
 }) {
-  const [items, owners, org] = await Promise.all([
+  const [items, owners, org, templates] = await Promise.all([
     listTimeline(ctx, link),
     listOwnerOptions(ctx),
     getOrganization(ctx),
+    listActivityTemplates(ctx),
   ]);
   const names = new Map(owners.map((o) => [o.userId, o.name]));
   return (
@@ -35,6 +36,8 @@ export async function ActivitiesPanel({
             link={link}
             owners={owners}
             canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
+            templates={templates}
+            timezone={org.timezone}
           />
         )}
         {(link.leadId || link.contactId || link.dealId) && (

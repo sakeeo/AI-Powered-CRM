@@ -19,6 +19,7 @@ type S = {
   taxInclusive: boolean;
   validityDays: number;
   terms: string | null;
+  approvalThreshold: string | null;
 };
 
 export function QuotationSettingsForm({ initial, canEdit }: { initial: S; canEdit: boolean }) {
@@ -26,6 +27,7 @@ export function QuotationSettingsForm({ initial, canEdit }: { initial: S; canEdi
     ...initial,
     terms: initial.terms ?? "",
     validityDays: String(initial.validityDays),
+    approvalThreshold: initial.approvalThreshold ?? "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, start] = useTransition();
@@ -90,6 +92,20 @@ export function QuotationSettingsForm({ initial, canEdit }: { initial: S; canEdi
               <Label htmlFor="qs-incl">Harga sudah termasuk pajak</Label>
             </div>
           </div>
+          <FormField
+            id="qs-approval"
+            label="Perlu persetujuan bila total ≥ (opsional)"
+            error={errors.approvalThreshold}
+            hint="Kosongkan bila quotation tidak memerlukan approval. Disetujui oleh Owner/Admin/Sales Manager."
+          >
+            <NumberInput
+              id="qs-approval"
+              decimals={2}
+              value={s.approvalThreshold}
+              disabled={!canEdit}
+              onValueChange={(v) => setS({ ...s, approvalThreshold: v })}
+            />
+          </FormField>
           <FormField id="qs-terms" label="Syarat & ketentuan default" error={errors.terms}>
             <Textarea
               id="qs-terms"

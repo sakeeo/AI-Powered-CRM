@@ -18,16 +18,36 @@ import { AiAssist } from "@/modules/activities/components/ai-assist";
 import { createActivity } from "@/modules/activities/server/actions";
 
 export type OwnerOption = { userId: string; name: string };
+export type TemplateOption = {
+  id: string;
+  name: string;
+  type: ActivityType;
+  subject: string;
+  body: string | null;
+  dueInDays: number | null;
+};
+
+/** Tenggat relatif → nilai datetime-local pada zona waktu organisasi (09:00). */
+function dueFromDays(days: number | null, timezone: string) {
+  if (days === null) return "";
+  const d = new Date(Date.now() + days * 86_400_000);
+  const local = d.toLocaleString("sv-SE", { timeZone: timezone }); // YYYY-MM-DD HH:MM:SS
+  return `${local.slice(0, 10)}T09:00`;
+}
 
 /** Quick composer: catat call/meeting/email/note atau buat task, dengan catatan rich text. */
 export function ActivityComposer({
   link,
   owners,
   canAssignOwner,
+  templates = [],
+  timezone = "UTC",
 }: {
   link: ActivityLink;
   owners: OwnerOption[];
   canAssignOwner: boolean;
+  templates?: TemplateOption[];
+  timezone?: string;
 }) {
   const router = useRouter();
   const [type, setType] = useState<ActivityType>("note");
@@ -74,6 +94,26 @@ export function ActivityComposer({
           </Button>
         ))}
       </div>
+      {templates.length > 0 && (
+        <FormField id="act-template" label="Pakai template">
+          <SelectField
+            id="act-template"
+            value=""
+            placeholder="Pilih template…"
+            onChange={(id) => {
+              const t = templates.find((x) => x.id === id);
+              if (!t) return;
+              setType(t.type);
+              setSubject(t.subject);
+              setBody(t.body ?? "");
+              setDue(dueFromDays(t.dueInDays, timezone));
+              setEditorKey((k) => k + 1);
+              toast.success(`Template “${t.name}” dimuat — periksa lalu simpan`);
+            }}
+            options={templates.map((t) => ({ value: t.id, label: t.name }))}
+          />
+        </FormField>
+      )}
       <AiAssist
         link={link}
         onSummary={(html) => {

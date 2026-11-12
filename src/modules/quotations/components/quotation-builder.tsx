@@ -66,7 +66,7 @@ export function QuotationBuilder({
   canDelete: boolean;
 }) {
   const router = useRouter();
-  const editable = canEdit && q.status === "draft";
+  const editable = canEdit && q.status === "draft" && q.approvalStatus !== "pending";
   const [pending, start] = useTransition();
   const [title, setTitle] = useState(q.title);
   const [validUntil, setValidUntil] = useState<string>(q.validUntil);

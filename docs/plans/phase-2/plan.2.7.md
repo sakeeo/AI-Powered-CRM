@@ -14,15 +14,15 @@ Pelengkap P2 pada quotation, aktivitas, dan retensi.
 
 ## Tugas
 
-- [ ] Versi & riwayat perubahan quotation; opsional alur approval (sesuai keputusan #7).
-- [ ] Template aktivitas.
-- [ ] Identifikasi peluang repeat purchase.
-- [ ] Test versioning dan riwayat.
+- [x] Versi & riwayat perubahan quotation; opsional alur approval (sesuai keputusan #7).
+- [x] Template aktivitas.
+- [x] Identifikasi peluang repeat purchase.
+- [x] Test versioning dan riwayat.
 
 ## Acceptance Criteria
 
-- [ ] Versi quotation dapat dibandingkan.
-- [ ] Template aktivitas dapat dipakai ulang.
+- [x] Versi quotation dapat dibandingkan.
+- [x] Template aktivitas dapat dipakai ulang.
 
 ## Verifikasi
 

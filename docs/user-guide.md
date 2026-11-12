@@ -21,6 +21,8 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 
 11. **Laporan lanjutan**: _Reports → Report Builder_ menyusun laporan sendiri (data, jumlah/total/daftar, kelompok, periode, filter), menyimpannya (pribadi atau organisasi), mengekspor CSV/XLSX, dan menjadwalkan pengiriman email harian/mingguan/bulanan ke anggota tim — tiap penerima hanya menerima data yang boleh ia lihat. **Segmen dinamis** (Customers → Segmen baru, Owner/Admin/Manager) mengelompokkan customer otomatis berdasarkan tag, total belanja, jumlah deal, dan recency; dapat dipakai sebagai filter dan di laporan "Segmen Pelanggan".
 
+12. **Quotation lanjutan & aktivitas**: riwayat versi quotation dengan perbandingan dan pemulihan Draft; _Settings → Quotation_ dapat mengatur ambang approval (total ≥ ambang → ajukan persetujuan, disetujui Owner/Admin/Sales Manager sebelum dikirim). **Template aktivitas** (Settings, Owner/Admin/Manager) dipakai dari composer aktivitas (_Pakai template_). Di **Customers**, kartu _Peluang repeat purchase_ menampilkan customer yang perlu di-follow-up beserta tombol _Buat follow-up_.
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

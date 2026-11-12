@@ -142,6 +142,8 @@ model Organization {
   automationRuns          AutomationRun[]
   conversations           Conversation[]
   savedReports            SavedReport[]
+  quotationVersions       QuotationVersion[]
+  activityTemplates       ActivityTemplate[]
   messages                Message[]
   outboundWebhooks        OutboundWebhook[]
   outboundDeliveries      OutboundDelivery[]
@@ -771,6 +773,8 @@ model QuotationSettings {
   taxInclusive   Boolean  @default(false) @map("tax_inclusive")
   validityDays   Int      @default(14) @map("validity_days")
   terms          String?
+  /// Quotation dengan total ≥ nilai ini perlu persetujuan sebelum dikirim; null = tanpa approval (plan 2.7)
+  approvalThreshold Decimal? @map("approval_threshold") @db.Decimal(18, 2)
   updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -806,6 +810,13 @@ model Quotation {
   terms                 String?
   /// Narasi pengantar/SOW (diedit user; boleh berasal dari draf AI yang sudah ditinjau)
   narrative             String?
+  /// none | pending | approved | rejected (plan 2.7)
+  approvalStatus        String    @default("none") @map("approval_status")
+  approvalRequestedBy   String?   @map("approval_requested_by") @db.Uuid
+  approvalRequestedAt   DateTime? @map("approval_requested_at") @db.Timestamptz(3)
+  approvedBy            String?   @map("approved_by") @db.Uuid
+  approvedAt            DateTime? @map("approved_at") @db.Timestamptz(3)
+  approvalNote          String?   @map("approval_note")
   pdfKey                String?   @map("pdf_key")
   pdfGeneratedAt        DateTime? @map("pdf_generated_at") @db.Timestamptz(3)
   sentAt                DateTime? @map("sent_at") @db.Timestamptz(3)
@@ -820,6 +831,7 @@ model Quotation {
   contact      Contact?        @relation(fields: [contactId], references: [id], onDelete: SetNull)
   company      Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
   items        QuotationItem[]
+  versions     QuotationVersion[]
 
   @@unique([organizationId, number])
   @@index([organizationId, status, validUntil])
@@ -1296,4 +1308,53 @@ model SavedReport {
   @@index([organizationId, ownerId])
   @@index([frequency, nextRunAt])
   @@map("saved_reports")
+}
+
+// ---------------------------------------------------------------------------
+// Pelengkap P2 (plan 2.7): riwayat versi quotation & template aktivitas.
+// ---------------------------------------------------------------------------
+
+/// Snapshot isi quotation setiap kali disimpan/dikirim → riwayat perubahan & perbandingan versi.
+model QuotationVersion {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  quotationId    String   @map("quotation_id") @db.Uuid
+  version        Int
+  /// Disimpan | Dikirim | Dipulihkan dari vN | ...
+  label          String
+  /// Header + item (semua nilai sebagai string agar presisi uang terjaga)
+  snapshot       Json
+  total          Decimal  @db.Decimal(18, 2)
+  createdBy      String?  @map("created_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  quotation    Quotation    @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@unique([quotationId, version])
+  @@index([organizationId, quotationId])
+  @@map("quotation_versions")
+}
+
+/// Template aktivitas yang dapat dipakai ulang (mis. "Follow-up 3 hari setelah demo").
+model ActivityTemplate {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  /// task | call | meeting | email | note | whatsapp
+  type           String
+  subject        String
+  body           String?
+  /// Tenggat relatif: N hari sejak template dipakai (null = tanpa tenggat)
+  dueInDays      Int?     @map("due_in_days")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?  @map("created_by") @db.Uuid
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, name])
+  @@map("activity_templates")
 }
