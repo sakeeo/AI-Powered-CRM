@@ -45,7 +45,7 @@ const SUBJECT_LABEL: Record<string, string> = {
   Tag: "Tag",
   CustomField: "Custom field",
   Automation: "Automation",
-  Conversation: "Inbox WhatsApp",
+  Conversation: "Inbox",
 };
 
 function Cell({ grant }: { grant: Grant }) {

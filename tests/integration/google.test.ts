@@ -428,7 +428,12 @@ describe("Gmail read-only", () => {
     expect(acts[0].subject).toBe("Email masuk: Re: Penawaran");
     expect(acts[0].body).toContain("&lt;b&gt;penawaran");
     expect(await testPrisma.emailSyncLog.count()).toBe(2);
+    // Kanal terpadu (plan 3.6): email contact juga menjadi percakapan email di Inbox (idempoten).
+    const emailConv = await testPrisma.conversation.findFirstOrThrow({ where: { kind: "email" } });
+    expect(emailConv).toMatchObject({ handle: "budi@klien.test", contactId: contact.id });
+    expect(await testPrisma.message.count({ where: { externalId: "gmail:m1" } })).toBe(1);
     expect(await google.syncGmail(integ.id)).toEqual({ logged: 0 });
+    expect(await testPrisma.message.count({ where: { conversationId: emailConv.id } })).toBe(1);
     expect(await testPrisma.activity.count({ where: { type: "email" } })).toBe(1);
     expect(calls.every((c) => c.method === "GET" || /oauth2/.test(c.url))).toBe(true);
     expect(callsTo(/gmail\.googleapis\.com/).every((c) => !/send|modify|trash/.test(c.url))).toBe(

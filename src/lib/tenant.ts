@@ -54,6 +54,7 @@ export const TENANT_MODELS = new Set<string>([
   "ActivityTemplate",
   "RecommendationFeedback",
   "InsightAlert",
+  "ChannelRouting",
 ]);
 
 const WHERE_OPS = new Set([

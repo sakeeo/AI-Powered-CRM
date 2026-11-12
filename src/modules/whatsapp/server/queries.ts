@@ -9,12 +9,20 @@ export type InboxFilter = "all" | "mine" | "unassigned";
 
 export async function listConversations(
   ctx: TenantContext,
-  opts: { filter?: InboxFilter; status?: "open" | "closed"; q?: string; take?: number } = {},
+  opts: {
+    filter?: InboxFilter;
+    status?: "open" | "closed";
+    /** Jenis kanal (whatsapp | email | other); kosong = semua kanal. */
+    kind?: string;
+    q?: string;
+    take?: number;
+  } = {},
 ) {
   const where: Where = {
     AND: [
       scopeWhere(ctx, "view", "Conversation") as Where,
       { status: opts.status ?? "open" },
+      ...(opts.kind ? [{ kind: opts.kind }] : []),
       ...(opts.filter === "mine" ? [{ assigneeId: ctx.userId }] : []),
       ...(opts.filter === "unassigned" ? [{ assigneeId: null }] : []),
       ...(opts.q
@@ -23,6 +31,7 @@ export async function listConversations(
               OR: [
                 { displayName: { contains: opts.q, mode: "insensitive" as const } },
                 { phone: { contains: opts.q } },
+                { email: { contains: opts.q, mode: "insensitive" as const } },
                 { lastMessagePreview: { contains: opts.q, mode: "insensitive" as const } },
               ],
             },

@@ -14,13 +14,13 @@ Penyatuan kanal komunikasi dalam satu hub.
 
 ## Tugas
 
-- [ ] Tambah kanal (email, WA, lainnya) ke model percakapan.
-- [ ] Routing & assignment lintas kanal.
-- [ ] Timeline terpadu per customer.
+- [x] Tambah kanal (email, WA, lainnya) ke model percakapan.
+- [x] Routing & assignment lintas kanal.
+- [x] Timeline terpadu per customer.
 
 ## Acceptance Criteria
 
-- [ ] Percakapan multi-kanal terpadu per customer.
+- [x] Percakapan multi-kanal terpadu per customer.
 
 ## Verifikasi
 

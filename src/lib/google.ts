@@ -4,6 +4,7 @@ import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { ingestChannelMessage } from "@/modules/omnichannel/server/channel";
 import { forTenant } from "@/lib/tenant";
 
 /**
@@ -478,6 +479,21 @@ export async function syncGmail(integrationId: string, now = new Date()) {
       });
       activityId = a.id;
       logged++;
+      // Kanal terpadu (plan 3.6): email yang sama juga masuk percakapan email contact (idempoten per pesan).
+      const counterpart = people.find((p) => p === contact.email?.toLowerCase()) ?? people[0]!;
+      // Kegagalan di sini tidak boleh menggagalkan pencatatan sinkron (agar aktivitas tidak terduplikasi).
+      await ingestChannelMessage(db, {
+        kind: "email",
+        handle: counterpart,
+        direction: out ? "out" : "in",
+        body: `${(h("Subject") || "(tanpa subjek)").slice(0, 120)}\n\n${(msg.snippet ?? "").slice(0, 300)}`,
+        externalId: `gmail:${id}`,
+        at: when,
+        name: contact.name,
+        email: counterpart,
+        channelType: "email_gmail",
+        contactId: contact.id,
+      }).catch((err) => logger.error({ err, messageId: id }, "Gagal memasukkan email ke inbox"));
     }
     try {
       await db.emailSyncLog.create({ data: { integrationId, messageId: id, activityId } as never });

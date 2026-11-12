@@ -4,6 +4,7 @@ import { decryptSecret } from "@/lib/crypto";
 import { normalizePhone } from "@/lib/phone";
 import { rateLimit } from "@/lib/rate-limit";
 import { signPayload, verifySignature } from "@/modules/webhooks/server/receive";
+import { routeNewConversation } from "@/modules/omnichannel/server/routing";
 import { parseInbound } from "@/modules/whatsapp/gateway";
 
 type Db = TenantContext["db"];
@@ -105,6 +106,7 @@ export async function receiveWhatsappWebhook(
   };
   // Cari-lalu-buat (bukan upsert: kunci unik gabungan tidak dapat di-scope tenant); balapan ditangani P2002.
   let conv = await db.conversation.findFirst({ where: { phoneNormalized } });
+  let createdConv = false;
   if (conv) {
     conv = await db.conversation.update({ where: { id: conv.id }, data: touch });
   } else {
@@ -112,6 +114,8 @@ export async function receiveWhatsappWebhook(
       conv = await db.conversation.create({
         data: {
           channel: connector.type,
+          kind: "whatsapp",
+          handle: phoneNormalized,
           phone: msg.from,
           phoneNormalized,
           displayName: msg.name ?? null,
@@ -122,11 +126,21 @@ export async function receiveWhatsappWebhook(
           unreadCount: 1,
         } as never,
       });
+      createdConv = true;
     } catch (e) {
       if ((e as { code?: string }).code !== "P2002") throw e;
       const existing = await db.conversation.findFirstOrThrow({ where: { phoneNormalized } });
       conv = await db.conversation.update({ where: { id: existing.id }, data: touch });
     }
+  }
+  // Routing lintas kanal: percakapan baru ditugaskan sesuai aturan organisasi (default: tanpa routing).
+  if (createdConv) {
+    const assigned = await routeNewConversation(db, {
+      conversationId: conv.id,
+      kind: "whatsapp",
+      stickyOwnerId: contact?.ownerId ?? lead?.ownerId ?? null,
+    });
+    if (assigned) conv = { ...conv, assigneeId: assigned };
   }
   // Tautkan ke record bila sebelumnya belum tertaut (mis. contact baru dibuat setelah chat pertama).
   if ((!conv.contactId && contact) || (!conv.leadId && lead)) {

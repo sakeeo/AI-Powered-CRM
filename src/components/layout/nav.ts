@@ -71,10 +71,11 @@ export const NAV_GROUPS: NavGroup[] = [
         description: "Task, call, meeting, dan follow-up.",
       },
       {
-        title: "Inbox WhatsApp",
+        title: "Inbox",
         href: "/inbox",
         icon: MessageCircle,
-        description: "Percakapan WhatsApp pelanggan dalam satu inbox.",
+        description:
+          "Percakapan pelanggan lintas kanal (WhatsApp, email, lainnya) dalam satu inbox.",
       },
       {
         title: "Calendar",

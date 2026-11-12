@@ -13,18 +13,27 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  CHANNEL_KINDS,
+  CHANNEL_LABEL,
+  CHANNEL_TONE,
+  type ChannelKind,
+} from "@/modules/omnichannel/constants";
 import { MAX_MESSAGE_LENGTH } from "@/modules/whatsapp/constants";
 import {
   assignConversation,
   createLeadFromConversation,
   markConversationRead,
-  sendWhatsappMessage,
+  sendConversationMessage,
   setConversationStatus,
 } from "@/modules/whatsapp/server/actions";
 
 export type ConvRow = {
   id: string;
-  phone: string;
+  kind: string;
+  phone: string | null;
+  email: string | null;
+  channelLabel: string | null;
   displayName: string | null;
   status: string;
   assigneeId: string | null;
@@ -44,7 +53,10 @@ export type MsgRow = {
 };
 type Owner = { userId: string; name: string };
 
-const label = (c: Pick<ConvRow, "displayName" | "phone">) => c.displayName ?? c.phone;
+const label = (c: Pick<ConvRow, "displayName" | "phone" | "email" | "channelLabel">) =>
+  c.displayName ?? c.phone ?? c.email ?? c.channelLabel ?? "Percakapan";
+const addressOf = (c: Pick<ConvRow, "phone" | "email" | "channelLabel" | "kind">) =>
+  c.kind === "email" ? c.email : c.kind === "other" ? c.channelLabel : c.phone;
 const fmt = (d: Date) =>
   new Date(d).toLocaleString("id-ID", {
     day: "2-digit",
@@ -59,8 +71,9 @@ const FILTERS = [
   { key: "unassigned", label: "Belum ditugaskan" },
 ] as const;
 
-function href(filter: string, status: string, c?: string) {
+function href(filter: string, status: string, c?: string, kind?: string) {
   const sp = new URLSearchParams();
+  if (kind) sp.set("kind", kind);
   if (filter !== "all") sp.set("filter", filter);
   if (status !== "open") sp.set("status", status);
   if (c) sp.set("c", c);
@@ -101,7 +114,7 @@ function Thread({
     const body = text.trim();
     if (!body) return;
     start(async () => {
-      const res = await sendWhatsappMessage({ conversationId: conv.id, body });
+      const res = await sendConversationMessage({ conversationId: conv.id, body });
       if (!res.ok) toast.error(res.error);
       else setText("");
       router.refresh();
@@ -121,7 +134,10 @@ function Thread({
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold">{label(conv)}</h2>
           <p className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-            <span>{conv.phone}</span>
+            <ToneBadge tone={CHANNEL_TONE[conv.kind as ChannelKind] ?? "blue"}>
+              {CHANNEL_LABEL[conv.kind as ChannelKind] ?? conv.kind}
+            </ToneBadge>
+            <span>{addressOf(conv)}</span>
             {conv.contact && (
               <Link className="text-primary hover:underline" href={`/contacts/${conv.contact.id}`}>
                 Contact: {conv.contact.name}
@@ -249,6 +265,7 @@ export function Inbox({
   selected,
   filter,
   status,
+  kind,
   owners,
   me,
   role,
@@ -258,6 +275,7 @@ export function Inbox({
   selected: { conv: ConvRow; messages: MsgRow[] } | null;
   filter: string;
   status: string;
+  kind?: string;
   owners: Owner[];
   me: string;
   role: string;
@@ -279,7 +297,7 @@ export function Inbox({
             {FILTERS.map((f) => (
               <Link
                 key={f.key}
-                href={href(f.key, status)}
+                href={href(f.key, status, undefined, kind)}
                 aria-current={filter === f.key ? "page" : undefined}
                 className={cn(
                   "h-8 rounded-3xl px-3 text-xs leading-8",
@@ -292,11 +310,31 @@ export function Inbox({
               </Link>
             ))}
           </div>
+          <div className="flex flex-wrap gap-1.5" data-testid="kind-filter">
+            {[
+              { key: "", label: "Semua kanal" },
+              ...CHANNEL_KINDS.map((k) => ({ key: k, label: CHANNEL_LABEL[k] })),
+            ].map((k) => (
+              <Link
+                key={k.key}
+                href={href(filter, status, undefined, k.key || undefined)}
+                aria-current={(kind ?? "") === k.key ? "page" : undefined}
+                className={cn(
+                  "h-7 rounded-3xl px-2.5 text-xs leading-7",
+                  (kind ?? "") === k.key
+                    ? "bg-secondary text-primary font-medium"
+                    : "text-muted-foreground hover:bg-secondary",
+                )}
+              >
+                {k.label}
+              </Link>
+            ))}
+          </div>
           <div className="flex gap-1.5">
             {(["open", "closed"] as const).map((s) => (
               <Link
                 key={s}
-                href={href(filter, s)}
+                href={href(filter, s, undefined, kind)}
                 className={cn(
                   "text-xs",
                   status === s
@@ -316,14 +354,19 @@ export function Inbox({
           {conversations.map((c) => (
             <li key={c.id}>
               <Link
-                href={href(filter, status, c.id)}
+                href={href(filter, status, c.id, kind)}
                 className={cn(
                   "hover:bg-accent/50 block space-y-0.5 px-3 py-2.5",
                   selected?.conv.id === c.id && "bg-accent",
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-medium">{label(c)}</span>
+                  <span className="truncate text-sm font-medium">
+                    <span className="text-muted-foreground mr-1.5 text-[11px] font-normal">
+                      {CHANNEL_LABEL[c.kind as ChannelKind] ?? c.kind}
+                    </span>
+                    {label(c)}
+                  </span>
                   {c.unreadCount > 0 && <Badge>{c.unreadCount}</Badge>}
                 </div>
                 <p className="text-muted-foreground truncate text-xs">{c.lastMessagePreview}</p>
@@ -343,7 +386,7 @@ export function Inbox({
       {selected ? (
         <div className="flex min-h-0 flex-col">
           <Link
-            href={href(filter, status)}
+            href={href(filter, status, undefined, kind)}
             className="text-primary border-b px-3 py-2 text-xs md:hidden"
           >
             ← Daftar percakapan

@@ -99,3 +99,26 @@ Dilaporkan **cakupan** (persen bulan dengan aktual di dalam P10–P90; ideal ≈
 - Dengan sedikit bulan ber-backtest, cakupan/MAPE sangat berfluktuasi — baca sebagai indikatif.
 - Pengguna melihat forecast deal dalam izinnya (Sales Rep: miliknya); pelatihan probabilitas memakai seluruh deal tertutup
   organisasi (agregat). Diaktifkan hanya bila ≥ 10 deal tertutup dan riwayat ≥ 3 bulan.
+
+## 3.6 Omnichannel communication hub
+
+**Model** — `Conversation` kini lintas kanal: `kind` (`whatsapp` | `email` | `other`), `handle` (pengenal lawan bicara
+ternormalisasi: nomor WA / email huruf kecil / `manual:<kanal>:<id>`), unik per `(organisasi, kind, handle)`. Kolom
+telepon menjadi opsional; migrasi mengisi `handle` percakapan WhatsApp lama. Sumber pesan: webhook WhatsApp
+(tetap), **email** dari sinkron Gmail (idempoten `gmail:<id>`, kegagalan tidak menggagalkan pencatatan), dan **kanal lain**
+yang dicatat manual (Instagram, Telegram, dst. — hanya mencatat, tidak mengirim). Balasan keluar selalu aksi eksplisit:
+WhatsApp via gateway BYOK, email via connector email tenant, kanal lain hanya dicatat.
+
+**Routing & assignment** (Settings → Routing Inbox, hanya Owner/Admin) per kanal: _tanpa routing_ (default, perilaku lama),
+_ikuti pemilik record_ (contact/lead yang cocok; tanpa pemilik → giliran pool), atau _round robin_. Pool kosong = semua
+anggota aktif non-viewer; pool disaring ke anggota aktif yang dapat menangani inbox. Kursor round robin diklaim lewat
+compare-and-swap sehingga pesan paralel tidak berebut giliran yang sama. Penerima mendapat notifikasi in-app; tidak ada
+balasan otomatis.
+
+**Timeline terpadu** — kartu "Timeline komunikasi terpadu" di detail lead, contact, company, dan Customer 360:
+pesan semua kanal + aktivitas (call, meeting, catatan, task) dalam satu urutan waktu; company mengagregasi percakapan
+contact-nya. Aktivitas yang merupakan salinan otomatis pesan (WhatsApp masuk/keluar, email hasil sinkron) disembunyikan agar
+tidak ganda. Izin: pesan hanya bila pengguna boleh melihat percakapannya (Sales Rep: miliknya/belum ditugaskan).
+
+Batasan: email hanya dari Gmail (IMAP ditunda, keputusan #16); pesan email tersimpan sebagai subjek + cuplikan (bukan isi penuh);
+satu percakapan per lawan bicara per kanal (tidak ada threading per subjek).

@@ -21,6 +21,8 @@ import { findLeadDuplicates } from "@/modules/duplicates/server/detect";
 import { ConvertLeadDialog } from "@/modules/leads/components/convert-lead-dialog";
 import { getConversionSuggestions } from "@/modules/leads/server/conversion";
 import { LeadActions } from "@/modules/leads/components/lead-actions";
+import { UnifiedTimeline } from "@/modules/omnichannel/components/unified-timeline";
+import { getUnifiedTimeline } from "@/modules/omnichannel/server/timeline";
 import { LeadScoreCard } from "@/modules/intelligence/components/lead-score-card";
 import { FollowUpCard } from "@/modules/intelligence/components/followup-card";
 import { getFollowUpView } from "@/modules/intelligence/server/followup-view";
@@ -47,7 +49,8 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
     !lead.convertedAt &&
     ctx.ability.can("update", subject);
   const open = !lead.convertedAt && !lead.archivedAt;
-  const [score, followUp, suggestions, dups] = await Promise.all([
+  const [timeline, score, followUp, suggestions, dups] = await Promise.all([
+    getUnifiedTimeline(ctx, { type: "lead", id: lead.id }),
     getLeadScore(ctx, lead.id),
     open ? getFollowUpView(ctx, { type: "lead", id: lead.id }) : null,
     canConvert ? getConversionSuggestions(ctx, lead.id) : null,
@@ -225,6 +228,12 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
         currentName={lead.name}
         matches={dups}
         canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
+      />
+      <UnifiedTimeline
+        items={timeline}
+        logSubject={
+          ctx.ability.can("create", "Activity") ? { type: "lead", id: lead.id } : undefined
+        }
       />
       <ActivitiesPanel ctx={ctx} link={{ leadId: lead.id }} phone={lead.phone} />
     </div>

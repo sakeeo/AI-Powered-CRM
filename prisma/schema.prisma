@@ -146,6 +146,7 @@ model Organization {
   activityTemplates       ActivityTemplate[]
   recommendationFeedback  RecommendationFeedback[]
   insightAlerts           InsightAlert[]
+  channelRoutings         ChannelRouting[]
   messages                Message[]
   outboundWebhooks        OutboundWebhook[]
   outboundDeliveries      OutboundDelivery[]
@@ -1096,10 +1097,18 @@ model AutomationRun {
 model Conversation {
   id                 String   @id @default(uuid(7)) @db.Uuid
   organizationId     String   @map("organization_id") @db.Uuid
-  /// Tipe connector WhatsApp yang dipakai (whatsapp_fonnte | whatsapp_http)
+  /// Tipe connector yang dipakai (whatsapp_fonnte | whatsapp_http | email_gmail | manual)
   channel            String
-  phone              String
-  phoneNormalized    String   @map("phone_normalized")
+  /// Jenis kanal terpadu: whatsapp | email | other (plan 3.6)
+  kind               String   @default("whatsapp")
+  /// Pengenal lawan bicara ternormalisasi per kanal: telepon (WA), email huruf kecil, atau manual:<id>
+  handle             String?
+  /// Alamat email lawan bicara (kind email)
+  email              String?
+  /// Label kanal bebas untuk kind other (mis. Instagram, Telegram)
+  channelLabel       String?  @map("channel_label")
+  phone              String?
+  phoneNormalized    String?  @map("phone_normalized")
   displayName        String?  @map("display_name")
   contactId          String?  @map("contact_id") @db.Uuid
   leadId             String?  @map("lead_id") @db.Uuid
@@ -1120,6 +1129,7 @@ model Conversation {
   messages     Message[]
 
   @@unique([organizationId, phoneNormalized])
+  @@unique([organizationId, kind, handle])
   @@index([organizationId, status, lastMessageAt(sort: Desc)])
   @@index([organizationId, assigneeId])
   @@map("conversations")
@@ -1414,4 +1424,25 @@ model InsightAlert {
   @@unique([organizationId, dedupeKey])
   @@index([organizationId, status, detectedAt(sort: Desc)])
   @@map("insight_alerts")
+}
+
+/// Aturan routing percakapan per kanal (plan 3.6): bagaimana percakapan baru ditugaskan.
+model ChannelRouting {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  /// whatsapp | email | other
+  kind           String
+  /// none | sticky_owner | round_robin
+  strategy       String   @default("none")
+  /// Anggota yang menerima giliran (round robin); kosong = semua anggota aktif non-viewer
+  pool           Json     @default("[]")
+  /// Penunjuk giliran round robin (naik tiap penugasan)
+  cursor         Int      @default(0)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, kind])
+  @@map("channel_routing")
 }

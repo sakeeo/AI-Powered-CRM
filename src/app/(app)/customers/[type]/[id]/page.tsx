@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireTenant } from "@/lib/context";
 import { formatMoney } from "@/lib/money";
 import { orNotFound } from "@/lib/not-found";
+import { UnifiedTimeline } from "@/modules/omnichannel/components/unified-timeline";
+import { getUnifiedTimeline } from "@/modules/omnichannel/server/timeline";
 import { FollowUpCard } from "@/modules/intelligence/components/followup-card";
 import { getFollowUpView } from "@/modules/intelligence/server/followup-view";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
@@ -32,7 +34,10 @@ export default async function Page(props: PageProps<"/customers/[type]/[id]">) {
     listSegments(ctx),
   ]);
   const party = { type: t, id };
-  const followUp = await getFollowUpView(ctx, { type: t, id });
+  const [followUp, timeline] = await Promise.all([
+    getFollowUpView(ctx, { type: t, id }),
+    getUnifiedTimeline(ctx, { type: t, id }),
+  ]);
   const canEdit = ctx.ability.can("update", t === "company" ? "Company" : "Contact");
   const link = t === "company" ? { companyId: id } : { contactId: id };
   return (
@@ -164,6 +169,14 @@ export default async function Page(props: PageProps<"/customers/[type]/[id]">) {
         subject={{ type: t, id }}
         rec={followUp}
         canCreate={ctx.ability.can("create", "Activity")}
+      />
+      <UnifiedTimeline
+        items={timeline}
+        logSubject={
+          t === "contact" && ctx.ability.can("create", "Activity")
+            ? { type: "contact", id }
+            : undefined
+        }
       />
       <ActivitiesPanel ctx={ctx} link={link} phone={c.partyPhone} />
     </div>

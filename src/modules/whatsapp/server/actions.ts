@@ -11,6 +11,8 @@ import { rateLimit } from "@/lib/rate-limit";
 import { idInput } from "@/lib/schema-helpers";
 import { ensureLeadSources } from "@/modules/leads/server/queries";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
+import { sendMail } from "@/lib/mailer";
+import type { ChannelKind } from "@/modules/omnichannel/constants";
 import { sendViaGateway, type WaConfig } from "@/modules/whatsapp/gateway";
 import { waProviderFromType } from "@/modules/whatsapp/constants";
 import {
@@ -43,17 +45,25 @@ async function defaultGateway(ctx: ActionContext): Promise<WaConfig> {
   return { provider, token: cfg.token, apiUrl: cfg.apiUrl };
 }
 
+const firstLine = (t: string) => t.split("\n")[0]!.trim().slice(0, 120);
+
 /**
- * Kirim pesan keluar. SELALU aksi eksplisit pengguna (tombol Kirim) — tidak ada pengiriman otomatis,
- * termasuk dari AI. Perlu izin mengubah percakapan; dibatasi laju per pengguna.
+ * Kirim pesan keluar di kanal apa pun (plan 3.6). SELALU aksi eksplisit pengguna (tombol Kirim) — tidak ada
+ * pengiriman otomatis, termasuk dari AI. Perlu izin mengubah percakapan; dibatasi laju per pengguna.
+ * - whatsapp: lewat gateway BYOK; email: lewat connector email tenant; other: hanya dicatat (tanpa pengiriman).
  */
-export const sendWhatsappMessage = tenantAction(sendMessageSchema, async (ctx, input) => {
+export const sendConversationMessage = tenantAction(sendMessageSchema, async (ctx, input) => {
   const conv = await loadConversation(ctx, input.conversationId);
   assertCan(ctx, "update", "Conversation", conv);
   const rl = await rateLimit(`wa-send:${ctx.organizationId}:${ctx.userId}`, 30, 60);
   if (!rl.allowed)
     throw new AppError("Terlalu banyak pesan. Coba lagi sebentar.", 429, "rate_limited");
-  const gateway = await defaultGateway(ctx);
+  const kind = (conv.kind ?? "whatsapp") as ChannelKind;
+  const gateway = kind === "whatsapp" ? await defaultGateway(ctx) : null;
+  if (kind === "whatsapp" && !conv.phoneNormalized)
+    throw new AppError("Percakapan ini tidak punya nomor telepon");
+  if (kind === "email" && !conv.email)
+    throw new AppError("Percakapan ini tidak punya alamat email");
 
   const msg = await ctx.db.message.create({
     data: {
@@ -64,7 +74,31 @@ export const sendWhatsappMessage = tenantAction(sendMessageSchema, async (ctx, i
       sentBy: ctx.userId,
     } as never,
   });
-  const res = await sendViaGateway(gateway, conv.phoneNormalized, input.body);
+  let res: { ok: true; externalId?: string } | { ok: false; error: string };
+  if (kind === "whatsapp") {
+    res = await sendViaGateway(gateway!, conv.phoneNormalized!, input.body);
+  } else if (kind === "email") {
+    const lastIn = await ctx.db.message.findFirst({
+      where: { conversationId: conv.id, direction: "in" },
+      orderBy: { createdAt: "desc" },
+      select: { body: true },
+    });
+    try {
+      await sendMail(
+        {
+          to: conv.email!,
+          subject: lastIn ? `Re: ${firstLine(lastIn.body)}` : "Tindak lanjut",
+          text: input.body,
+        },
+        { organizationId: ctx.organizationId },
+      );
+      res = { ok: true };
+    } catch (e) {
+      res = { ok: false, error: (e as Error).message.slice(0, 200) };
+    }
+  } else {
+    res = { ok: true }; // kanal lain: dicatat manual
+  }
   const now = new Date();
   await ctx.db.message.update({
     where: { id: msg.id },
@@ -85,7 +119,7 @@ export const sendWhatsappMessage = tenantAction(sendMessageSchema, async (ctx, i
       updatedBy: ctx.userId,
     },
   });
-  if (res.ok && (conv.contactId || conv.leadId)) {
+  if (res.ok && kind === "whatsapp" && (conv.contactId || conv.leadId)) {
     await ctx.db.activity.create({
       data: {
         type: "whatsapp",
@@ -104,12 +138,15 @@ export const sendWhatsappMessage = tenantAction(sendMessageSchema, async (ctx, i
     action: res.ok ? "whatsapp.message_sent" : "whatsapp.message_failed",
     entityType: "Conversation",
     entityId: conv.id,
-    after: { length: input.body.length, error: res.ok ? undefined : res.error },
+    after: { kind, length: input.body.length, error: res.ok ? undefined : res.error },
   });
   revalidatePath("/inbox");
   if (!res.ok) throw new AppError(`Pesan gagal terkirim: ${res.error}`);
   return { id: msg.id };
 });
+
+/** Nama lama (kompatibel): pesan WhatsApp lewat jalur terpadu. */
+export const sendWhatsappMessage = sendConversationMessage;
 
 /** Ambil/tugaskan percakapan. Sales Rep hanya boleh mengambil yang belum ditugaskan atau melepas miliknya. */
 export const assignConversation = tenantAction(
@@ -166,9 +203,12 @@ export const createLeadFromConversation = tenantAction(idInput, async (ctx, { id
   const source = await ctx.db.leadSource.findFirst({ where: { name: "WhatsApp" } });
   const lead = await ctx.db.lead.create({
     data: {
-      name: conv.displayName ?? `+${conv.phoneNormalized}`,
-      phone: `+${conv.phoneNormalized}`,
+      name:
+        conv.displayName ??
+        (conv.phoneNormalized ? `+${conv.phoneNormalized}` : (conv.email ?? "Lead baru")),
+      phone: conv.phoneNormalized ? `+${conv.phoneNormalized}` : null,
       phoneNormalized: conv.phoneNormalized,
+      email: conv.email,
       sourceId: source?.id ?? null,
       ownerId: conv.assigneeId ?? ctx.userId,
       createdBy: ctx.userId,

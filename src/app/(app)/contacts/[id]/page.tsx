@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CustomizationCard } from "@/modules/customization/components/customization-card";
 import { getEntityCustomization } from "@/modules/customization/server/queries";
+import { UnifiedTimeline } from "@/modules/omnichannel/components/unified-timeline";
+import { getUnifiedTimeline } from "@/modules/omnichannel/server/timeline";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
@@ -29,6 +31,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
   const owner = owners.find((o) => o.userId === contact.ownerId)?.name;
   const subject = asSubject("Contact", contact);
   const cust = await getEntityCustomization(ctx, "contact", contact.id, contact.customFields);
+  const timeline = await getUnifiedTimeline(ctx, { type: "contact", id: contact.id });
   const dups = await findContactDuplicates(ctx, {
     name: contact.name,
     email: contact.email ?? undefined,
@@ -135,6 +138,12 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
         currentName={contact.name}
         matches={dups}
         canMerge={ctx.ability.can("update", subject) && ctx.ability.can("delete", subject)}
+      />
+      <UnifiedTimeline
+        items={timeline}
+        logSubject={
+          ctx.ability.can("create", "Activity") ? { type: "contact", id: contact.id } : undefined
+        }
       />
       <ActivitiesPanel ctx={ctx} link={{ contactId: contact.id }} phone={contact.phone} />
     </div>

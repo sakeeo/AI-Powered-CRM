@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CustomizationCard } from "@/modules/customization/components/customization-card";
 import { getEntityCustomization } from "@/modules/customization/server/queries";
+import { UnifiedTimeline } from "@/modules/omnichannel/components/unified-timeline";
+import { getUnifiedTimeline } from "@/modules/omnichannel/server/timeline";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
@@ -25,6 +27,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
   ]);
   const owner = owners.find((o) => o.userId === company.ownerId)?.name;
   const subject = asSubject("Company", company);
+  const timeline = await getUnifiedTimeline(ctx, { type: "company", id: company.id });
   const cust = await getEntityCustomization(ctx, "company", company.id, company.customFields);
   return (
     <div className="space-y-4">
@@ -108,6 +111,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
         </Card>
       </div>
       <RelatedDeals deals={await listRelatedDeals(ctx, { companyId: company.id })} />
+      <UnifiedTimeline items={timeline} />
       <ActivitiesPanel ctx={ctx} link={{ companyId: company.id }} />
     </div>
   );
