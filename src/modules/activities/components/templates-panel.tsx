@@ -7,6 +7,7 @@ import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -238,8 +239,9 @@ export function TemplatesPanel({
                 </div>
                 {canManage && (
                   <div className="flex gap-1.5">
-                    <Button
-                      size="sm"
+                    <RowAction
+                      icon={Pencil}
+                      label="Ubah"
                       variant="outline"
                       onClick={() =>
                         setDraft({
@@ -252,11 +254,10 @@ export function TemplatesPanel({
                           isActive: t.isActive,
                         })
                       }
-                    >
-                      <Pencil /> Ubah
-                    </Button>
-                    <Button
-                      size="sm"
+                    />
+                    <RowAction
+                      icon={Trash2}
+                      label="Hapus"
                       variant="destructive"
                       disabled={pending}
                       onClick={() =>
@@ -266,9 +267,7 @@ export function TemplatesPanel({
                           else toast.success("Template dihapus");
                         })
                       }
-                    >
-                      <Trash2 /> Hapus
-                    </Button>
+                    />
                   </div>
                 )}
               </li>

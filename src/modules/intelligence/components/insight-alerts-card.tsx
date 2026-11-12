@@ -1,10 +1,13 @@
 "use client";
 
+import { EyeOff } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ANOMALY_LABEL, type AnomalyKind } from "@/modules/intelligence/anomalies";
@@ -88,8 +91,9 @@ export function InsightAlertsCard({ alerts, canScan }: { alerts: AlertRow[]; can
                   </div>
                   <p className="text-muted-foreground text-xs">{a.detail}</p>
                 </div>
-                <Button
-                  size="sm"
+                <RowAction
+                  icon={EyeOff}
+                  label="Abaikan"
                   variant="ghost"
                   disabled={pending}
                   onClick={() =>
@@ -99,9 +103,7 @@ export function InsightAlertsCard({ alerts, canScan }: { alerts: AlertRow[]; can
                       else router.refresh();
                     })
                   }
-                >
-                  Abaikan
-                </Button>
+                />
               </li>
             ))}
           </ul>

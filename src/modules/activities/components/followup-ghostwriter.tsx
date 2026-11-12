@@ -3,6 +3,7 @@
 import { Copy, MessageCircle, Sparkles } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { normalizePhone } from "@/lib/phone";
 import type { ActivityLink } from "@/modules/activities/constants";
@@ -47,24 +48,29 @@ export function FollowUpGhostwriter({
               </p>
               <p className="text-sm whitespace-pre-wrap">{o.text}</p>
               <div className="flex gap-2">
-                <Button
+                <RowAction
+                  icon={Copy}
+                  label="Salin"
                   type="button"
-                  size="sm"
                   variant="outline"
                   onClick={() =>
                     void navigator.clipboard.writeText(o.text).then(() => toast.success("Disalin"))
                   }
-                >
-                  <Copy /> Salin
-                </Button>
+                />
                 {o.channel === "whatsapp" && wa && (
-                  <Button asChild size="sm" variant="outline">
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="max-lg:size-10 max-lg:rounded-full max-lg:px-0"
+                  >
                     <a
                       href={`https://wa.me/${wa}?text=${encodeURIComponent(o.text)}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      title="Buka WhatsApp"
                     >
-                      <MessageCircle /> Buka WhatsApp
+                      <MessageCircle /> <span className="max-lg:sr-only">Buka WhatsApp</span>
                     </a>
                   </Button>
                 )}

@@ -21,6 +21,6 @@ test("template aktivitas: dibuat di Settings lalu dipakai di composer lead", asy
   await page.locator("#act-template").click();
   await page.getByRole("option", { name: tpl }).click();
   await expect(page.getByLabel("Judul")).toHaveValue(`Hubungi setelah demo ${stamp}`);
-  await page.getByRole("button", { name: "Buat task" }).click();
+  await page.getByRole("button", { name: "Buat task", exact: true }).click();
   await expect(page.getByTestId("timeline")).toContainText(`Hubungi setelah demo ${stamp}`);
 });

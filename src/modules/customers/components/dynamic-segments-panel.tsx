@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -298,11 +299,15 @@ export function DynamicSegmentsPanel({
                 </div>
                 {canManage && (
                   <div className="flex gap-1.5">
-                    <Button size="sm" variant="outline" onClick={() => setDraft(toDraft(s))}>
-                      <Pencil /> Ubah
-                    </Button>
-                    <Button
-                      size="sm"
+                    <RowAction
+                      icon={Pencil}
+                      label="Ubah"
+                      variant="outline"
+                      onClick={() => setDraft(toDraft(s))}
+                    />
+                    <RowAction
+                      icon={Trash2}
+                      label="Hapus"
                       variant="destructive"
                       disabled={pending}
                       onClick={() =>
@@ -312,9 +317,7 @@ export function DynamicSegmentsPanel({
                           else toast.success("Segmen dihapus");
                         })
                       }
-                    >
-                      <Trash2 /> Hapus
-                    </Button>
+                    />
                   </div>
                 )}
               </li>

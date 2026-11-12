@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -336,14 +337,14 @@ export function QuotationBuilder({
                   onValueChange={(v) => set(l.key, { discountPercent: v })}
                 />
                 {editable && (
-                  <Button
+                  <RowAction
+                    icon={Trash2}
+                    label="Hapus"
                     type="button"
                     variant="destructive"
                     aria-label={`Hapus item ${i + 1}`}
                     onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))}
-                  >
-                    <Trash2 /> Hapus
-                  </Button>
+                  />
                 )}
                 <p className="text-muted-foreground text-xs tabular-nums sm:col-span-5">
                   Total baris: {calc?.lines[i] ? formatMoney(calc.lines[i].net, currency) : "—"}

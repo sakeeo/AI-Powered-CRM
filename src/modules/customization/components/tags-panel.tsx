@@ -1,10 +1,11 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Check, Pencil, Trash2, X } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
 import { SelectField } from "@/components/shared/select-field";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,12 +58,14 @@ function Row({ tag }: { tag: TagRow }) {
           <div className="w-28">
             <SelectField value={color} onChange={setColor} options={colorOptions} />
           </div>
-          <Button size="sm" type="submit" disabled={pending}>
-            Simpan
-          </Button>
-          <Button size="sm" type="button" variant="outline" onClick={() => setEditing(false)}>
-            Batal
-          </Button>
+          <RowAction icon={Check} label="Simpan" type="submit" disabled={pending} />
+          <RowAction
+            icon={X}
+            label="Batal"
+            type="button"
+            variant="outline"
+            onClick={() => setEditing(false)}
+          />
         </form>
       ) : (
         <div className="flex items-center gap-3">
@@ -73,13 +76,17 @@ function Row({ tag }: { tag: TagRow }) {
       {!editing && (
         <div className="flex gap-2">
           {can("update", "Tag") && (
-            <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-              <Pencil /> Ubah
-            </Button>
+            <RowAction
+              icon={Pencil}
+              label="Ubah"
+              variant="outline"
+              onClick={() => setEditing(true)}
+            />
           )}
           {can("delete", "Tag") && (
-            <Button
-              size="sm"
+            <RowAction
+              icon={Trash2}
+              label="Hapus"
               variant="destructive"
               disabled={pending}
               onClick={() => {
@@ -94,9 +101,7 @@ function Row({ tag }: { tag: TagRow }) {
                   else toast.success("Tag dihapus");
                 });
               }}
-            >
-              <Trash2 /> Hapus
-            </Button>
+            />
           )}
         </div>
       )}

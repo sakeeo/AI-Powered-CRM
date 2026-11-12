@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Package, Pencil, Plus } from "lucide-react";
+import { Package, Pencil, Plus, Power, PowerOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { EntitySheet } from "@/components/shared/entity-sheet";
 import { PageActions } from "@/components/shared/page-actions";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/money";
 import { ProductForm } from "@/modules/products/components/product-form";
@@ -73,15 +74,16 @@ export function ProductsTable({
               const r = c.row.original;
               return (
                 <div className="flex justify-end gap-1">
-                  <Button
+                  <RowAction
+                    icon={Pencil}
+                    label="Ubah"
                     variant="outline"
                     aria-label={`Ubah ${r.name}`}
                     onClick={() => setSheet({ row: r })}
-                  >
-                    <Pencil /> Ubah
-                  </Button>
-                  <Button
-                    size="sm"
+                  />
+                  <RowAction
+                    icon={r.isActive ? PowerOff : Power}
+                    label={r.isActive ? "Nonaktifkan" : "Aktifkan"}
                     variant="outline"
                     disabled={pending}
                     onClick={() =>
@@ -91,11 +93,10 @@ export function ProductsTable({
                         else router.refresh();
                       })
                     }
-                  >
-                    {r.isActive ? "Nonaktifkan" : "Aktifkan"}
-                  </Button>
+                  />
                   {can("delete", "Product") && (
                     <DeleteEntityButton
+                      compact
                       action={deleteProduct}
                       id={r.id}
                       entity="Produk"

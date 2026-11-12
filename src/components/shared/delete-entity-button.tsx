@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,12 +23,15 @@ export function DeleteEntityButton({
   entity,
   name,
   redirectTo,
+  compact = false,
 }: {
   action: (input: { id: string }) => Promise<ActionResult<unknown>>;
   id: string;
   entity: string;
   name: string;
   redirectTo: string;
+  /** Aksi per item di tabel/daftar: hanya ikon di mobile/tablet. */
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -46,9 +50,19 @@ export function DeleteEntityButton({
   }
   return (
     <>
-      <Button variant="destructive" onClick={() => setOpen(true)}>
-        <Trash2 /> Hapus
-      </Button>
+      {compact ? (
+        <RowAction
+          icon={Trash2}
+          label="Hapus"
+          variant="destructive"
+          aria-label={`Hapus ${name}`}
+          onClick={() => setOpen(true)}
+        />
+      ) : (
+        <Button variant="destructive" onClick={() => setOpen(true)}>
+          <Trash2 /> Hapus
+        </Button>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

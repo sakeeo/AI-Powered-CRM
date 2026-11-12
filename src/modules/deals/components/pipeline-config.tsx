@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { Archive, ArrowDown, ArrowUp, Check } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -89,8 +90,9 @@ function StageItem({
           >
             <ArrowDown /> Turun
           </Button>
-          <Button
-            size="sm"
+          <RowAction
+            icon={Check}
+            label="Simpan"
             disabled={pending || !dirty}
             onClick={() =>
               run(
@@ -98,17 +100,14 @@ function StageItem({
                 "Stage disimpan",
               )
             }
-          >
-            Simpan
-          </Button>
-          <Button
-            size="sm"
+          />
+          <RowAction
+            icon={Archive}
+            label="Arsipkan"
             variant="destructive"
             disabled={pending}
             onClick={() => run(() => archiveStage({ id: stage.id }), "Stage diarsipkan")}
-          >
-            Arsipkan
-          </Button>
+          />
         </div>
       )}
     </li>

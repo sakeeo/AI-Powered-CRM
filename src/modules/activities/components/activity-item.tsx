@@ -2,14 +2,17 @@
 
 import {
   CalendarClock,
+  Check,
   CheckCircle2,
   FileText,
   ListTodo,
   Mail,
   MessageCircle,
   Phone,
+  RotateCcw,
   Trash2,
   Users,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,7 +20,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
 import { ToneBadge } from "@/components/shared/tone-badge";
-import { Button } from "@/components/ui/button";
+import { RowAction } from "@/components/shared/row-action";
 import { formatInTz } from "@/lib/timezone";
 import {
   ACTIVITY_STATUS_LABEL,
@@ -143,42 +146,39 @@ export function ActivityItem({
         <div className="flex shrink-0 items-start gap-1">
           {status === "open" ? (
             <>
-              <Button
-                size="sm"
+              <RowAction
+                icon={Check}
+                label="Selesai"
                 variant="outline"
                 disabled={pending}
                 onClick={() => run(() => setActivityStatus({ id: a.id, status: "done" }))}
-              >
-                Selesai
-              </Button>
-              <Button
-                size="sm"
+              />
+              <RowAction
+                icon={X}
+                label="Batal"
                 variant="ghost"
                 disabled={pending}
                 onClick={() => run(() => setActivityStatus({ id: a.id, status: "cancelled" }))}
-              >
-                Batal
-              </Button>
+              />
             </>
           ) : (
-            <Button
-              size="sm"
+            <RowAction
+              icon={RotateCcw}
+              label="Buka lagi"
               variant="ghost"
               disabled={pending}
               onClick={() => run(() => setActivityStatus({ id: a.id, status: "open" }))}
-            >
-              Buka lagi
-            </Button>
+            />
           )}
           {can("delete", "Activity", a) && (
-            <Button
+            <RowAction
+              icon={Trash2}
+              label="Hapus"
               variant="destructive"
               aria-label={`Hapus ${a.subject}`}
               disabled={pending}
               onClick={() => run(() => deleteActivity({ id: a.id }) as never)}
-            >
-              <Trash2 /> Hapus
-            </Button>
+            />
           )}
         </div>
       )}

@@ -1,12 +1,13 @@
 "use client";
 
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Pencil, Plus, RotateCcw, Send, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -289,9 +290,10 @@ export function OutboundWebhooksCard({
                 </div>
                 {canManage && (
                   <div className="flex flex-wrap gap-2">
-                    <Button
+                    <RowAction
+                      icon={Pencil}
+                      label="Ubah"
                       variant="outline"
-                      size="sm"
                       onClick={() =>
                         setDraft({
                           id: w.id,
@@ -302,12 +304,11 @@ export function OutboundWebhooksCard({
                           isActive: w.isActive,
                         })
                       }
-                    >
-                      Ubah
-                    </Button>
-                    <Button
+                    />
+                    <RowAction
+                      icon={Send}
+                      label="Kirim uji"
                       variant="outline"
-                      size="sm"
                       disabled={pending}
                       onClick={() =>
                         start(async () => {
@@ -317,12 +318,11 @@ export function OutboundWebhooksCard({
                           else toast.error(res.data.error);
                         })
                       }
-                    >
-                      Kirim uji
-                    </Button>
-                    <Button
+                    />
+                    <RowAction
+                      icon={KeyRound}
+                      label="Putar secret"
                       variant="outline"
-                      size="sm"
                       disabled={pending}
                       onClick={() =>
                         start(async () => {
@@ -331,12 +331,11 @@ export function OutboundWebhooksCard({
                           else setSecret(res.data.secret);
                         })
                       }
-                    >
-                      Putar secret
-                    </Button>
-                    <Button
+                    />
+                    <RowAction
+                      icon={Trash2}
+                      label="Hapus"
                       variant="destructive"
-                      size="sm"
                       disabled={pending}
                       onClick={() =>
                         start(async () => {
@@ -345,9 +344,7 @@ export function OutboundWebhooksCard({
                           else toast.success("Webhook dihapus");
                         })
                       }
-                    >
-                      <Trash2 /> Hapus
-                    </Button>
+                    />
                   </div>
                 )}
               </li>
@@ -384,8 +381,9 @@ export function OutboundWebhooksCard({
                     {x.error ? ` · ${x.error}` : ""}
                   </span>
                   {canManage && x.status === "failed" && (
-                    <Button
-                      size="xs"
+                    <RowAction
+                      icon={RotateCcw}
+                      label="Kirim ulang"
                       variant="outline"
                       className="ml-auto"
                       disabled={pending}
@@ -396,9 +394,7 @@ export function OutboundWebhooksCard({
                           else toast.success("Pengiriman diantre ulang");
                         })
                       }
-                    >
-                      Kirim ulang
-                    </Button>
+                    />
                   )}
                 </li>
               ))}

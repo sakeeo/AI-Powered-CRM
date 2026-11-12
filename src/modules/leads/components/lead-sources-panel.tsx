@@ -1,9 +1,12 @@
 "use client";
 
+import { Pencil, Power, PowerOff } from "lucide-react";
+
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -73,11 +76,15 @@ function Row({ s, canEdit }: { s: SourceRow; canEdit: boolean }) {
       )}
       {canEdit && !editing && !s.isSystem && (
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-            Ubah nama
-          </Button>
-          <Button
-            size="sm"
+          <RowAction
+            icon={Pencil}
+            label="Ubah nama"
+            variant="outline"
+            onClick={() => setEditing(true)}
+          />
+          <RowAction
+            icon={s.isActive ? PowerOff : Power}
+            label={s.isActive ? "Nonaktifkan" : "Aktifkan"}
             variant={s.isActive ? "destructive" : "outline"}
             disabled={pending}
             onClick={() =>
@@ -86,9 +93,7 @@ function Row({ s, canEdit }: { s: SourceRow; canEdit: boolean }) {
                 if (!res.ok) toast.error(res.error);
               })
             }
-          >
-            {s.isActive ? "Nonaktifkan" : "Aktifkan"}
-          </Button>
+          />
         </div>
       )}
     </li>

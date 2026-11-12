@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -194,8 +195,9 @@ export function HistoryCard({
                 </span>
               </span>
               {canRestore && (
-                <Button
-                  size="sm"
+                <RowAction
+                  icon={RotateCcw}
+                  label="Pulihkan"
                   variant="outline"
                   disabled={pending}
                   onClick={() =>
@@ -208,9 +210,7 @@ export function HistoryCard({
                       }
                     })
                   }
-                >
-                  <RotateCcw /> Pulihkan
-                </Button>
+                />
               )}
             </li>
           ))}

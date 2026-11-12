@@ -1,10 +1,11 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Trash2, Users } from "lucide-react";
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -155,12 +156,16 @@ export function TeamsPanel({ teams, people }: { teams: TeamRow[]; people: Person
                 </div>
                 {can("update", "Team") && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditing(t)}>
-                      Atur anggota
-                    </Button>
+                    <RowAction
+                      icon={Users}
+                      label="Atur anggota"
+                      variant="outline"
+                      onClick={() => setEditing(t)}
+                    />
                     {can("delete", "Team") && (
-                      <Button
-                        size="sm"
+                      <RowAction
+                        icon={Trash2}
+                        label="Hapus"
                         variant="destructive"
                         disabled={pending}
                         onClick={() =>
@@ -170,9 +175,7 @@ export function TeamsPanel({ teams, people }: { teams: TeamRow[]; people: Person
                             else toast.success("Tim dihapus");
                           })
                         }
-                      >
-                        <Trash2 /> Hapus
-                      </Button>
+                      />
                     )}
                   </div>
                 )}

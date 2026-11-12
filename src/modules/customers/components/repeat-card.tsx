@@ -1,11 +1,13 @@
 "use client";
 
+import { CalendarPlus } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { ToneBadge } from "@/components/shared/tone-badge";
-import { Button } from "@/components/ui/button";
+import { RowAction } from "@/components/shared/row-action";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { REPEAT_LABEL, type RepeatStatus } from "@/modules/customers/repeat";
 import { createRepeatFollowUp } from "@/modules/customers/server/repeat-actions";
@@ -67,8 +69,9 @@ export function RepeatCard({
                 </p>
               </div>
               {canCreate && (
-                <Button
-                  size="sm"
+                <RowAction
+                  icon={CalendarPlus}
+                  label="Buat follow-up"
                   variant="outline"
                   disabled={pending}
                   onClick={() =>
@@ -81,9 +84,7 @@ export function RepeatCard({
                       }
                     })
                   }
-                >
-                  Buat follow-up
-                </Button>
+                />
               )}
             </li>
           ))}

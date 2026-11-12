@@ -1,8 +1,11 @@
 "use client";
 
+import { Merge } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -84,9 +87,12 @@ export function DuplicatesCard({
                 </span>
               </div>
               {canMerge && (
-                <Button size="sm" variant="outline" onClick={() => setTarget(m)}>
-                  Gabungkan…
-                </Button>
+                <RowAction
+                  icon={Merge}
+                  label="Gabungkan…"
+                  variant="outline"
+                  onClick={() => setTarget(m)}
+                />
               )}
             </li>
           ))}

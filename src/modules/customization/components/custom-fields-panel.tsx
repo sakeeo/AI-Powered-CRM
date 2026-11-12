@@ -8,6 +8,7 @@ import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -421,19 +422,19 @@ export function CustomFieldsPanel({ fields }: { fields: Record<CustomEntity, Fie
                     >
                       <ArrowDown />
                     </Button>
-                    <Button
-                      size="sm"
+                    <RowAction
+                      icon={Pencil}
+                      label="Ubah"
                       variant="outline"
                       onClick={() => {
                         setDraft(toDraft(d));
                         setOpen(true);
                       }}
-                    >
-                      <Pencil /> Ubah
-                    </Button>
+                    />
                     {can("delete", "CustomField") && (
-                      <Button
-                        size="sm"
+                      <RowAction
+                        icon={Trash2}
+                        label="Hapus"
                         variant="destructive"
                         disabled={pending}
                         onClick={() => {
@@ -449,9 +450,7 @@ export function CustomFieldsPanel({ fields }: { fields: Record<CustomEntity, Fie
                             else toast.success("Field dihapus");
                           });
                         }}
-                      >
-                        <Trash2 /> Hapus
-                      </Button>
+                      />
                     )}
                   </div>
                 )}

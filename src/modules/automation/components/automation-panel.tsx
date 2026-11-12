@@ -1,12 +1,13 @@
 "use client";
 
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Power, PowerOff, Trash2, X } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -355,8 +356,9 @@ export function AutomationPanel({
                   </div>
                   {canEdit && (
                     <div className="flex gap-1.5">
-                      <Button
-                        size="sm"
+                      <RowAction
+                        icon={r.isActive ? PowerOff : Power}
+                        label={r.isActive ? "Nonaktifkan" : "Aktifkan"}
                         variant="outline"
                         disabled={pending}
                         onClick={() =>
@@ -365,11 +367,10 @@ export function AutomationPanel({
                             if (!res.ok) toast.error(res.error);
                           })
                         }
-                      >
-                        {r.isActive ? "Nonaktifkan" : "Aktifkan"}
-                      </Button>
-                      <Button
-                        size="sm"
+                      />
+                      <RowAction
+                        icon={Pencil}
+                        label="Ubah"
                         variant="outline"
                         onClick={() =>
                           setDraft({
@@ -381,12 +382,11 @@ export function AutomationPanel({
                             isActive: r.isActive,
                           })
                         }
-                      >
-                        <Pencil /> Ubah
-                      </Button>
+                      />
                       {can("delete", "Automation") && (
-                        <Button
-                          size="sm"
+                        <RowAction
+                          icon={Trash2}
+                          label="Hapus"
                           variant="destructive"
                           disabled={pending}
                           onClick={() => {
@@ -396,9 +396,7 @@ export function AutomationPanel({
                               if (!res.ok) toast.error(res.error);
                             });
                           }}
-                        >
-                          <Trash2 /> Hapus
-                        </Button>
+                        />
                       )}
                     </div>
                   )}

@@ -1,11 +1,12 @@
 "use client";
 
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Pencil, Plug, PlugZap, Plus, Star, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -235,15 +236,17 @@ export function WhatsappConnectorList({
               </div>
               {canManage && (
                 <div className="flex flex-wrap gap-2">
-                  <Button
+                  <RowAction
+                    icon={c ? Pencil : Plug}
+                    label={c ? "Ubah" : "Hubungkan"}
                     variant={c ? "outline" : "default"}
                     onClick={() => setForm({ provider: p, n: Date.now() })}
-                  >
-                    {c ? "Ubah" : "Hubungkan"}
-                  </Button>
+                  />
                   {c && (
                     <>
-                      <Button
+                      <RowAction
+                        icon={PlugZap}
+                        label="Test Connection"
                         variant="outline"
                         disabled={pending}
                         onClick={() =>
@@ -254,10 +257,10 @@ export function WhatsappConnectorList({
                             else toast.error(res.data.error);
                           })
                         }
-                      >
-                        Test Connection
-                      </Button>
-                      <Button
+                      />
+                      <RowAction
+                        icon={KeyRound}
+                        label="Putar secret"
                         variant="outline"
                         disabled={pending}
                         onClick={() =>
@@ -268,11 +271,11 @@ export function WhatsappConnectorList({
                               setSecret({ publicId, secret: res.data.webhookSecret });
                           })
                         }
-                      >
-                        Putar secret
-                      </Button>
+                      />
                       {!c.isDefault && (
-                        <Button
+                        <RowAction
+                          icon={Star}
+                          label="Jadikan default"
                           variant="outline"
                           disabled={pending}
                           onClick={() =>
@@ -281,19 +284,17 @@ export function WhatsappConnectorList({
                               "Default diubah",
                             )
                           }
-                        >
-                          Jadikan default
-                        </Button>
+                        />
                       )}
-                      <Button
+                      <RowAction
+                        icon={Trash2}
+                        label="Hapus"
                         variant="destructive"
                         disabled={pending}
                         onClick={() =>
                           run(() => removeWhatsappConnector({ provider: p }), "Connector dihapus")
                         }
-                      >
-                        <Trash2 /> Hapus
-                      </Button>
+                      />
                     </>
                   )}
                 </div>

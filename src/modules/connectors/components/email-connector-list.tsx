@@ -1,9 +1,10 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, Plug, Plus, Send, Star, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -109,15 +110,17 @@ export function EmailConnectorList({
               </div>
               {canManage && (
                 <div className="flex flex-wrap gap-2">
-                  <Button
+                  <RowAction
+                    icon={c ? Pencil : Plug}
+                    label={c ? "Ubah" : "Hubungkan"}
                     variant={c ? "outline" : "default"}
                     onClick={() => setForm({ provider: p, n: Date.now() })}
-                  >
-                    {c ? "Ubah" : "Hubungkan"}
-                  </Button>
+                  />
                   {c && (
                     <>
-                      <Button
+                      <RowAction
+                        icon={Send}
+                        label="Kirim email uji"
                         variant="outline"
                         disabled={pending}
                         onClick={() =>
@@ -129,29 +132,27 @@ export function EmailConnectorList({
                             else toast.error(res.data.error);
                           })
                         }
-                      >
-                        Kirim email uji
-                      </Button>
+                      />
                       {!c.isDefault && (
-                        <Button
+                        <RowAction
+                          icon={Star}
+                          label="Jadikan default"
                           variant="outline"
                           disabled={pending}
                           onClick={() =>
                             run(() => setDefaultEmailConnector({ provider: p }), "Default diubah")
                           }
-                        >
-                          Jadikan default
-                        </Button>
+                        />
                       )}
-                      <Button
+                      <RowAction
+                        icon={Trash2}
+                        label="Hapus"
                         variant="destructive"
                         disabled={pending}
                         onClick={() =>
                           run(() => removeEmailConnector({ provider: p }), "Connector dihapus")
                         }
-                      >
-                        <Trash2 /> Hapus
-                      </Button>
+                      />
                     </>
                   )}
                 </div>

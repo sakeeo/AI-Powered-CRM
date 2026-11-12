@@ -1,6 +1,15 @@
 "use client";
 
-import { CalendarClock, Download, Play, Save, Trash2, X } from "lucide-react";
+import {
+  CalendarClock,
+  Download,
+  FileSpreadsheet,
+  FolderOpen,
+  Play,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -8,6 +17,7 @@ import { useCan } from "@/components/providers/ability-provider";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -546,8 +556,9 @@ export function ReportBuilder({
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    <Button
-                      size="sm"
+                    <RowAction
+                      icon={FolderOpen}
+                      label="Buka"
                       variant="outline"
                       onClick={() => {
                         setPlan(r.definition);
@@ -557,31 +568,51 @@ export function ReportBuilder({
                         setResult(null);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                    >
-                      Buka
-                    </Button>
+                    />
                     {can("export", "Report") && (
                       <>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={`/api/reports/saved/${r.id}/export?format=csv`} download>
-                            <Download /> CSV
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          asChild
+                          className="max-lg:size-10 max-lg:rounded-full max-lg:px-0"
+                        >
+                          <a
+                            href={`/api/reports/saved/${r.id}/export?format=csv`}
+                            download
+                            title="Unduh CSV"
+                          >
+                            <Download /> <span className="max-lg:sr-only">CSV</span>
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={`/api/reports/saved/${r.id}/export?format=xlsx`} download>
-                            XLSX
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          asChild
+                          className="max-lg:size-10 max-lg:rounded-full max-lg:px-0"
+                        >
+                          <a
+                            href={`/api/reports/saved/${r.id}/export?format=xlsx`}
+                            download
+                            title="Unduh XLSX"
+                          >
+                            <FileSpreadsheet /> <span className="max-lg:sr-only">XLSX</span>
                           </a>
                         </Button>
                       </>
                     )}
                     {r.mine && can("export", "Report") && (
-                      <Button size="sm" variant="outline" onClick={() => setSchedule(r)}>
-                        <CalendarClock /> Jadwal
-                      </Button>
+                      <RowAction
+                        icon={CalendarClock}
+                        label="Jadwal"
+                        variant="outline"
+                        onClick={() => setSchedule(r)}
+                      />
                     )}
                     {r.mine && (
-                      <Button
-                        size="sm"
+                      <RowAction
+                        icon={Trash2}
+                        label="Hapus"
                         variant="destructive"
                         disabled={pending}
                         onClick={() =>
@@ -594,9 +625,7 @@ export function ReportBuilder({
                             }
                           })
                         }
-                      >
-                        <Trash2 /> Hapus
-                      </Button>
+                      />
                     )}
                   </div>
                 </li>

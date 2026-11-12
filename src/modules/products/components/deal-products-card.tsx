@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { SelectField } from "@/components/shared/select-field";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -65,7 +66,9 @@ export function DealProductsCard({
                     {formatMoney(i.quantity * Number(i.unitPrice), i.currency)}
                   </span>
                   {canEdit && (
-                    <Button
+                    <RowAction
+                      icon={Trash2}
+                      label="Hapus"
                       variant="destructive"
                       aria-label={`Hapus ${i.name}`}
                       disabled={pending}
@@ -76,9 +79,7 @@ export function DealProductsCard({
                           else router.refresh();
                         })
                       }
-                    >
-                      <Trash2 /> Hapus
-                    </Button>
+                    />
                   )}
                 </li>
               ))}

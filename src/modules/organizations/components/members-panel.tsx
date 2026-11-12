@@ -1,9 +1,12 @@
 "use client";
 
+import { UserCheck, UserX, X } from "lucide-react";
+
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
 import { Badge } from "@/components/ui/badge";
+import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -213,8 +216,9 @@ export function MembersPanel({
                   {canManage && (
                     <TableCell className="text-right">
                       {!locked && (
-                        <Button
-                          size="sm"
+                        <RowAction
+                          icon={m.active ? UserX : UserCheck}
+                          label={m.active ? "Nonaktifkan" : "Aktifkan"}
                           variant={m.active ? "destructive" : "outline"}
                           disabled={pending}
                           onClick={() =>
@@ -223,9 +227,7 @@ export function MembersPanel({
                               m.active ? "Anggota dinonaktifkan" : "Anggota diaktifkan",
                             )
                           }
-                        >
-                          {m.active ? "Nonaktifkan" : "Aktifkan"}
-                        </Button>
+                        />
                       )}
                     </TableCell>
                   )}
@@ -252,16 +254,15 @@ export function MembersPanel({
                     </div>
                   </div>
                   {can("create", "Member") && (
-                    <Button
-                      size="sm"
+                    <RowAction
+                      icon={X}
+                      label="Batalkan"
                       variant="outline"
                       disabled={pending}
                       onClick={() =>
                         run(() => revokeInvitation({ id: i.id }), "Undangan dibatalkan")
                       }
-                    >
-                      Batalkan
-                    </Button>
+                    />
                   )}
                 </li>
               ))}
