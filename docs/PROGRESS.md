@@ -80,3 +80,34 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [3.5](plans/phase-3/plan.3.5.md) | Probabilistic sales forecasting                 | Done | 2026-11-12 | Halaman /forecast: simulasi Monte Carlo (2.000 percobaan, PRNG ber-seed → deterministik) atas deal terbuka (p = win rate historis stage, dihaluskan prior; nilai = value; bulan = perkiraan closing, horizon 3 bulan) → P10/P50/P90 + nilai harapan per bulan & total, grafik Recharts rentang. Label "estimasi, bukan jaminan/akuntansi" selalu tampil; deal tanpa tanggal/di luar horizon/mata uang lain dikecualikan & dihitung. Backtest 6 bulan tanpa kebocoran (stage direkonstruksi dari riwayat, pelatihan hanya data sebelum bulan itu): cakupan P10–P90 & MAPE ditampilkan. Asumsi/batasan di docs/intelligence.md §3.5. Digerbangi kualitas data; rep hanya deal miliknya; read-only. 10 test unit/integrasi. |
 | [3.6](plans/phase-3/plan.3.6.md) | Omnichannel communication hub                   | Done | 2026-11-12 | Conversation lintas kanal (`kind` whatsapp/email/other + `handle` unik per kanal; migrasi mengisi handle lama): email dari sinkron Gmail (idempoten, tertaut ke contact lewat email), kanal lain dicatat manual; balasan keluar selalu aksi eksplisit (WA gateway / connector email / hanya dicatat). Routing & assignment per kanal (Settings → Routing Inbox, Owner/Admin): tanpa routing (default), ikuti pemilik record, atau round robin dengan kursor compare-and-swap (paralel tak berebut), notifikasi ke penerima. Timeline komunikasi terpadu (pesan semua kanal + aktivitas, tanpa duplikat auto-log) di detail lead/contact/company/Customer 360; izin percakapan dihormati. Inbox: filter kanal. decisions.md #25. 13 test baru (unit + integrasi) + uji ulang WhatsApp/Google lama hijau. |
 | [3.7](plans/phase-3/plan.3.7.md) | Outbound webhooks for ERP/POS/Accounting        | Done | 2026-11-12 | Perluasan webhook keluar 2.4 untuk ERP/POS/akuntansi: katalog 13 event (baru: lead.converted, deal.stage_changed, customer.created [Won pertama, sekali], quotation.accepted/rejected, product.created/updated) dengan kategori & deskripsi di UI; amplop ber-versi `schemaVersion: "1"` + header X-CRM-Schema-Version; payload divalidasi Zod terhadap skema sebelum diantre (yang melanggar tidak dikirim); signature HMAC, retry exponential BullMQ, idempoten (webhook,eventId); dead-letter (failed) terlihat di UI dengan Kirim ulang (izin connector, hanya failed + endpoint aktif, teraudit); UI endpoint per tenant + katalog event di Settings → Connectors. Dokumentasi docs/webhooks.md. 9 test unit/integrasi baru; test 2.4 disesuaikan ke payload valid. **Catatan:** belum diuji ke ERP/POS sungguhan (mock fetch). decisions.md #26. |
+
+## Phase 4 — Backlog (usulan, belum direncanakan)
+
+Detail & sumber: [phase-4-backlog.md](phase/phase-4-backlog.md). Belum ada plan/prioritas final; kelompok E hanya kandidat.
+
+| ID | Butir | Kelompok | Status |
+| -- | ----- | -------- | ------ |
+| 4.A1 | Plan 1.20 tuntas: deploy server nyata (HTTPS), UAT, tag v1.0.0 | Prasyarat rilis | Not started |
+| 4.A2 | Verifikasi integrasi dengan kredensial sungguhan (WhatsApp, Google, Zapier/Make, ERP/POS, email delivery) | Prasyarat rilis | Not started |
+| 4.A3 | Monitoring worker produksi (job insights 6 jam & scheduler lain) | Prasyarat rilis | Not started |
+| 4.B1 | Kalibrasi bobot lead scoring terhadap konversi nyata | Model Phase 3 | Not started |
+| 4.B2 | Backtest pengali sinyal aktivitas prediksi deal (butuh snapshot aktivitas historis) | Model Phase 3 | Not started |
+| 4.B3 | Forecast: korelasi/musiman, multi-mata-uang, zona waktu, expectedCloseDate historis | Model Phase 3 | Not started |
+| 4.B4 | Ambang anomali dapat dikonfigurasi per organisasi; VIP lintas mata uang | Model Phase 3 | Not started |
+| 4.B5 | Sinyal respons pelanggan selain WhatsApp masuk (email, telepon) | Model Phase 3 | Not started |
+| 4.B6 | Monitoring kualitas model berkala (akurasi, coverage, acceptance rate, drift) | Model Phase 3 | Not started |
+| 4.C1 | Email: IMAP, threading per subjek, isi lebih lengkap, kirim dari kotak pengguna | Omnichannel & integrasi | Not started |
+| 4.C2 | Kanal terintegrasi (Instagram/Telegram/SMS) menggantikan pencatatan manual | Omnichannel & integrasi | Not started |
+| 4.C3 | Routing lanjutan: tim/skill/jam kerja, SLA & eskalasi | Omnichannel & integrasi | Not started |
+| 4.C4 | Webhook inbound dua arah, skema v2 + transisi, rotasi secret tanpa downtime | Omnichannel & integrasi | Not started |
+| 4.C5 | Connector bawaan akuntansi/ERP populer | Omnichannel & integrasi | Not started |
+| 4.D1 | Skala & performa: optimasi, horizontal scaling, load test ulang halaman Phase 3 | Skala & operasional | Not started |
+| 4.D2 | Kebijakan retensi/penghapusan data final (#8), ekspor data tenant | Skala & operasional | Not started |
+| 4.D3 | Keputusan privasi log AI (#10) | Skala & operasional | Not started |
+| 4.D4 | Tinjauan keamanan ulang Phase 2–3 (OWASP, isolasi tenant, npm audit) | Skala & operasional | Not started |
+| 4.D5 | Observabilitas job BullMQ & biaya AI per tenant | Skala & operasional | Not started |
+| 4.E1 | UI konfigurasi bobot/ambang fitur cerdas | Produk (kandidat) | Not started |
+| 4.E2 | PWA mobile & notifikasi push | Produk (kandidat) | Not started |
+| 4.E3 | Billing/plan & kuota per tenant, onboarding self-serve | Produk (kandidat) | Not started |
+| 4.E4 | i18n & format tanggal/uang per organisasi | Produk (kandidat) | Not started |
+| 4.E5 | Audit aksesibilitas WCAG komponen Phase 3 | Produk (kandidat) | Not started |
