@@ -106,3 +106,51 @@ export const quotationPayload = (q: {
   companyId: q.companyId,
   ownerId: q.ownerId,
 });
+
+/** Perpindahan stage deal: payload deal + stage asal/tujuan. */
+export const stageChangePayload = (
+  d: Parameters<typeof dealPayload>[0],
+  fromStageId: string,
+  toStageId: string,
+) => ({ ...dealPayload(d), fromStageId, toStageId });
+
+/** Konversi lead → record CRM (id hasil konversi). */
+export const leadConvertedPayload = (
+  l: Parameters<typeof leadPayload>[0],
+  r: { contactId: string | null; companyId: string | null; dealId: string | null },
+) => ({ ...leadPayload(l), contactId: r.contactId, companyId: r.companyId, dealId: r.dealId });
+
+/** Customer baru = party (company, atau contact bila tanpa company) dengan deal Won pertamanya. */
+export const customerPayload = (c: {
+  partyType: "company" | "contact";
+  partyId: string;
+  dealId: string;
+  value: D;
+  currency: string;
+  wonAt: Date;
+}) => ({
+  partyType: c.partyType,
+  partyId: c.partyId,
+  firstDealId: c.dealId,
+  firstDealValue: money(c.value),
+  currency: c.currency,
+  wonAt: iso(c.wonAt),
+});
+
+export const productPayload = (p: {
+  id: string;
+  name: string;
+  sku: string | null;
+  price: D;
+  currency: string;
+  isActive: boolean;
+  categoryId: string | null;
+}) => ({
+  id: p.id,
+  name: p.name,
+  sku: p.sku,
+  price: money(p.price),
+  currency: p.currency,
+  isActive: p.isActive,
+  categoryId: p.categoryId,
+});

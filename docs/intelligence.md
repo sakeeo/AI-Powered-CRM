@@ -122,3 +122,11 @@ tidak ganda. Izin: pesan hanya bila pengguna boleh melihat percakapannya (Sales 
 
 Batasan: email hanya dari Gmail (IMAP ditunda, keputusan #16); pesan email tersimpan sebagai subjek + cuplikan (bukan isi penuh);
 satu percakapan per lawan bicara per kanal (tidak ada threading per subjek).
+
+## 3.7 Outbound webhooks ERP/POS/Akuntansi
+
+Perluasan webhook keluar plan 2.4 — dokumentasi lengkap (amplop, header, signature, katalog event, keandalan) ada di
+[`docs/webhooks.md`](webhooks.md). Ringkas: 13 event (tambahan: `lead.converted`, `deal.stage_changed`,
+`customer.created`, `quotation.accepted/rejected`, `product.created/updated`), amplop ber-versi (`schemaVersion: "1"`,
+header `X-CRM-Schema-Version`), payload divalidasi Zod terhadap skema sebelum diantre, dead-letter terlihat di UI dengan
+tombol Kirim ulang (teraudit), katalog event tampil di Settings → Connectors.

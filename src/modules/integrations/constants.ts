@@ -1,21 +1,38 @@
 export const OUTBOUND_EVENTS = [
   "lead.created",
+  "lead.converted",
   "contact.created",
   "deal.created",
+  "deal.stage_changed",
   "deal.won",
   "deal.lost",
+  "customer.created",
   "quotation.sent",
+  "quotation.accepted",
+  "quotation.rejected",
+  "product.created",
+  "product.updated",
 ] as const;
 export type OutboundEvent = (typeof OUTBOUND_EVENTS)[number];
 
 export const OUTBOUND_EVENT_LABEL: Record<OutboundEvent, string> = {
   "lead.created": "Lead dibuat",
+  "lead.converted": "Lead dikonversi",
   "contact.created": "Contact dibuat",
   "deal.created": "Deal dibuat",
+  "deal.stage_changed": "Stage deal berubah",
   "deal.won": "Deal Won",
   "deal.lost": "Deal Lost",
+  "customer.created": "Customer baru (Won pertama)",
   "quotation.sent": "Quotation terkirim",
+  "quotation.accepted": "Quotation disetujui pelanggan",
+  "quotation.rejected": "Quotation ditolak pelanggan",
+  "product.created": "Produk dibuat",
+  "product.updated": "Produk diubah",
 };
+
+/** Versi skema payload. Perubahan yang tidak kompatibel → versi baru; consumer membaca `schemaVersion`. */
+export const OUTBOUND_SCHEMA_VERSION = "1";
 
 export const OUTBOUND_PROVIDERS = ["zapier", "make", "custom"] as const;
 export type OutboundProvider = (typeof OUTBOUND_PROVIDERS)[number];

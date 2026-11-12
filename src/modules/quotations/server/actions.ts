@@ -279,6 +279,14 @@ export const setQuotationStatus = tenantAction(
       before: { status: q.status },
       after: { status },
     });
+    if (status === "accepted" || status === "rejected") {
+      await emitBusinessEvent(
+        ctx.organizationId,
+        status === "accepted" ? "quotation.accepted" : "quotation.rejected",
+        `quotation.${status}:${id}:${Date.now()}`,
+        quotationPayload({ ...q, status }),
+      );
+    }
     if (status === "sent") {
       await recordVersion(ctx.db, id, { label: "Dikirim", userId: ctx.userId, force: true });
       await emitBusinessEvent(

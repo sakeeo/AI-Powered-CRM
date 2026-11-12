@@ -7,7 +7,7 @@ import { writeAudit } from "@/lib/audit";
 import { assertCan } from "@/lib/authz";
 import { encryptSecret } from "@/lib/crypto";
 import { AppError, NotFoundError } from "@/lib/errors";
-import { deliverOutbound } from "@/lib/outbound-webhooks";
+import { deliverOutbound, enqueueDelivery } from "@/lib/outbound-webhooks";
 import { idInput } from "@/lib/schema-helpers";
 import { assertPublicHttpsUrl } from "@/lib/ssrf";
 import { MAX_OUTBOUND_WEBHOOKS } from "@/modules/integrations/constants";
@@ -144,4 +144,33 @@ export const testOutboundWebhook = tenantAction(idInput, async (ctx, { id }) => 
   return after.status === "success"
     ? ({ ok: true } as const)
     : ({ ok: false, error: after.error ?? "Gagal" } as const);
+});
+
+/**
+ * Kirim ulang pengiriman yang masuk dead-letter (gagal setelah semua percobaan). Aksi eksplisit pengguna dengan
+ * izin kelola connector; hanya untuk status `failed` pada endpoint yang aktif. Memakai ID event yang sama,
+ * jadi penerima tetap dapat membuang duplikat lewat `x-crm-delivery`/`id` payload.
+ */
+export const retryOutboundDelivery = tenantAction(idInput, async (ctx, { id }) => {
+  assertCan(ctx, "update", "Connector");
+  const d = await ctx.db.outboundDelivery.findFirst({
+    where: { id },
+    include: { webhook: { select: { isActive: true, name: true } } },
+  });
+  if (!d) throw NotFoundError("Pengiriman");
+  if (d.status !== "failed")
+    throw new AppError("Hanya pengiriman yang gagal yang dapat dikirim ulang");
+  if (!d.webhook.isActive) throw new AppError("Aktifkan endpoint webhook terlebih dahulu");
+  await ctx.db.outboundDelivery.update({
+    where: { id },
+    data: { status: "pending", attempts: 0, error: null, httpStatus: null },
+  });
+  await enqueueDelivery(ctx.organizationId, id, `r${Date.now()}`);
+  await writeAudit(ctx, {
+    action: "outbound_delivery.retried",
+    entityType: "Connector",
+    entityId: id,
+    after: { event: d.event, webhook: d.webhook.name },
+  });
+  revalidatePath("/settings/connectors");
 });

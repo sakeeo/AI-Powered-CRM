@@ -5,6 +5,7 @@ import { ConnectorHub } from "@/modules/connectors/components/connector-hub";
 import { listConnectors } from "@/modules/connectors/server/queries";
 import { EmailConnectorList } from "@/modules/connectors/components/email-connector-list";
 import { WhatsappConnectorList } from "@/modules/whatsapp/components/whatsapp-connector-list";
+import { EventCatalog } from "@/modules/integrations/components/event-catalog";
 import { OutboundWebhooksCard } from "@/modules/integrations/components/outbound-webhooks-card";
 import {
   listOutboundDeliveries,
@@ -33,7 +34,14 @@ export default async function Page() {
         webhook: <WebhookCard webhook={webhook} canManage={canManage} />,
         email: <EmailConnectorList connectors={connectors} canManage={canManage} />,
         outbound: (
-          <OutboundWebhooksCard webhooks={outbound} deliveries={deliveries} canManage={canManage} />
+          <div className="space-y-4">
+            <OutboundWebhooksCard
+              webhooks={outbound}
+              deliveries={deliveries}
+              canManage={canManage}
+            />
+            <EventCatalog />
+          </div>
         ),
         whatsapp: <WhatsappConnectorList connectors={connectors} canManage={canManage} />,
       }}

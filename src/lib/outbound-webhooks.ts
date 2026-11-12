@@ -6,7 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { getQueue, QUEUES } from "@/lib/queue";
 import { assertPublicHttpsUrl } from "@/lib/ssrf";
 import { forTenant } from "@/lib/tenant";
-import { OUTBOUND_MAX_ATTEMPTS, type OutboundEvent } from "@/modules/integrations/constants";
+import {
+  OUTBOUND_MAX_ATTEMPTS,
+  OUTBOUND_SCHEMA_VERSION,
+  type OutboundEvent,
+} from "@/modules/integrations/constants";
+import { validateEventData } from "@/modules/integrations/events";
 
 /**
  * Webhook keluar (Zapier/Make/kustom). Alur: aksi bisnis → `emitBusinessEvent` mencatat satu
@@ -21,6 +26,21 @@ export function signBody(secret: string, timestamp: string, body: string) {
   return createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
 }
 
+/** Antre satu delivery ke BullMQ (retry exponential). `suffix` membuat jobId baru untuk kirim ulang manual. */
+export async function enqueueDelivery(organizationId: string, deliveryId: string, suffix?: string) {
+  await getQueue(QUEUES.outbound).add(
+    "deliver",
+    { organizationId, deliveryId } satisfies OutboundJob,
+    {
+      jobId: suffix ? `out-${deliveryId}-${suffix}` : `out-${deliveryId}`,
+      attempts: OUTBOUND_MAX_ATTEMPTS,
+      backoff: { type: "exponential", delay: 10_000 },
+      removeOnComplete: 500,
+      removeOnFail: 500,
+    },
+  );
+}
+
 /**
  * Catat & antre event bisnis. Dipanggil setelah data tersimpan; tidak pernah melempar ke pemanggil.
  * `eventId` unik per kejadian (mis. `deal.won:<id>:<closedAt>`).
@@ -32,6 +52,18 @@ export async function emitBusinessEvent(
   data: Record<string, unknown>,
 ) {
   try {
+    // Kontrak payload ber-versi: data yang tidak sesuai skema TIDAK dikirim (kesalahan pemrogram, bukan input pengguna).
+    const valid = validateEventData(event, data);
+    if (!valid.success) {
+      logger.error(
+        {
+          event,
+          issues: valid.error.issues.slice(0, 5).map((i) => `${i.path.join(".")}: ${i.message}`),
+        },
+        "Payload webhook keluar tidak sesuai skema; tidak dikirim",
+      );
+      return;
+    }
     const db = forTenant(prisma, organizationId);
     const hooks = await db.outboundWebhook.findMany({ where: { isActive: true } });
     for (const h of hooks) {
@@ -46,6 +78,7 @@ export async function emitBusinessEvent(
             payload: {
               id: randomUUID(),
               event,
+              schemaVersion: OUTBOUND_SCHEMA_VERSION,
               createdAt: new Date().toISOString(),
               data,
             } as unknown as Prisma.InputJsonValue,
@@ -56,17 +89,7 @@ export async function emitBusinessEvent(
         if ((e as { code?: string }).code === "P2002") continue; // sudah tercatat
         throw e;
       }
-      await getQueue(QUEUES.outbound).add(
-        "deliver",
-        { organizationId, deliveryId } satisfies OutboundJob,
-        {
-          jobId: `out-${deliveryId}`,
-          attempts: OUTBOUND_MAX_ATTEMPTS,
-          backoff: { type: "exponential", delay: 10_000 },
-          removeOnComplete: 500,
-          removeOnFail: 500,
-        },
-      );
+      await enqueueDelivery(organizationId, deliveryId);
     }
   } catch (err) {
     logger.error({ err, event }, "Gagal mengantre webhook keluar");
@@ -108,6 +131,7 @@ export async function deliverOutbound(job: OutboundJob, opts: { final?: boolean 
         "content-type": "application/json",
         "user-agent": "CRM-Webhook/1.0",
         "x-crm-event": delivery.event,
+        "x-crm-schema-version": OUTBOUND_SCHEMA_VERSION,
         "x-crm-delivery": delivery.id,
         "x-crm-timestamp": ts,
         "x-crm-signature": `sha256=${signBody(secret, ts, body)}`,

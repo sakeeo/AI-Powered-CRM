@@ -28,7 +28,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  OUTBOUND_EVENTS,
+  EVENT_CATALOG,
+  EVENT_CATEGORIES,
+  EVENT_CATEGORY_LABEL,
+} from "@/modules/integrations/events";
+import {
   OUTBOUND_EVENT_LABEL,
   OUTBOUND_PROVIDERS,
   OUTBOUND_PROVIDER_INFO,
@@ -38,6 +42,7 @@ import {
 import {
   createOutboundWebhook,
   deleteOutboundWebhook,
+  retryOutboundDelivery,
   rotateOutboundSecret,
   testOutboundWebhook,
   updateOutboundWebhook,
@@ -144,24 +149,41 @@ function WebhookDialog({
               onChange={(e) => set({ url: e.target.value })}
             />
           </FormField>
-          <fieldset className="space-y-2">
+          <fieldset className="space-y-3">
             <legend className="text-sm font-medium">Event yang dikirim</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {OUTBOUND_EVENTS.map((ev) => (
-                <div key={ev} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`ow-ev-${ev}`}
-                    checked={d.events.includes(ev)}
-                    onCheckedChange={(c) =>
-                      set({
-                        events: c === true ? [...d.events, ev] : d.events.filter((x) => x !== ev),
-                      })
-                    }
-                  />
-                  <Label htmlFor={`ow-ev-${ev}`}>{OUTBOUND_EVENT_LABEL[ev]}</Label>
+            {EVENT_CATEGORIES.map((cat) => (
+              <div key={cat} className="space-y-1.5">
+                <p className="text-muted-foreground text-xs font-medium">
+                  {EVENT_CATEGORY_LABEL[cat]}
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {EVENT_CATALOG.filter((e) => e.category === cat).map(
+                    ({ event: ev, description }) => (
+                      <div key={ev} className="flex items-start gap-2">
+                        <Checkbox
+                          id={`ow-ev-${ev}`}
+                          className="mt-0.5"
+                          checked={d.events.includes(ev)}
+                          onCheckedChange={(c) =>
+                            set({
+                              events:
+                                c === true ? [...d.events, ev] : d.events.filter((x) => x !== ev),
+                            })
+                          }
+                        />
+                        <Label
+                          htmlFor={`ow-ev-${ev}`}
+                          className="flex-col items-start gap-0 font-normal"
+                        >
+                          <span>{OUTBOUND_EVENT_LABEL[ev]}</span>
+                          <span className="text-muted-foreground text-[11px]">{description}</span>
+                        </Label>
+                      </div>
+                    ),
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </fieldset>
           {d.id && (
             <div className="flex items-center gap-2">
@@ -260,7 +282,8 @@ export function OutboundWebhooksCard({
                     {host(w.url)} · {w.events.map((e) => OUTBOUND_EVENT_LABEL[e] ?? e).join(", ")}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    Berhasil {w.stats.success} · Gagal {w.stats.failed} · Menunggu {w.stats.pending}
+                    Berhasil {w.stats.success} · Dead-letter {w.stats.failed} · Menunggu{" "}
+                    {w.stats.pending}
                     <span className="ml-2 font-mono">{w.maskedHint}</span>
                   </p>
                 </div>
@@ -333,7 +356,12 @@ export function OutboundWebhooksCard({
         )}
         {deliveries.length > 0 && (
           <div className="space-y-1.5">
-            <h4 className="text-sm font-semibold">Pengiriman terakhir</h4>
+            <h4 className="text-sm font-semibold">
+              Pengiriman terakhir{" "}
+              <span className="text-muted-foreground text-xs font-normal">
+                (dead-letter = gagal setelah semua percobaan; dapat dikirim ulang)
+              </span>
+            </h4>
             <ul className="divide-y rounded-lg border text-xs" data-testid="delivery-log">
               {deliveries.map((x) => (
                 <li key={x.id} className="flex flex-wrap items-center gap-2 px-3 py-2">
@@ -345,7 +373,7 @@ export function OutboundWebhooksCard({
                     {x.status === "success"
                       ? "Sukses"
                       : x.status === "failed"
-                        ? "Gagal"
+                        ? "Dead-letter"
                         : "Menunggu"}
                   </ToneBadge>
                   <span className="font-medium">{nameOf.get(x.webhookId) ?? "—"}</span>
@@ -355,6 +383,23 @@ export function OutboundWebhooksCard({
                     {x.httpStatus ? `· HTTP ${x.httpStatus}` : ""}
                     {x.error ? ` · ${x.error}` : ""}
                   </span>
+                  {canManage && x.status === "failed" && (
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      className="ml-auto"
+                      disabled={pending}
+                      onClick={() =>
+                        start(async () => {
+                          const res = await retryOutboundDelivery({ id: x.id });
+                          if (!res.ok) toast.error(res.error);
+                          else toast.success("Pengiriman diantre ulang");
+                        })
+                      }
+                    >
+                      Kirim ulang
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>

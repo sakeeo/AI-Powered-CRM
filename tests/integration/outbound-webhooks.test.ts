@@ -11,6 +11,35 @@ const { closeQueues, getQueue, QUEUES } = await import("@/lib/queue");
 const { getTenantContext } = await import("@/lib/context");
 const { decryptSecret } = await import("@/lib/crypto");
 const { deliverOutbound, emitBusinessEvent, signBody } = await import("@/lib/outbound-webhooks");
+const { leadPayload, dealPayload } = await import("@/modules/integrations/payloads");
+
+/** Payload valid menurut skema v1 (emitBusinessEvent menolak data yang tidak sesuai kontrak). */
+const leadData = (id: string) =>
+  leadPayload({
+    id,
+    name: `Lead ${id}`,
+    email: null,
+    phone: null,
+    companyName: null,
+    status: "new",
+    sourceId: null,
+    ownerId: null,
+    budget: null,
+    currency: "IDR",
+    createdAt: new Date(),
+  });
+const dealData = (id: string) =>
+  dealPayload({
+    id,
+    title: "Deal",
+    status: "won",
+    value: "0",
+    currency: "IDR",
+    stageId: "s1",
+    contactId: null,
+    companyId: null,
+    ownerId: null,
+  });
 const actions = await import("@/modules/integrations/server/webhook-actions");
 const q = await import("@/modules/integrations/server/queries");
 const leadActions = await import("@/modules/leads/server/actions");
@@ -131,8 +160,8 @@ describe("Pengiriman", () => {
       events: ["lead.created"],
       isActive: false,
     });
-    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:1", { id: "1" });
-    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:1", { id: "1" });
+    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:1", leadData("1"));
+    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:1", leadData("1"));
     expect(await testPrisma.outboundDelivery.count()).toBe(1);
     expect((await queue().getJobCounts()).waiting).toBe(1);
     const d = await testPrisma.outboundDelivery.findFirstOrThrow();
@@ -142,7 +171,7 @@ describe("Pengiriman", () => {
   it("berhasil: header + tanda tangan HMAC dapat diverifikasi penerima; status success", async () => {
     const o = await makeOrg("Org A");
     const { id, secret } = await hook();
-    await emitBusinessEvent(o.orgId, "deal.won", "deal.won:9:1", { id: "9", title: "Deal" });
+    await emitBusinessEvent(o.orgId, "deal.won", "deal.won:9:1", dealData("9"));
     const d = await testPrisma.outboundDelivery.findFirstOrThrow();
     fetchMock.mockResolvedValueOnce(new Response("ok", { status: 200 }));
     await deliverOutbound({ organizationId: o.orgId, deliveryId: d.id });
@@ -166,7 +195,7 @@ describe("Pengiriman", () => {
   it("gagal: melempar agar di-retry, tetap pending; percobaan terakhir → failed", async () => {
     const o = await makeOrg("Org A");
     await hook();
-    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:2", { id: "2" });
+    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:2", leadData("2"));
     const d = await testPrisma.outboundDelivery.findFirstOrThrow();
     fetchMock.mockResolvedValue(new Response("err", { status: 500 }));
     await expect(deliverOutbound({ organizationId: o.orgId, deliveryId: d.id })).rejects.toThrow(
@@ -186,7 +215,7 @@ describe("Pengiriman", () => {
   it("URL berubah menjadi privat/non-HTTPS di DB → gagal terminal tanpa fetch; webhook nonaktif tidak mengirim", async () => {
     const o = await makeOrg("Org A");
     const { id } = await hook();
-    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:3", { id: "3" });
+    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:3", leadData("3"));
     const d = await testPrisma.outboundDelivery.findFirstOrThrow();
     await testPrisma.outboundWebhook.update({
       where: { id },
@@ -197,7 +226,7 @@ describe("Pengiriman", () => {
     expect(
       await testPrisma.outboundDelivery.findUniqueOrThrow({ where: { id: d.id } }),
     ).toMatchObject({ status: "failed" });
-    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:4", { id: "4" });
+    await emitBusinessEvent(o.orgId, "lead.created", "lead.created:4", leadData("4"));
     await testPrisma.outboundWebhook.update({ where: { id }, data: { isActive: false } });
     const d2 = await testPrisma.outboundDelivery.findFirstOrThrow({
       where: { eventId: "lead.created:4" },

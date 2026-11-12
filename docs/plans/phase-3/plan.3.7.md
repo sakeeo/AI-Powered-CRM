@@ -14,9 +14,9 @@ Event bisnis diteruskan ke sistem eksternal secara andal.
 
 ## Tugas
 
-- [ ] Katalog event bisnis & skema payload versi.
-- [ ] Pengiriman webhook dengan signature, retry, dead-letter log.
-- [ ] UI manajemen endpoint per tenant.
+- [x] Katalog event bisnis & skema payload versi.
+- [x] Pengiriman webhook dengan signature, retry, dead-letter log.
+- [x] UI manajemen endpoint per tenant.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -24,7 +24,7 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `BullMQ`.
 
 ## Acceptance Criteria
 
-- [ ] Event terkirim dengan retry dan dapat diaudit.
+- [x] Event terkirim dengan retry dan dapat diaudit.
 
 ## Verifikasi
 

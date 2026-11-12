@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
+import { emitBusinessEvent } from "@/lib/outbound-webhooks";
+import { productPayload } from "@/modules/integrations/payloads";
 import { writeAudit } from "@/lib/audit";
 import { assertCan } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
@@ -50,6 +52,12 @@ export const createProduct = tenantAction(productSchema, async (ctx, input) => {
     entityId: p.id,
     after: { name: p.name, price, currency: data.currency },
   });
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "product.created",
+    `product.created:${p.id}`,
+    productPayload(p),
+  );
   revalidatePath("/products");
   return { id: p.id };
 });
@@ -61,7 +69,7 @@ export const updateProduct = tenantAction(updateProductSchema, async (ctx, input
   if (!existing) throw NotFoundError("Produk");
   await assertSkuFree(ctx, data.sku, id);
   const categoryId = await resolveCategory(ctx, categoryName);
-  await ctx.db.product.update({
+  const updated = await ctx.db.product.update({
     where: { id },
     data: {
       ...data,
@@ -79,6 +87,12 @@ export const updateProduct = tenantAction(updateProductSchema, async (ctx, input
     before: { name: existing.name, price: existing.price.toFixed(2), isActive: existing.isActive },
     after: { name: data.name, price, isActive: data.isActive },
   });
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "product.updated",
+    `product.updated:${id}:${updated.updatedAt.getTime()}`,
+    productPayload(updated),
+  );
   revalidatePath("/products");
 });
 
@@ -88,12 +102,21 @@ export const setProductActive = tenantAction(
     assertCan(ctx, "update", "Product");
     const existing = await ctx.db.product.findFirst({ where: { id, deletedAt: null } });
     if (!existing) throw NotFoundError("Produk");
-    await ctx.db.product.update({ where: { id }, data: { isActive, updatedBy: ctx.userId } });
+    const updated = await ctx.db.product.update({
+      where: { id },
+      data: { isActive, updatedBy: ctx.userId },
+    });
     await writeAudit(ctx, {
       action: isActive ? "product.activated" : "product.deactivated",
       entityType: "Product",
       entityId: id,
     });
+    await emitBusinessEvent(
+      ctx.organizationId,
+      "product.updated",
+      `product.updated:${id}:${updated.updatedAt.getTime()}`,
+      productPayload(updated),
+    );
     revalidatePath("/products");
   },
 );

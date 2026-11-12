@@ -7,7 +7,9 @@ import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import { emitBusinessEvent } from "@/lib/outbound-webhooks";
 import {
+  customerPayload,
   dealPayload,
+  stageChangePayload,
 } from "@/modules/integrations/payloads";
 
 import { AppError, NotFoundError } from "@/lib/errors";
@@ -179,6 +181,12 @@ export const moveDealStage = tenantAction(moveStageSchema, async (ctx, { id, sta
       },
     }),
   ]);
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "deal.stage_changed",
+    `deal.stage_changed:${id}:${Date.now()}`,
+    stageChangePayload(deal, deal.stageId, stageId),
+  );
   await writeAudit(ctx, {
     action: "deal.stage_changed",
     entityType: "Deal",
@@ -212,6 +220,33 @@ export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
     `deal.won:${id}:${closedAt.getTime()}`,
     dealPayload({ ...deal, status: "won", closedAt }),
   );
+  // Customer baru: pihak (company, atau contact tanpa company) yang baru mendapat deal Won pertamanya.
+  const partyType = deal.companyId ? "company" : deal.contactId ? "contact" : null;
+  if (partyType) {
+    const partyId = (deal.companyId ?? deal.contactId)!;
+    const earlier = await ctx.db.deal.count({
+      where: {
+        id: { not: id },
+        status: "won",
+        deletedAt: null,
+        ...(partyType === "company" ? { companyId: partyId } : { companyId: null, contactId: partyId }),
+      },
+    });
+    if (earlier === 0)
+      await emitBusinessEvent(
+        ctx.organizationId,
+        "customer.created",
+        `customer.created:${partyType}:${partyId}`,
+        customerPayload({
+          partyType,
+          partyId,
+          dealId: id,
+          value: deal.value,
+          currency: deal.currency,
+          wonAt: closedAt,
+        }),
+      );
+  }
   await emitAutomationEvent(ctx.db, {
     organizationId: ctx.organizationId,
     trigger: "deal_won",

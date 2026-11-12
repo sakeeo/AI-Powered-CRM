@@ -3,6 +3,8 @@ import { writeAudit } from "@/lib/audit";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import type { TenantContext } from "@/lib/context";
 import { AppError, NotFoundError } from "@/lib/errors";
+import { emitBusinessEvent } from "@/lib/outbound-webhooks";
+import { leadConvertedPayload } from "@/modules/integrations/payloads";
 import { toDecimal } from "@/lib/money-db";
 import { normalizePhone } from "@/lib/phone";
 import { findCompanyDuplicates, findContactDuplicates } from "@/modules/duplicates/server/detect";
@@ -178,5 +180,11 @@ export async function convertLeadService(ctx: ActionContext, input: ConvertLeadD
     before: { status: lead.status },
     after: result,
   });
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "lead.converted",
+    `lead.converted:${lead.id}`,
+    leadConvertedPayload(lead, result),
+  );
   return result;
 }
