@@ -22,7 +22,7 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
-  --color-loud: var(--sidebar-primary);
+  --color-loud: var(--tone-red-ink);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar: var(--sidebar);
