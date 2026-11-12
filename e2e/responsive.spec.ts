@@ -52,6 +52,9 @@ const PAGES = [
   "/reports/builder",
   "/settings/activity-templates",
   "/settings/integrations",
+  "/intelligence",
+  "/forecast",
+  "/settings/routing",
 ];
 for (const [name, width, height] of [
   ["smartphone", 375, 812],

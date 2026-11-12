@@ -33,6 +33,11 @@ Menambahkan kecerdasan prediktif dan omnichannel di atas data yang sudah berkual
 
 ## Kriteria Selesai Phase (Exit Criteria)
 
-- [ ] Semua plan Phase 3 Done di `docs/PROGRESS.md`.
-- [ ] Semua fitur AI read-only/non-autonomous dan lulus test Red Zone.
-- [ ] Kualitas data memadai (dibuktikan metrik) sebelum fitur prediktif diaktifkan.
+- [x] Semua plan Phase 3 Done di `docs/PROGRESS.md`.
+- [x] Semua fitur AI read-only/non-autonomous dan lulus test Red Zone — `tests/integration/phase3-redzone.test.ts` (pemindaian sumber + snapshot seluruh tabel tak berubah saat semua fungsi baca dijalankan) serta test Red Zone per plan.
+- [x] Kualitas data memadai (dibuktikan metrik) sebelum fitur prediktif diaktifkan — gerbang `evaluateQuality` (ambang di `docs/intelligence.md`); tiap fitur prediktif menampilkan alasan, bukan angka, bila data belum memadai; metrik tampil di `/intelligence`.
+
+## Dokumentasi
+
+- Metodologi, asumsi & batasan seluruh fitur: [`docs/intelligence.md`](../intelligence.md)
+- Webhook ERP/POS/akuntansi (katalog event, signature, retry, dead-letter): [`docs/webhooks.md`](../webhooks.md)

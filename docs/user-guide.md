@@ -23,6 +23,15 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 
 12. **Quotation lanjutan & aktivitas**: riwayat versi quotation dengan perbandingan dan pemulihan Draft; _Settings → Quotation_ dapat mengatur ambang approval (total ≥ ambang → ajukan persetujuan, disetujui Owner/Admin/Sales Manager sebelum dikirim). **Template aktivitas** (Settings, Owner/Admin/Manager) dipakai dari composer aktivitas (_Pakai template_). Di **Customers**, kartu _Peluang repeat purchase_ menampilkan customer yang perlu di-follow-up beserta tombol _Buat follow-up_.
 
+13. **Fitur cerdas (Phase 3)** — semuanya hanya **memberi saran/informasi**, keputusan tetap di tangan Anda:
+    - **Skor lead** (badge di daftar & rincian faktor di detail lead): Hot ≥ 70 / Warm 40–69 / Cold < 40 dari kelengkapan data, urgensi, interaksi, dan konversi historis sumber. Tidak mengubah status/penugasan.
+    - **Asisten penjualan** di detail deal terbuka: estimasi peluang closing + saran stage (advance/stay/review) dengan akurasi backtest ditampilkan. Muncul setelah data deal tertutup memadai.
+    - **Rekomendasi follow-up** (detail lead & Customer 360): kanal, waktu, dan draf dari pola interaksi; _Buat task follow-up_ menjadikannya task, _Tidak relevan_ hanya mencatat umpan balik.
+    - **Intelligence** (`/intelligence`): kesiapan data per fitur, anomali otomatis (aktivitas customer VIP turun, win rate turun, lead baru turun; notifikasi in-app), akurasi prediksi, dan AI Draft Acceptance Rate.
+    - **Forecast** (`/forecast`): rentang P10/P50/P90 untuk 3 bulan ke depan + backtest — _estimasi, bukan jaminan/akuntansi_.
+    - **Inbox lintas kanal**: WhatsApp, email (dari sinkron Gmail), dan kanal lain yang dicatat manual dalam satu inbox; _Settings → Routing Inbox_ (Owner/Admin) mengatur penugasan otomatis (pemilik record / round robin). _Timeline komunikasi terpadu_ tampil di detail lead, contact, company, dan Customer 360.
+    - **Webhook ERP/POS/akuntansi**: katalog 13 event dengan skema ber-versi di _Settings → Connectors_; pengiriman gagal masuk dead-letter dan dapat dikirim ulang. Lihat `docs/webhooks.md`.
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").
