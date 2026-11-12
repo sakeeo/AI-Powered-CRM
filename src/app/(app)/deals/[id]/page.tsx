@@ -19,6 +19,8 @@ import { getDealOrThrow } from "@/modules/deals/server/detail";
 import { listQuotationsForDeal } from "@/modules/quotations/server/queries";
 import { DealProductsCard } from "@/modules/products/components/deal-products-card";
 import { listActiveProducts, listDealProducts } from "@/modules/products/server/queries";
+import { DealPredictionCard } from "@/modules/intelligence/components/deal-prediction-card";
+import { getDealPrediction } from "@/modules/intelligence/server/deal-prediction";
 import { listStageHistory } from "@/modules/deals/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
@@ -38,7 +40,8 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
   const cust = await getEntityCustomization(ctx, "deal", deal.id, deal.customFields);
   const status = deal.status as DealStatus;
   const owner = owners.find((o) => o.userId === deal.ownerId)?.name;
-  const [history, dealItems, productOptions, dealQuotations] = await Promise.all([
+  const [prediction, history, dealItems, productOptions, dealQuotations] = await Promise.all([
+    getDealPrediction(ctx, deal.id),
     listStageHistory(ctx, deal.id),
     listDealProducts(ctx, deal.id),
     listActiveProducts(ctx),
@@ -146,6 +149,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           </dl>
         </CardContent>
       </Card>
+      {prediction && <DealPredictionCard result={prediction} />}
       <CustomizationCard defs={cust.defs} values={cust.values} tags={cust.tags} />
       <Card>
         <CardHeader>

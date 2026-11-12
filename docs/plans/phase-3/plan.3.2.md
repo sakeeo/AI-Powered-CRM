@@ -14,15 +14,15 @@ Saran stage terbaik dan estimasi probabilitas closing sebagai rekomendasi.
 
 ## Tugas
 
-- [ ] Model/prompting untuk saran stage & probabilitas.
-- [ ] UI rekomendasi di deal (user memutuskan).
-- [ ] Evaluasi akurasi vs outcome historis.
-- [ ] Test Red Zone (tanpa auto-move).
+- [x] Model/prompting untuk saran stage & probabilitas.
+- [x] UI rekomendasi di deal (user memutuskan).
+- [x] Evaluasi akurasi vs outcome historis.
+- [x] Test Red Zone (tanpa auto-move).
 
 ## Acceptance Criteria
 
-- [ ] Rekomendasi tampil tanpa mengubah stage.
-- [ ] Akurasi terukur dan terdokumentasi.
+- [x] Rekomendasi tampil tanpa mengubah stage.
+- [x] Akurasi terukur dan terdokumentasi.
 
 ## Verifikasi
 
