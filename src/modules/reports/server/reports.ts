@@ -8,6 +8,7 @@ import { getDefaultPipeline, pipelineSummary } from "@/modules/deals/server/quer
 import { resolveFilters, type DashboardFilters } from "@/modules/dashboard/server/metrics";
 import { LEAD_STATUS_LABEL, type LeadStatus } from "@/modules/leads/constants";
 import { listOwnerOptions } from "@/modules/organizations/server/queries";
+import { loadCustomerRows } from "@/modules/customers/server/queries";
 import { ACTIVITY_TYPE_LABEL, type ActivityType } from "@/modules/activities/constants";
 import { REPORT_LABEL, UNCATEGORIZED, type ReportType } from "@/modules/reports/constants";
 import type { ChartSpec } from "@/modules/reports/chart-spec";
@@ -621,6 +622,88 @@ export async function getReport(
                 .sort((a, b) => a[0].localeCompare(b[0]))
                 .map(([k, e]) => [k, e.n, money(e.v)] as Cell[]),
               ["Total", tot.n, money(tot.v)],
+            ],
+          },
+        ],
+      };
+    }
+    case "segment": {
+      // Segmen pelanggan (statis + dinamis). Angka dari deal Won; nilai = mata uang default organisasi.
+      const customers = await loadCustomerRows(ctx, undefined, now);
+      const segs = await ctx.db.customerSegment.findMany({
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, kind: true },
+      });
+      const totalOf = (rows: typeof customers) =>
+        rows.reduce((t, r) => t.plus(r.totals[cur] ?? 0), new Decimal(0));
+      const lastOf = (rows: typeof customers) =>
+        rows.reduce<Date | null>(
+          (m, r) => (r.lastWonAt && (!m || r.lastWonAt > m) ? r.lastWonAt : m),
+          null,
+        );
+      const lines = segs.map((sg) => {
+        const members = customers.filter((c) => c.segments.some((x) => x.id === sg.id));
+        const total = totalOf(members);
+        return {
+          sg,
+          n: members.length,
+          total,
+          avg: members.length ? total.div(members.length) : new Decimal(0),
+          last: lastOf(members),
+        };
+      });
+      const unsegmented = customers.filter((c) => c.segments.length === 0);
+      return {
+        ...base,
+        periodLabel: `per ${dateInTz(now, tz)}`,
+        charts: lines.length
+          ? [
+              {
+                title: "Customer per segmen",
+                kind: "bar",
+                data: lines.map((l) => ({ name: l.sg.name, jumlah: l.n })),
+                xKey: "name",
+                series: [{ key: "jumlah", name: "Customer" }],
+              },
+            ]
+          : [],
+        note: `Customer = contact/company dengan ≥1 deal Won. Total belanja dalam ${cur}; mata uang lain tidak dijumlahkan.`,
+        sections: [
+          {
+            title: "Ringkasan per segmen",
+            columns: [
+              "Segmen",
+              "Jenis",
+              "Customer",
+              `Total belanja (${cur})`,
+              "Rata-rata",
+              "Pembelian terakhir",
+            ],
+            rows: [
+              ...lines.map(
+                (l) =>
+                  [
+                    l.sg.name,
+                    l.sg.kind === "dynamic" ? "Dinamis" : "Statis",
+                    l.n,
+                    formatMoney(l.total.toFixed(2), cur),
+                    formatMoney(l.avg.toFixed(2), cur),
+                    l.last ? dateInTz(l.last, tz) : "—",
+                  ] as Cell[],
+              ),
+              [
+                "Tanpa segmen",
+                "—",
+                unsegmented.length,
+                formatMoney(totalOf(unsegmented).toFixed(2), cur),
+                unsegmented.length
+                  ? formatMoney(totalOf(unsegmented).div(unsegmented.length).toFixed(2), cur)
+                  : "—",
+                (() => {
+                  const l = lastOf(unsegmented);
+                  return l ? dateInTz(l, tz) : "—";
+                })(),
+              ],
             ],
           },
         ],

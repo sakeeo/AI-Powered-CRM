@@ -49,6 +49,9 @@ export default async function Page(props: PageProps<"/reports">) {
             </Link>
           </Button>
         ))}
+        <Button asChild size="sm" variant="outline">
+          <Link href="/reports/builder">Report Builder</Link>
+        </Button>
       </div>
       <PageActions title={report.title} description={report.periodLabel}>
         <UrlFilterSelect

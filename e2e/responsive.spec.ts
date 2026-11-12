@@ -49,6 +49,7 @@ const PAGES = [
   "/settings/automation",
   "/inbox",
   "/insights",
+  "/reports/builder",
   "/settings/integrations",
 ];
 for (const [name, width, height] of [

@@ -5,6 +5,7 @@ import { deliverMail, type MailJob } from "@/lib/mailer";
 import { createQueueConnection, getQueue, QUEUES } from "@/lib/queue";
 import { runAutomations, scanAutomationTriggers, type AutomationEvent } from "@/lib/automation";
 import { deliverOutbound, type OutboundJob } from "@/lib/outbound-webhooks";
+import { runDueReportSchedules } from "@/lib/report-schedule";
 import { pushActivity, syncAllGoogle, type CalendarJob } from "@/lib/google";
 import { scanQuotations, scanReminders } from "@/lib/reminders";
 
@@ -26,6 +27,7 @@ export function startWorkers() {
       await scanReminders(now);
       await scanQuotations(now);
       await scanAutomationTriggers(now);
+      await runDueReportSchedules(now);
     },
     {
       connection,

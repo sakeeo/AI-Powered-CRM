@@ -56,6 +56,24 @@ export const SUM_FIELDS: Partial<Record<InsightEntity, string>> = {
   lead: "budget",
 };
 
+/** Nilai status/tipe baku untuk filter. */
+export const STATUS_VALUES: Record<InsightEntity, readonly string[]> = {
+  lead: ["new", "contacted", "qualified", "unqualified"],
+  deal: ["open", "won", "lost"],
+  contact: [],
+  company: [],
+  activity: ["open", "done", "cancelled"],
+  quotation: ["draft", "sent", "accepted", "rejected", "expired"],
+};
+export const ACTIVITY_TYPE_VALUES = [
+  "task",
+  "call",
+  "meeting",
+  "email",
+  "note",
+  "whatsapp",
+] as const;
+
 export const PERIOD_PRESETS = [
   "all",
   "today",

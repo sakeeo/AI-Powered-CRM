@@ -14,10 +14,10 @@ Pelaporan lebih dalam dan segmentasi pelanggan lanjutan.
 
 ## Tugas
 
-- [ ] Report builder dasar dan saved reports.
-- [ ] Segmentasi dinamis berbasis rule (tag, nilai, recency).
-- [ ] Jadwal pengiriman laporan via email.
-- [ ] Test akurasi metrik.
+- [x] Report builder dasar dan saved reports.
+- [x] Segmentasi dinamis berbasis rule (tag, nilai, recency).
+- [x] Jadwal pengiriman laporan via email.
+- [x] Test akurasi metrik.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -25,8 +25,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Recharts`, `Exc
 
 ## Acceptance Criteria
 
-- [ ] Segmen dinamis dapat dipakai di filter dan laporan.
-- [ ] Laporan terjadwal terkirim.
+- [x] Segmen dinamis dapat dipakai di filter dan laporan.
+- [x] Laporan terjadwal terkirim.
 
 ## Verifikasi
 

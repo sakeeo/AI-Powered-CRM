@@ -19,6 +19,8 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 
 10. **AI tambahan** (butuh AI connector): di quotation, _Buat draf dengan AI_ menulis pengantar/ruang lingkup — selalu draf yang Anda edit lalu _Simpan_; harga tidak pernah dibuat AI (peringatan muncul bila ada nominal). **Tanya CRM (AI)** menjawab pertanyaan seperti "Berapa deal Won bulan ini?" dengan kueri baca-saja; hasil hanya mencakup data yang boleh Anda lihat dan "cara pertanyaan dipahami" ditampilkan untuk diperiksa.
 
+11. **Laporan lanjutan**: _Reports → Report Builder_ menyusun laporan sendiri (data, jumlah/total/daftar, kelompok, periode, filter), menyimpannya (pribadi atau organisasi), mengekspor CSV/XLSX, dan menjadwalkan pengiriman email harian/mingguan/bulanan ke anggota tim — tiap penerima hanya menerima data yang boleh ia lihat. **Segmen dinamis** (Customers → Segmen baru, Owner/Admin/Manager) mengelompokkan customer otomatis berdasarkan tag, total belanja, jumlah deal, dan recency; dapat dipakai sebagai filter dan di laporan "Segmen Pelanggan".
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

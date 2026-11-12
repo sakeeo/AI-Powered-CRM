@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
 import { assertCan } from "@/lib/authz";
-import { NotFoundError } from "@/lib/errors";
+import { AppError, NotFoundError } from "@/lib/errors";
 import {
   assignSegmentSchema,
   removeSegmentSchema,
@@ -27,6 +27,10 @@ export const assignSegment = tenantAction(assignSegmentSchema, async (ctx, { typ
   let segment = await ctx.db.customerSegment.findFirst({
     where: { name: { equals: name, mode: "insensitive" } },
   });
+  if (segment?.kind === "dynamic")
+    throw new AppError(
+      "Segmen dinamis dihitung otomatis dari aturannya; tidak bisa ditambah manual",
+    );
   segment ??= await ctx.db.customerSegment.create({ data: { name } as never });
   const exists = await ctx.db.customerSegmentMember.findFirst({
     where: { segmentId: segment.id, ...link(type, id) },

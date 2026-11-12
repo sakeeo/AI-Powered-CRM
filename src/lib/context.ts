@@ -39,6 +39,17 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
   });
   if (!member || !isRole(member.role)) return null;
 
+  return buildContext(
+    { organizationId: member.organizationId, role: member.role },
+    { id: userId, name: session.user.name, email: session.user.email },
+  );
+});
+
+async function buildContext(
+  member: { organizationId: string; role: Role },
+  user: { id: string; name: string; email: string },
+): Promise<TenantContext> {
+  const userId = user.id;
   // Sales Manager: akses ubah/hapus mencakup anggota timnya.
   let teamUserIds: string[] = [];
   if (member.role === "sales_manager") {
@@ -60,13 +71,30 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
 
   return {
     userId,
-    user: { id: userId, name: session.user.name, email: session.user.email },
+    user,
     organizationId: member.organizationId,
     role: member.role,
     ability: defineAbilityFor({ role: member.role, userId, teamUserIds }),
     db: forTenant(prisma, member.organizationId),
   };
-});
+}
+
+/**
+ * Konteks tenant untuk pekerjaan latar (tanpa session), mis. laporan terjadwal: dibangun dari
+ * keanggotaan aktif di database sehingga izin sama persis dengan saat pengguna login.
+ * Null bila pengguna bukan anggota aktif organisasi itu.
+ */
+export async function getMemberContext(
+  organizationId: string,
+  userId: string,
+): Promise<TenantContext | null> {
+  const member = await prisma.member.findFirst({
+    where: { userId, organizationId, active: true, organization: { deletedAt: null } },
+    include: { user: { select: { id: true, name: true, email: true } } },
+  });
+  if (!member || !isRole(member.role)) return null;
+  return buildContext({ organizationId, role: member.role }, member.user);
+}
 
 /** Untuk halaman/aksi privat: login + punya organisasi aktif. */
 export async function requireTenant(): Promise<TenantContext> {

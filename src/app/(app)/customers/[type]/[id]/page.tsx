@@ -73,7 +73,25 @@ export default async function Page(props: PageProps<"/customers/[type]/[id]">) {
               </dd>
             </div>
           </dl>
-          <SegmentsEditor party={party} segments={c.segments} all={allSegments} canEdit={canEdit} />
+          <SegmentsEditor
+            party={party}
+            segments={c.segments}
+            all={allSegments.filter((s) => s.kind !== "dynamic")}
+            canEdit={canEdit}
+          />
+          {c.dynamicSegments.length > 0 && (
+            <p
+              className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs"
+              data-testid="dynamic-segments"
+            >
+              Segmen otomatis:
+              {c.dynamicSegments.map((s) => (
+                <ToneBadge key={s.id} tone="purple">
+                  {s.name}
+                </ToneBadge>
+              ))}
+            </p>
+          )}
           <FollowUpScheduler party={party} name={c.name} />
           <BriefingCard party={party} />
         </CardContent>

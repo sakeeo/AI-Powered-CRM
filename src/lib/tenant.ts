@@ -49,6 +49,7 @@ export const TENANT_MODELS = new Set<string>([
   "GoogleIntegration",
   "CalendarEventLink",
   "EmailSyncLog",
+  "SavedReport",
 ]);
 
 const WHERE_OPS = new Set([

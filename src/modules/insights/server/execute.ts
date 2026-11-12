@@ -6,7 +6,9 @@ import { formatMoney } from "@/lib/money";
 import { dateInTz, zonedToUtc } from "@/lib/timezone";
 import {
   ENTITY_LABEL,
+  ACTIVITY_TYPE_VALUES,
   PERIOD_LABEL,
+  STATUS_VALUES,
   SUM_FIELDS,
   type InsightEntity,
   type InsightPlan,
@@ -46,15 +48,7 @@ const DB_FIELD: Record<string, string> = {
   stage: "stageId",
 };
 
-const STATUS_VALUES: Record<InsightEntity, readonly string[]> = {
-  lead: ["new", "contacted", "qualified", "unqualified"],
-  deal: ["open", "won", "lost"],
-  contact: [],
-  company: [],
-  activity: ["open", "done", "cancelled"],
-  quotation: ["draft", "sent", "accepted", "rejected", "expired"],
-};
-const ACTIVITY_TYPES = ["task", "call", "meeting", "email", "note", "whatsapp"];
+const ACTIVITY_TYPES: readonly string[] = ACTIVITY_TYPE_VALUES;
 
 const norm = (s: string) => s.trim().toLowerCase();
 

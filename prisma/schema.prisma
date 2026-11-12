@@ -141,6 +141,7 @@ model Organization {
   automationRules         AutomationRule[]
   automationRuns          AutomationRun[]
   conversations           Conversation[]
+  savedReports            SavedReport[]
   messages                Message[]
   outboundWebhooks        OutboundWebhook[]
   outboundDeliveries      OutboundDelivery[]
@@ -852,6 +853,10 @@ model CustomerSegment {
   id             String   @id @default(uuid(7)) @db.Uuid
   organizationId String   @map("organization_id") @db.Uuid
   name           String
+  /// static (anggota ditetapkan manual) | dynamic (anggota dihitung dari `rules`, plan 2.6)
+  kind           String   @default("static")
+  /// Aturan segmen dinamis: { party?, minTotal?, maxTotal?, minWonCount?, wonWithinDays?, inactiveDays?, tagIds? }
+  rules          Json?
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -1252,4 +1257,43 @@ model EmailSyncLog {
 
   @@unique([integrationId, messageId])
   @@map("email_sync_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Report builder & laporan terjadwal (plan 2.6).
+// ---------------------------------------------------------------------------
+
+/// Laporan kustom tersimpan. `definition` = rencana kueri whitelist (sama dengan Insights) sehingga
+/// eksekusinya selalu read-only, ter-scope tenant, dan mengikuti izin PEMBACA (bukan pembuat).
+model SavedReport {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String
+  definition     Json
+  /// personal | organization
+  visibility     String    @default("personal")
+  ownerId        String    @map("owner_id") @db.Uuid
+  /// none | daily | weekly | monthly
+  frequency      String    @default("none")
+  /// 1 (Senin) – 7 (Minggu) untuk weekly
+  weekday        Int?
+  /// 1–28 untuk monthly
+  monthday       Int?
+  /// Jam kirim (0–23) menurut zona waktu organisasi
+  hour           Int       @default(8)
+  /// Penerima: anggota aktif organisasi (id user)
+  recipientIds   Json      @default("[]") @map("recipient_ids")
+  nextRunAt      DateTime? @map("next_run_at") @db.Timestamptz(3)
+  lastRunAt      DateTime? @map("last_run_at") @db.Timestamptz(3)
+  lastStatus     String?   @map("last_status")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?   @map("created_by") @db.Uuid
+  updatedBy      String?   @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, ownerId])
+  @@index([frequency, nextRunAt])
+  @@map("saved_reports")
 }

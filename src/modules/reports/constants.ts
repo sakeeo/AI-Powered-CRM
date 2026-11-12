@@ -7,6 +7,7 @@ export const REPORT_TYPES = [
   "sales",
   "activity",
   "revenue",
+  "segment",
 ] as const;
 export type ReportType = (typeof REPORT_TYPES)[number];
 export const REPORT_LABEL: Record<ReportType, string> = {
@@ -18,6 +19,7 @@ export const REPORT_LABEL: Record<ReportType, string> = {
   sales: "Sales Performance",
   activity: "Activity",
   revenue: "Revenue",
+  segment: "Segmen Pelanggan",
 };
 /** Kategori baku alasan Lost (Safe AI Lost Reason Categorizer mengusulkan salah satu; user yang memutuskan). */
 export const LOST_CATEGORIES = [
