@@ -13,12 +13,12 @@ export function AuthCard({
   footer?: ReactNode;
 }) {
   return (
-    <Card>
-      <CardHeader className="block">
+    <Card className="py-2 sm:py-4">
+      <CardHeader className="block px-6 sm:px-8">
         <CardTitle className="text-xl">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 px-6 sm:px-8">
         {children}
         {footer && <div className="text-muted-foreground text-label text-center">{footer}</div>}
       </CardContent>
