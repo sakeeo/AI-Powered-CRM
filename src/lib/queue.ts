@@ -14,6 +14,7 @@ export const QUEUES = {
   outbound: "outbound",
   calendar: "calendar",
   googleSync: "google-sync",
+  insights: "insights",
 } as const;
 
 const globalForQueue = globalThis as unknown as {

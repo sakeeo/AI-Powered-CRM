@@ -55,3 +55,21 @@ terkirim, tanpa duplikat) + umpan balik `accepted`; **Tidak relevan** → umpan 
 Acceptance Rate = diterima ÷ (diterima + ditolak), ditampilkan di `/intelligence`.
 
 Batasan: "respons pelanggan" hanya diketahui dari pesan WhatsApp masuk; belum ada sinyal balasan email/telepon.
+
+## 3.4 Insight otomatis & deteksi anomali
+
+Job BullMQ (`insights`, worker, tiap 6 jam; juga tombol **Pindai sekarang** untuk Owner/Admin) memindai tiap
+organisasi dan menyimpan anomali di `insight_alerts` + notifikasi in-app. Tiga definisi (ambang di `anomalies.ts`):
+
+1. **Aktivitas VIP menurun** — VIP = 20% teratas menurut total pembelian (deal Won, mata uang default organisasi).
+   Alert bila interaksi 30 hari terakhir ≤ 25% dari rata-rata 30 harinya pada 90 hari sebelumnya (baseline ≥ 2
+   interaksi/30 hari). Interaksi = aktivitas selesai tertaut ke company/contact/deal-nya + pesan WhatsApp contact.
+2. **Win rate menurun** — turun ≥ 20 poin dibanding 90 hari sebelumnya (≥ 5 deal tertutup per jendela).
+3. **Lead baru menurun** — 14 hari terakhir ≤ 50% rata-rata 14 harinya pada 56 hari sebelumnya (baseline ≥ 8).
+
+Idempoten: satu alert per subjek per pekan (`dedupeKey = kunci:awal-pekan`); anomali yang masih berlangsung muncul lagi
+pekan berikutnya. Notifikasi ke Owner/Admin/Sales Manager + pemilik customer. Sales Rep hanya melihat alert customer
+miliknya. **Tidak ada aksi otonom** — pemindai hanya menulis `insight_alerts` dan `notifications`; Abaikan hanya
+mengubah status alert.
+
+Batasan: total pembelian hanya mata uang default; ambang tetap (belum dapat dikonfigurasi per organisasi).

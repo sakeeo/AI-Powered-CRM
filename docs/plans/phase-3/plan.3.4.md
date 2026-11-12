@@ -14,9 +14,9 @@ Deteksi penurunan aktivitas pelanggan penting dan insight otomatis.
 
 ## Tugas
 
-- [ ] Definisi anomali (mis. penurunan aktivitas pelanggan VIP).
-- [ ] Job terjadwal + notifikasi in-app.
-- [ ] Dashboard insight; tanpa tindakan otomatis.
+- [x] Definisi anomali (mis. penurunan aktivitas pelanggan VIP).
+- [x] Job terjadwal + notifikasi in-app.
+- [x] Dashboard insight; tanpa tindakan otomatis.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -24,8 +24,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `BullMQ`.
 
 ## Acceptance Criteria
 
-- [ ] Anomali terdeteksi dan dinotifikasikan.
-- [ ] Tidak ada aksi otonom.
+- [x] Anomali terdeteksi dan dinotifikasikan.
+- [x] Tidak ada aksi otonom.
 
 ## Verifikasi
 

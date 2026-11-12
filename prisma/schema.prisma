@@ -145,6 +145,7 @@ model Organization {
   quotationVersions       QuotationVersion[]
   activityTemplates       ActivityTemplate[]
   recommendationFeedback  RecommendationFeedback[]
+  insightAlerts           InsightAlert[]
   messages                Message[]
   outboundWebhooks        OutboundWebhook[]
   outboundDeliveries      OutboundDelivery[]
@@ -1381,4 +1382,36 @@ model RecommendationFeedback {
   @@index([organizationId, kind, createdAt(sort: Desc)])
   @@index([organizationId, subjectType, subjectId])
   @@map("recommendation_feedback")
+}
+
+/// Anomali/insight otomatis hasil pemindaian terjadwal (plan 3.4). Hanya informasi — tidak memicu aksi otomatis.
+model InsightAlert {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  /// vip_activity_drop | win_rate_drop | lead_inflow_drop
+  kind           String
+  /// high | medium
+  severity       String
+  title          String
+  detail         String
+  /// company | contact (null untuk insight tingkat organisasi)
+  subjectType    String?   @map("subject_type")
+  subjectId      String?   @map("subject_id") @db.Uuid
+  /// Pemilik subjek (untuk visibilitas Sales Rep)
+  ownerId        String?   @map("owner_id") @db.Uuid
+  /// Kunci idempotensi: satu anomali per subjek per pekan
+  dedupeKey      String    @map("dedupe_key")
+  /// Angka pendukung (jendela, jumlah, dst.)
+  data           Json      @default("{}")
+  /// open | dismissed
+  status         String    @default("open")
+  dismissedBy    String?   @map("dismissed_by") @db.Uuid
+  dismissedAt    DateTime? @map("dismissed_at") @db.Timestamptz(3)
+  detectedAt     DateTime  @default(now()) @map("detected_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, dedupeKey])
+  @@index([organizationId, status, detectedAt(sort: Desc)])
+  @@map("insight_alerts")
 }

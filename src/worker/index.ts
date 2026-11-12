@@ -7,6 +7,7 @@ import { runAutomations, scanAutomationTriggers, type AutomationEvent } from "@/
 import { deliverOutbound, type OutboundJob } from "@/lib/outbound-webhooks";
 import { runDueReportSchedules } from "@/lib/report-schedule";
 import { pushActivity, syncAllGoogle, type CalendarJob } from "@/lib/google";
+import { scanAllInsights } from "@/lib/insight-scan";
 import { scanQuotations, scanReminders } from "@/lib/reminders";
 
 /**
@@ -56,7 +57,11 @@ export function startWorkers() {
     connection,
     concurrency: 1,
   });
-  for (const w of [mail, reminders, automation, outbound, calendar, googleSync]) {
+  const insights = new Worker(QUEUES.insights, () => scanAllInsights(), {
+    connection,
+    concurrency: 1,
+  });
+  for (const w of [mail, reminders, automation, outbound, calendar, googleSync, insights]) {
     w.on("failed", (job, err) =>
       logger.error(
         { queue: w.name, jobId: job?.id, attempt: job?.attemptsMade, err: err.message },
@@ -65,7 +70,10 @@ export function startWorkers() {
     );
     w.on("error", (err) => logger.error({ queue: w.name, err: err.message }, "Worker error"));
   }
-  return { workers: [mail, reminders, automation, outbound, calendar, googleSync], connection };
+  return {
+    workers: [mail, reminders, automation, outbound, calendar, googleSync, insights],
+    connection,
+  };
 }
 
 async function main() {
@@ -80,7 +88,15 @@ async function main() {
     { every: 5 * 60_000 },
     { name: "sync", opts: { removeOnComplete: true, removeOnFail: 100 } },
   );
-  logger.info("Worker berjalan (mail, reminders, automation, outbound, calendar, google)");
+  // Insight & anomali: tiap 6 jam (idempoten per subjek per pekan, jadi aman diulang).
+  await getQueue(QUEUES.insights).upsertJobScheduler(
+    "insight-scan",
+    { every: 6 * 3_600_000 },
+    { name: "scan", opts: { removeOnComplete: true, removeOnFail: 100 } },
+  );
+  logger.info(
+    "Worker berjalan (mail, reminders, automation, outbound, calendar, google, insights)",
+  );
   const stop = async () => {
     await Promise.all(workers.map((w) => w.close()));
     process.exit(0);
