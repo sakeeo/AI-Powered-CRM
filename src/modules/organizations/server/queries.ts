@@ -7,10 +7,22 @@ export async function listMyOrganizations(userId: string) {
   const rows = await prisma.member.findMany({
     where: { userId, active: true, organization: { deletedAt: null } },
     orderBy: { createdAt: "asc" },
-    select: { role: true, organization: { select: { id: true, name: true } } },
+    select: {
+      role: true,
+      organization: { select: { id: true, name: true, logo: true, updatedAt: true } },
+    },
   });
-  return rows.map((r) => ({ id: r.organization.id, name: r.organization.name, role: r.role }));
+  return rows.map((r) => ({
+    id: r.organization.id,
+    name: r.organization.name,
+    role: r.role,
+    logoUrl: orgLogoUrl(r.organization),
+  }));
 }
+
+/** URL logo organisasi aktif (diberi versi agar cache browser ikut berubah saat logo diganti). */
+export const orgLogoUrl = (o: { logo: string | null; updatedAt: Date }) =>
+  o.logo ? `/api/organization/logo?v=${o.updatedAt.getTime()}` : null;
 
 export function getOrganization(ctx: TenantContext) {
   return prisma.organization.findUniqueOrThrow({
@@ -19,6 +31,8 @@ export function getOrganization(ctx: TenantContext) {
       id: true,
       name: true,
       slug: true,
+      logo: true,
+      updatedAt: true,
       timezone: true,
       defaultCurrency: true,
       dateFormat: true,

@@ -1,5 +1,7 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -41,12 +43,11 @@ export function FeedbackActions({
       </Button>
       {can("delete", "Feedback", rec) && (
         <Button
-          size="sm"
-          variant="ghost"
+          variant="destructive"
           disabled={pending}
           onClick={() => run(() => deleteFeedback({ id }))}
         >
-          Hapus
+          <Trash2 /> Hapus
         </Button>
       )}
     </div>

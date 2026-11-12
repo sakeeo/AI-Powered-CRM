@@ -28,7 +28,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
         <button
           type="button"
           aria-label="Menu pengguna"
-          className="hover:bg-sidebar-accent/40 focus-visible:ring-sidebar-ring flex w-full items-center gap-2.5 rounded-md px-1 py-1 text-left outline-none group-data-[collapsible=icon]:justify-center focus-visible:ring-2"
+          className="hover:bg-sidebar-accent/40 focus-visible:ring-sidebar-ring flex w-full items-center gap-2.5 rounded-md px-1 py-1 text-left outline-none group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:justify-center focus-visible:ring-2"
         >
           <span
             aria-hidden
@@ -38,7 +38,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
           </span>
           <span className="min-w-0 flex-1 text-[13px] leading-tight group-data-[collapsible=icon]:hidden">
             <span className="block truncate">{user.name}</span>
-            <small className="text-sidebar-muted text-micro block truncate">{user.email}</small>
+            <small className="text-sidebar-muted block truncate text-xs">{user.email}</small>
           </span>
           <ChevronsUpDown className="size-4 shrink-0 opacity-70 group-data-[collapsible=icon]:hidden" />
         </button>

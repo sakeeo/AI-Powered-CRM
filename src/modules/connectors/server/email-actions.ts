@@ -135,6 +135,14 @@ export const removeEmailConnector = tenantAction(emailProviderSchema, async (ctx
   const row = await ctx.db.tenantConnector.findFirst({ where: { type: info.type } });
   if (!row) throw new AppError("Connector tidak ditemukan", 404, "not_found");
   await ctx.db.tenantConnector.delete({ where: { id: row.id } });
+  if (row.isDefault) {
+    const next = await ctx.db.tenantConnector.findFirst({
+      where: { type: { startsWith: "email_" } },
+      orderBy: { createdAt: "asc" },
+    });
+    if (next)
+      await ctx.db.tenantConnector.update({ where: { id: next.id }, data: { isDefault: true } });
+  }
   await writeAudit(ctx, {
     action: "connector.removed",
     entityType: "Connector",
@@ -143,3 +151,24 @@ export const removeEmailConnector = tenantAction(emailProviderSchema, async (ctx
   });
   revalidatePath("/settings/connectors");
 });
+
+export const setDefaultEmailConnector = tenantAction(
+  emailProviderSchema,
+  async (ctx, { provider }) => {
+    assertCan(ctx, "update", "Connector");
+    const info = EMAIL_PROVIDER_INFO[provider];
+    const row = await ctx.db.tenantConnector.findFirst({ where: { type: info.type } });
+    if (!row) throw new AppError("Connector tidak ditemukan", 404, "not_found");
+    await ctx.db.tenantConnector.updateMany({
+      where: { type: { startsWith: "email_" } },
+      data: { isDefault: false },
+    });
+    await ctx.db.tenantConnector.update({ where: { id: row.id }, data: { isDefault: true } });
+    await writeAudit(ctx, {
+      action: "connector.default_changed",
+      entityType: "Connector",
+      entityId: info.type,
+    });
+    revalidatePath("/settings/connectors");
+  },
+);

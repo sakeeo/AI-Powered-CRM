@@ -4,9 +4,13 @@ export type SearchParams = Record<string, string | string[] | undefined>;
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
+/** Pilihan jumlah item per halaman di UI; bawaan 10. */
+export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+export const DEFAULT_PAGE_SIZE = 10;
+
 const base = z.object({
   page: z.coerce.number().int().min(1).catch(1),
-  pageSize: z.coerce.number().int().min(5).max(100).catch(20),
+  pageSize: z.coerce.number().int().min(5).max(100).catch(DEFAULT_PAGE_SIZE),
   dir: z.enum(["asc", "desc"]).catch("desc"),
   q: z.string().trim().max(100).optional().catch(undefined),
 });

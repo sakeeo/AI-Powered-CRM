@@ -84,8 +84,7 @@ export function RolesMatrix({ matrices }: { matrices: Record<Role, Matrix> }) {
               onClick={() => setRole(r)}
               className={cn(
                 "border-input bg-card focus-visible:ring-ring/50 h-8 rounded-[8px] border px-3 text-xs outline-none focus-visible:ring-3",
-                role === r &&
-                  "border-primary bg-primary text-primary-foreground shadow-[0_2px_5px_rgb(18_105_168/0.2)]",
+                role === r && "border-primary bg-primary text-primary-foreground",
               )}
             >
               {ROLE_LABEL[r]}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ToneBadge } from "@/components/shared/tone-badge";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { generateWebhook, toggleWebhook } from "@/modules/webhooks/server/actions";
 import type { WebhookView } from "@/modules/webhooks/server/queries";
+
+const LOG_LIMIT = 10;
 
 const STATUS_LABEL: Record<string, string> = {
   accepted: "Diterima",
@@ -30,6 +32,7 @@ export function WebhookCard({
 }) {
   const [pending, start] = useTransition();
   // Secret hanya ada di state sampai halaman ditinggalkan; tidak pernah diambil ulang dari server.
+  const [showAll, setShowAll] = useState(false);
   const [secret, setSecret] = useState<string>();
   const [publicId, setPublicId] = useState(webhook?.publicId);
   const url = publicId
@@ -73,8 +76,8 @@ export function WebhookCard({
             >
               {url}
             </code>
-            <Button size="icon" variant="outline" aria-label="Salin URL" onClick={() => copy(url)}>
-              <Copy />
+            <Button variant="outline" aria-label="Salin URL" onClick={() => copy(url)}>
+              <Copy /> Salin
             </Button>
           </div>
           {secret ? (
@@ -89,13 +92,8 @@ export function WebhookCard({
                 >
                   {secret}
                 </code>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  aria-label="Salin secret"
-                  onClick={() => copy(secret)}
-                >
-                  <Copy />
+                <Button variant="outline" aria-label="Salin secret" onClick={() => copy(secret)}>
+                  <Copy /> Salin
                 </Button>
               </div>
             </div>
@@ -137,7 +135,7 @@ export function WebhookCard({
             <p className="text-muted-foreground text-xs">Belum ada permintaan masuk.</p>
           ) : (
             <ul className="divide-border divide-y text-xs" data-testid="webhook-log">
-              {webhook.deliveries.map((d) => (
+              {(showAll ? webhook.deliveries : webhook.deliveries.slice(0, LOG_LIMIT)).map((d) => (
                 <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 py-1.5">
                   <span className="tabular-nums">
                     {new Date(d.createdAt).toLocaleString("id-ID")}
@@ -151,6 +149,18 @@ export function WebhookCard({
                 </li>
               ))}
             </ul>
+          )}
+          {webhook.deliveries.length > LOG_LIMIT && (
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <span className="text-muted-foreground text-xs">
+                Menampilkan {showAll ? webhook.deliveries.length : LOG_LIMIT} dari{" "}
+                {webhook.deliveries.length} log
+              </span>
+              <Button variant="outline" onClick={() => setShowAll((v) => !v)}>
+                {showAll ? <ChevronUp /> : <ChevronDown />}{" "}
+                {showAll ? "Sembunyikan" : "Tampilkan semua"}
+              </Button>
+            </div>
           )}
         </div>
       )}

@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import type { DuplicateMatch } from "@/modules/duplicates/server/detect";
 import { convertLead } from "@/modules/leads/server/actions";
@@ -147,12 +148,7 @@ export function ConvertLeadDialog({
                     />
                   </FormField>
                   <FormField id="conv-value" label="Nilai">
-                    <Input
-                      id="conv-value"
-                      inputMode="decimal"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                    />
+                    <NumberInput id="conv-value" value={value} onValueChange={setValue} />
                   </FormField>
                 </div>
               )}

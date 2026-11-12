@@ -16,7 +16,7 @@ export const SETTINGS_LINKS: { href: string; label: string; subject?: SubjectNam
   { href: "/settings/audit-log", label: "Audit Log", subject: "AuditLog" },
 ];
 
-/** Sub-navigasi Settings memakai gaya tab segmen (design-system §5). */
+/** Sub-navigasi Settings memakai gaya tab segmen (design-system §5, pola tanpa padanan template). */
 export function SettingsNav({ hidden = [] }: { hidden?: string[] }) {
   const pathname = usePathname();
   const can = useCan();
@@ -32,9 +32,9 @@ export function SettingsNav({ hidden = [] }: { hidden?: string[] }) {
             href={l.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "border-input bg-card text-foreground focus-visible:ring-ring/50 h-8 rounded-[8px] border px-3 text-xs leading-[30px] transition-colors outline-none focus-visible:ring-3",
+              "text-muted-foreground hover:bg-secondary hover:text-primary focus-visible:ring-ring/50 inline-flex h-9 items-center rounded-3xl px-4 text-sm transition-colors outline-none focus-visible:ring-3",
               active &&
-                "border-primary bg-primary text-primary-foreground shadow-[0_2px_5px_rgb(18_105_168/0.2)]",
+                "bg-secondary text-primary font-medium",
             )}
           >
             {l.label}

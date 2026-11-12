@@ -21,7 +21,7 @@ export function FormField({
       {children}
       {hint && !error && <p className="text-muted-foreground text-xs">{hint}</p>}
       {error && (
-        <p id={`${id}-error`} role="alert" className="text-destructive text-xs">
+        <p id={`${id}-error`} role="alert" className="text-tone-red-ink text-xs">
           {error}
         </p>
       )}

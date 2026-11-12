@@ -10,7 +10,7 @@ export async function getWebhookView(ctx: TenantContext) {
   if (!hook) return null;
   const deliveries = await ctx.db.webhookDelivery.findMany({
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 200,
     select: {
       id: true,
       status: true,

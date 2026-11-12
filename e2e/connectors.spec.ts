@@ -5,8 +5,10 @@ test("Connector Hub: key AI tersimpan bermasker dan tidak pernah tampil utuh", a
   await page.waitForLoadState("networkidle");
   await expect(page.getByRole("heading", { name: "Google Gemini" })).toBeVisible();
 
-  const card = page.locator("[data-slot=card]", { hasText: "OpenAI" }).first();
-  await card.getByRole("button", { name: /Hubungkan|Ubah/ }).click();
+  await page
+    .getByTestId("ai-row-openai")
+    .getByRole("button", { name: /Hubungkan|Ubah/ })
+    .click();
   await page.getByLabel("API key").fill("sk-e2e-SECRET-0000-abcd");
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
   await expect(page.getByText("OpenAI disimpan")).toBeVisible();

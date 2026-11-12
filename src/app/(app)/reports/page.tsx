@@ -10,7 +10,8 @@ import { pickParam, type SearchParams } from "@/lib/list-params";
 import { PERIODS, PERIOD_LABEL } from "@/modules/dashboard/server/metrics";
 import { ExportReportButton } from "@/modules/reports/components/export-report-button";
 import { REPORT_LABEL, REPORT_TYPES, type ReportType } from "@/modules/reports/constants";
-import { getReport } from "@/modules/reports/server/reports";
+import { ReportChart } from "@/modules/reports/components/report-chart";
+import { getReport, type Section } from "@/modules/reports/server/reports";
 import { listOwnerOptions, listTeams } from "@/modules/organizations/server/queries";
 
 export const metadata: Metadata = { title: "Reports & Analytics" };
@@ -39,7 +40,7 @@ export default async function Page(props: PageProps<"/reports">) {
   const href = (t: ReportType) =>
     `/reports?${new URLSearchParams([["type", t], ...(keep as [string, string][])])}`;
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Jenis laporan">
         {REPORT_TYPES.map((t) => (
           <Button key={t} asChild size="sm" variant={t === type ? "default" : "outline"}>
@@ -85,42 +86,73 @@ export default async function Page(props: PageProps<"/reports">) {
           {report.note}
         </p>
       )}
-      {report.sections.map((s) => (
-        <Card key={s.title}>
-          <CardHeader>
-            <CardTitle>{s.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 overflow-x-auto">
-            {s.rows.length === 0 ? (
-              <p className="text-muted-foreground text-xs">Tidak ada data pada periode ini.</p>
-            ) : (
-              <table className="w-full text-sm" data-testid="report-table">
-                <thead>
-                  <tr className="text-muted-foreground border-b text-left text-xs">
-                    {s.columns.map((c) => (
-                      <th key={c} className="py-1.5 pr-3 font-medium">
-                        {c}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {s.rows.map((r, i) => (
-                    <tr key={i} className="border-b last:border-0">
-                      {r.map((c, j) => (
-                        <td key={j} className="py-1.5 pr-3 tabular-nums">
-                          {c}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            {s.note && <p className="text-muted-foreground text-xs">{s.note}</p>}
-          </CardContent>
-        </Card>
-      ))}
+      {report.charts.length > 0 && (
+        <div className={report.charts.length > 1 ? "grid gap-6 md:grid-cols-2" : "grid gap-6"}>
+          {report.charts.map((c) => (
+            <Card key={c.title}>
+              <CardHeader>
+                <CardTitle>{c.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReportChart spec={c} />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+      {type === "winlost" ? (
+        <>
+          <div className="grid gap-6 md:grid-cols-2">
+            {report.sections.slice(0, 2).map((s) => (
+              <SectionCard key={s.title} s={s} />
+            ))}
+          </div>
+          {report.sections.slice(2).map((s) => (
+            <SectionCard key={s.title} s={s} />
+          ))}
+        </>
+      ) : (
+        report.sections.map((s) => <SectionCard key={s.title} s={s} />)
+      )}
     </div>
+  );
+}
+
+function SectionCard({ s }: { s: Section }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{s.title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2 overflow-x-auto">
+        {s.rows.length === 0 ? (
+          <p className="text-muted-foreground text-xs">Tidak ada data pada periode ini.</p>
+        ) : (
+          <table className="w-full text-sm" data-testid="report-table">
+            <thead>
+              <tr className="text-muted-foreground border-b text-left text-xs">
+                {s.columns.map((c) => (
+                  <th key={c} className="py-1.5 pr-3 font-medium">
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {s.rows.map((r, i) => (
+                <tr key={i} className="border-b last:border-0">
+                  {r.map((c, j) => (
+                    <td key={j} className="py-1.5 pr-3 tabular-nums">
+                      {c}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {s.note && <p className="text-muted-foreground text-xs">{s.note}</p>}
+      </CardContent>
+    </Card>
   );
 }

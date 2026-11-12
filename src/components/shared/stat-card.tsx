@@ -5,7 +5,7 @@ import { ProgressBar } from "@/components/shared/progress-bar";
 import type { Tone } from "@/components/shared/tone";
 import { TrendBadge } from "@/components/shared/trend-badge";
 
-/** Kartu metrik/KPI mockup: ikon + tren, angka besar, label, progress, pembanding. */
+/** Kartu metrik/KPI (template Spike: ikon bulat tint + angka 22px): ikon + tren, angka besar, label, progress, pembanding. */
 export function StatCard({
   icon,
   tone = "blue",
@@ -31,8 +31,8 @@ export function StatCard({
         <IconTile icon={icon} tone={tone} />
         {trend && <TrendBadge value={trend.value} direction={trend.direction} />}
       </div>
-      <p className="text-kpi mt-3 font-bold tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-label">{label}</p>
+      <p className="mt-3 text-[22px] font-semibold tabular-nums">{value}</p>
+      <p className="text-muted-foreground text-sm">{label}</p>
       {hint && <p className="text-muted-foreground/80 mt-0.5 text-xs">{hint}</p>}
       {progress !== undefined && (
         <>
@@ -44,7 +44,7 @@ export function StatCard({
         </>
       )}
       {previous && (
-        <div className="text-muted-foreground text-micro mt-2 flex justify-between">
+        <div className="text-muted-foreground text-xs mt-2 flex justify-between">
           <span>{previous.label}</span>
           <b className="font-semibold tabular-nums">{previous.value}</b>
         </div>

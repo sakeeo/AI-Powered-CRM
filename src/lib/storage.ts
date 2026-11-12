@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
   PutObjectCommand,
@@ -49,4 +50,10 @@ export async function getTenantObject(organizationId: string, path: string): Pro
 
 export async function checkStorage() {
   await s3.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }));
+}
+
+export async function deleteTenantObject(organizationId: string, path: string) {
+  await s3.send(
+    new DeleteObjectCommand({ Bucket: env.S3_BUCKET, Key: tenantKey(organizationId, path) }),
+  );
 }

@@ -1,198 +1,214 @@
 # Design System
 
-> **Satu-satunya referensi desain UI/UX untuk frontend aplikasi ini.**
-> Sumber visual: [`mockup-dasboard.html`](mockup-dasboard.html) (Admin Dashboard). Dokumen ini adalah terjemahan mockup tersebut menjadi token, komponen, dan aturan. Bila ada konflik antara dokumen ini dan mockup, **mockup menang** — lalu perbarui dokumen ini.
+> **Satu-satunya referensi desain tampilan untuk frontend aplikasi ini: template [`spike-tailwind/`](spike-tailwind/)** (Spike / Modernize Tailwind Admin Template) — **dengan palet warna proyek** (§2.0: krem / hijau tua / merah-oranye, aturan 60/30/10).
+> Pembagian peran: **template = struktur** (layout, komponen, radius, bayangan, tipografi, spasi, responsif); **palet proyek = seluruh warna**. Sumber template: `spike-tailwind/package/src` (HTML + `tailwind.config.js`) dan `spike-tailwind/dist` (buka `dist/index.html`). Bila template dan dokumen ini bertentangan soal **struktur**, template menang; soal **warna**, §2.0 menang. Perbarui dokumen ini di commit yang sama dengan perubahan UI.
+>
+> Menggantikan mockup lama (`mockup-dasboard.html`, biru `#1269a8`, hero/quick-action). Mockup itu **tidak lagi menjadi acuan**.
 
 ## 0. Aturan Wajib
 
-1. Semua UI baru **harus** mengikuti dokumen ini dan mockup. Jangan memakai referensi desain lain (template shadcn bawaan, contoh dari internet, gaya pribadi).
-2. **Tidak ada nilai hardcode** (hex, px warna, shadow) di komponen/halaman. Gunakan token di [`src/app/globals.css`](../src/app/globals.css) lewat kelas Tailwind (`bg-primary`, `text-muted-foreground`, `bg-tone-green-soft`, `shadow-card`, …).
-3. Warna berarti sesuatu (lihat §2.3). Jangan memilih warna karena "kelihatan bagus".
-4. Gunakan komponen dari `src/components/ui` (primitif shadcn) dan `src/components/shared` (pola mockup) sebelum membuat yang baru. Pola baru yang dipakai ≥2 tempat → tambahkan ke `shared/` **dan** dokumentasikan di §5.
-5. Ikon: hanya `lucide-react`, stroke 1.8 (default 2 diterima), tanpa emoji dan tanpa karakter unicode sebagai ikon (mockup memakai emoji hanya sebagai placeholder).
-6. Setiap perubahan visual yang disengaja pada mockup harus ikut memperbarui dokumen ini di commit yang sama.
+1. **Template dulu, komponen baru belakangan.** Sebelum membuat komponen/pola UI, cari padanannya di template (`package/src/components/*.html`, `package/src/pages/*.html`, `package/src/partials/*`). Bila ada → tiru strukturnya (kelas, spasi, radius; **warna lewat token palet §2.0**, bukan warna bawaan template) dan bungkus sebagai komponen React. Komponen baru hanya boleh dibuat bila **tidak ada** padanan di template; tuliskan alasannya di §6.
+2. Jangan memakai referensi desain lain (default shadcn, contoh internet, gaya pribadi, mockup lama).
+3. **Tidak ada nilai hardcode** (hex, px warna, shadow) di komponen/halaman. Semua nilai (warna palet proyek, radius/bayangan template) didaftarkan sebagai token di [`src/app/globals.css`](../src/app/globals.css) dan dipakai lewat kelas Tailwind (`bg-primary`, `text-muted-foreground`, `rounded-md`, `shadow-card`, …).
+4. Pakai primitif `src/components/ui` (shadcn/Radix — perilaku & aksesibilitas) dan pola `src/components/shared`, tetapi **tampilannya mengikuti template**, bukan default shadcn. Template memakai Preline (JS dropdown/overlay/accordion) — di aplikasi ini padanannya adalah Radix/shadcn (`dropdown-menu`, `sheet`, `dialog`); jangan menambah Preline/jQuery/SimpleBar.
+5. Ikon: template memakai **Tabler Icons** (`ti ti-*`). Aplikasi tetap memakai `lucide-react` dengan padanan terdekat (ukuran template: menu 24px, header 20–24px). Tanpa emoji / karakter unicode sebagai ikon.
+6. Pola baru yang dipakai ≥2 tempat → komponen `shared/` **dan** dokumentasikan di §6.
 
 ## 1. Karakter Visual
 
-Bersih, terang, profesional. Latar abu kebiruan sangat muda; kartu putih berborder tipis dengan bayangan lembut; satu warna merek biru (`#1269a8`) sebagai jangkar; warna tambahan (hijau, oranye, ungu, merah) **hanya** sebagai penanda kategori/status dalam bentuk _tint_ lembut. Elemen "hero" dan aksi cepat boleh memakai gradien penuh — gradien tidak dipakai di tempat lain.
+Hangat, lembut, membulat. Latar halaman krem; blok konten (header, kartu) adalah **panel krem terang mengambang** dengan radius besar dan bayangan tipis; sidebar adalah **panel hijau tua mengambang** (bukan penuh-tinggi). Warna merek **hijau tua**; satu aksen **merah-oranye** dipakai hemat untuk perhatian/bahaya. Tombol berbentuk **kapsul** (radius 30px). Teks hijau-hitam hangat, bukan hitam murni. Tidak ada gradien.
 
 ## 2. Token
 
-### 2.1 Warna dasar (light — referensi utama)
+Struktur token (radius, bayangan, tipografi, spasi) mengikuti `spike-tailwind/package/tailwind.config.js`; **nilai warna mengikuti palet proyek di bawah**. Semua terdaftar di `src/app/globals.css`.
 
-| Token (Tailwind)                     | Nilai     | Mockup        | Pakai untuk                         |
-| ------------------------------------ | --------- | ------------- | ----------------------------------- |
-| `primary`                            | `#1269a8` | `--blue`      | Aksi utama, tab aktif, link, fokus  |
-| `primary-strong` (`--brand-strong`)  | `#0d5b96` | `--blue2`     | Hover aksi utama, ujung gradien     |
-| `brand-navy`                         | `#104f80` | `--navy`      | Ujung gradien gelap, teks di tint biru |
-| `foreground`                         | `#172033` | `--ink`       | Teks utama                          |
-| `muted-foreground`                   | `#7d8796` | `--muted`     | Teks sekunder, label, subjudul      |
-| `border`                             | `#e8edf3` | `--line`      | Border kartu, pemisah, topbar       |
-| `background`                         | `#f6f8fb` | `--bg`        | Latar halaman                       |
-| `card`                               | `#ffffff` | `#fff`        | Kartu, panel, popover               |
-| `muted`                              | `#f0f2f5` | `#f0f2f5`     | Track bar/progress, latar input     |
-| `input`                              | `#e2e7ed` | `#e2e7ed`     | Border kontrol (tab, input)         |
-| `destructive`                        | `#ef3c4b` | `--red`       | Aksi berbahaya, error               |
+### 2.0 Palet proyek — aturan 60/30/10
 
-### 2.2 Sidebar
+| Porsi | Peran | HEX | Token |
+| ----- | ----- | --- | ----- |
+| **60% Main** | Krem hangat: latar halaman; kartu/panel sedikit lebih terang | `#efece6` (kartu `#faf8f4`) | `background`, `card`, `popover` |
+| **30% Second** | Hijau tua: aksi utama, link, tab/menu aktif, ring fokus, sidebar | `#1d4631` (hover/gelap `#173d2b`) | `primary`, `primary-strong`, `sidebar`, `brand-navy` |
+| **10% Loud** | Merah-oranye terang: aksen, aksi berbahaya, indikator sidebar | `#ff4b26` | `destructive`, `tone-red`, `sidebar-primary` |
 
-| Token                      | Nilai                                | Catatan                         |
-| -------------------------- | ------------------------------------ | ------------------------------- |
-| `--sidebar-gradient`       | `linear-gradient(180deg,#126baa,#105b94)` | Latar sidebar (vertikal)   |
-| `sidebar-foreground`       | `#e3f1fb`                            | Teks/ikon menu                  |
-| `sidebar-accent`           | `#3485f6` (teks putih)               | Menu aktif **dan** hover        |
-| `sidebar-border`           | `rgba(255,255,255,.15)`              | Pemisah brand / user            |
-| subtitle brand             | `#c8e2f5`                            | "Admin Panel"-style caption     |
+Aturan pakai: Loud ≤ 10% permukaan — **bukan** warna tombol utama; Second untuk semua aksi utama; Main untuk semua permukaan netral.
 
-Sidebar **selalu biru** di light maupun dark mode (identitas merek).
+### 2.1 Peta peran template → token palet
 
-### 2.3 Tone (warna semantik kategori/status)
+Kolom "template" adalah peran yang dipakai HTML/kelas template (`blue-600`, `teal-500`, …). Kelas itu **tidak dipakai langsung**; pakai token di kolom kanan.
 
-Lima tone. Tiap tone punya `solid` (ikon penuh, tombol, badge angka), `soft` (latar tint), `border` (tepi kartu berwarna), dan `ink` (teks di atas soft).
+| Peran (kelas template)                  | Token CRM (kelas Tailwind)                 | Nilai light | Nilai dark |
+| --------------------------------------- | ------------------------------------------ | ----------- | ---------- |
+| Primary / tombol utama (`blue-600`)     | `primary` (`bg-primary`, `text-primary`)   | `#1d4631`   | `#5fb383`  |
+| Primary hover (`blue-700`)              | `primary-strong`                           | `#173d2b`   | `#7cc79c`  |
+| Tint primary: menu aktif/hover, alert primary (`blue-500`) | `secondary`, `accent` (`bg-secondary`) | `#e1e8e1` | `#1f3427` |
+| Teks di atas tint primary (`#006aaf`)   | `secondary-foreground`, `accent-foreground`| `#173d2b`   | `#d3e6da`  |
+| Success (`teal-*`)                      | `tone-green*`                              | `#4f9a6e`, tint `#e3f1e8`, ink `#2c7048` | `#6fc48a` |
+| Warning (`yellow-*`)                    | `tone-orange*`                             | `#e0a030`, tint `#fbf1dc`, ink `#8a6010` | `#e8b04a` |
+| Danger (`red-*`)                        | `destructive`, `tone-red*`                 | `#ff4b26`, tint `#ffe9e3`, ink `#c22a08` | `#ff6a47` |
+| Info (`blue-300/400/200`)               | `tone-purple*`                             | `#5b8f9a`, tint `#e2edef`, ink `#3a6873` | `#7fb0bb` |
+| Teks utama/judul (`gray-500`)           | `foreground`                               | `#17231c`   | `#ece9e2`  |
+| Teks sekunder/label (`gray-400`)        | `muted-foreground`                         | `#666b63`   | `#9aa89f`  |
+| Border & input (`gray-100/200`)         | `border`, `input`                          | `#dcd7cc` / `#d5d0c4` | putih 10–15% |
+| Latar halaman (`surface`)               | `background`                               | `#efece6`   | `#0f1a14`  |
+| Kartu/panel/popover (`white`)           | `card`, `popover`                          | `#faf8f4`   | `#16251c`  |
+| Chip/disabled/track (`gray-200`)        | `muted`                                    | `#e4e0d7`   | `#1c2b22`  |
+| Sidebar: latar / teks / label grup      | `sidebar` / `sidebar-foreground` / `sidebar-muted` | `#1d4631` / `#efece6` / `#a9bfb0` | `#0c1f16` / `#ece9e2` / `#8fa699` |
+| Sidebar: hover & aktif (sapuan pil)     | `sidebar-accent` + `sidebar-accent-foreground` | `#2b5a41` + putih | `#1d4631` + putih |
+| Sidebar: indikator/aksen                | `sidebar-primary`, `sidebar-ring`          | `#ff4b26`   | `#ff6a47`  |
+| Seri grafik 1–5                         | `chart-1…5`                                | hijau tua, hijau, kuning, teal, merah-oranye | — |
 
-| Tone     | solid     | soft      | border    | ink       | Makna                                             |
-| -------- | --------- | --------- | --------- | --------- | ------------------------------------------------- |
-| `blue`   | `#1269a8` | `#eff6ff` | `#c9e0ff` | `#1670b5` | Netral/informasi, data utama (user, lead)         |
-| `green`  | `#0eaa7c` | `#ecfbf4` | `#bfeedd` | `#0c9d72` | Positif: naik, sukses, won, live, uang masuk      |
-| `orange` | `#f47708` | `#fff8e9` | `#ffdfb8` | `#b45f06` | Perhatian: pending, perlu tindakan, belum selesai |
-| `purple` | `#913ce8` | `#f6f0ff` | `#e2cdfb` | `#7a2fd0` | Kategori ke-4, nilai/revenue, pelengkap           |
-| `red`    | `#ef3342` | `#fff0f1` | `#ffd1d5` | `#d92a39` | Negatif: turun, gagal, overdue, urgent            |
+**Makna warna:** hijau tua = utama/netral; hijau = sukses/naik; kuning = peringatan/pending; merah-oranye = bahaya/turun/gagal; teal = informasi. Tren naik = success, turun = danger, selalu disertai ikon/teks. Teks error memakai `tone-red-ink` (merah-oranye murni hanya untuk isian/ikon/tombol, kontras di atas krem rendah).
 
-Kelas Tailwind: `bg-tone-{tone}`, `bg-tone-{tone}-soft`, `border-tone-{tone}-border`, `text-tone-{tone}-ink`.
-Jangan mengubah makna: **tren naik = green, turun = red** (selalu disertai ikon panah, jangan hanya warna).
+### 2.2 Tipografi
 
-Gradien aksi cepat / hero (`--gradient-*`):
+Font: **Plus Jakarta Sans** 400/500/600/700 (`--font-sans`; ganti Inter). Mono: Geist Mono (kode/ID). Template memakai skala Tailwind standar:
 
-| Nama                | Gradien                                 |
-| ------------------- | --------------------------------------- |
-| `hero`              | `110deg, #176eae → #0e4e7d`             |
-| `quick-blue`        | `120deg, #176fae → #0e5790`             |
-| `quick-green`       | `120deg, #0dbb8a → #079b88`             |
-| `quick-orange`      | `120deg, #ff9b00 → #f0520a`             |
-| `quick-purple`      | `120deg, #994af3 → #7c1ce4`             |
-| `medal-gold/silver/bronze` | `135deg, #ffc400→#e89a00` / `#c9d4df→#77889b` / `#ff9c21→#f45c45` |
+| Peran                           | Kelas template                          |
+| ------------------------------- | --------------------------------------- |
+| Judul kartu/seksi               | `text-lg font-semibold text-gray-500` (→ `text-lg font-semibold text-foreground`) |
+| Judul statistik/angka besar     | `text-[22px] font-semibold`             |
+| Sub-judul kartu                 | `text-base font-semibold`               |
+| Body, tabel, form, alert        | `text-sm`                               |
+| Menu sidebar                    | `text-base` (ikon `text-2xl`)           |
+| Label grup menu                 | `text-xs font-semibold` uppercase, `gray-400` |
+| Label form                      | `text-sm text-gray-400`, `mb-2`         |
+| Caption / meta                  | `text-sm text-gray-400` (opacity 75–80) |
+| Heading konten (typography.html)| `text-2xl/3xl/4xl`                      |
 
-Seri grafik: `chart-1…5` = blue `#1269a8`, green `#0eaa7c`, orange `#f47708`, purple `#913ce8`, red `#ef3342` (urutan ini dipertahankan).
+Angka di tabel/KPI memakai `tabular-nums`. Tidak ada teks di bawah 12px.
 
-### 2.4 Dark mode (turunan — tidak ada di mockup)
+### 2.3 Radius (override template — penting)
 
-Mockup hanya light. Dark mode **diturunkan** dari hue yang sama dan tidak boleh memperkenalkan hue baru:
-`background #0e1522`, `card #151f30`, `border` putih 10%, `foreground #e6edf6`, `muted-foreground #94a1b3`, `primary #4a9ad8`, soft tone = solid tone pada opasitas 15% di atas card. Gradien hero/aksi cepat/sidebar tetap sama. Bila mockup dark resmi dibuat, ia menggantikan bagian ini.
+| Kelas | Nilai  | Dipakai untuk                                   |
+| ----- | ------ | ----------------------------------------------- |
+| `rounded-sm`  | 7px    | Input, textarea, select, alert, checkbox 4px     |
+| `rounded-md`  | 18px   | **Kartu, sidebar, header, dropdown**             |
+| `rounded-2xl` | 30px   | **Tombol** (`.btn`), kapsul                      |
+| `rounded-3xl` | 50rem  | Badge/pil status, badge menu                     |
+| `rounded-full`| 50%    | Avatar, ikon bulat, tombol ikon                  |
 
-### 2.5 Tipografi
+### 2.4 Bayangan
 
-Font: **Inter** (`--font-sans`), fallback `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`. Mono: Geist Mono (kode, ID). Line-height dasar 1.5. `tabular-nums` untuk semua angka di tabel/KPI.
+| Kelas       | Nilai                              | Dipakai untuk                          |
+| ----------- | ---------------------------------- | -------------------------------------- |
+| `shadow-md` | `0 2px 6px rgba(37,83,185,.10)`    | Kartu, header, sidebar (`shadow-card`) |
+| `shadow-sm` | `0 .5rem 1rem rgba(0,0,0,.15)`     | Dropdown/popover                       |
+| `shadow-xl` | `inset 0 1px 2px rgba(90,106,133,.075)` | Input disabled                     |
 
-Skala (mockup, setelah blok "typography scale"):
+### 2.5 Spasi & kontainer
 
-| Peran                      | Ukuran | Weight | Letter-spacing | Kelas                              |
-| -------------------------- | ------ | ------ | -------------- | ---------------------------------- |
-| Hero heading (welcome)     | 28px (25 <900px, 23 <600px) | 750 | -0.6px | `text-hero`           |
-| KPI besar (kartu metrik)   | 27px (24 <900px, 22 <600px) | 700 | -0.5px | `text-kpi`            |
-| KPI hero-stat              | 24px (22 <900px)            | 700 | 0      | `text-kpi-sm`         |
-| Judul halaman (topbar)     | 21px (19 <600px)            | 750 | -0.5px | `text-page-title`     |
-| Judul panel (`h3`)         | 17px (16 <600px)            | 650 | -0.2px | `text-panel-title`    |
-| Judul kartu pending        | 15px                        | 650 | 0      | `text-md font-semibold`|
-| Body / menu / tabel        | 14px                        | 400–500 | 0 | `text-sm` (default body)   |
-| Body kecil / label         | 13px                        | 400–600 | 0 | `text-label`|
-| Meta / caption / subjudul  | 12px                        | 400    | 0              | `text-xs`                          |
-| Micro (footer metrik, tertiary) | 11px — **minimum mutlak** | 400–600 | 0 | `text-micro`           |
+`card-body` = `p-6` (24px). Jarak antar blok `gap-6`; grid kartu `grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6`. Kontainer `max-w-7xl`, tengah. Header: `py-4 px-6`. Halaman: `p-5` di sekeliling, konten `xl:px-6`.
 
-Tidak ada teks di bawah 11px (mockup awal memakai 9–10px; versi final menaikkannya — jangan kembali).
+### 2.6 Dark mode
 
-### 2.6 Spasi, radius, bayangan
+Template hanya light. Dark mode **diturunkan dari palet proyek** tanpa hue baru: latar hijau-hitam `#0f1a14`, kartu `#16251c`, sidebar `#0c1f16`, primary hijau terang `#5fb383`, aksen `#ff6a47`; tint = warna solid pada opasitas 15% di atas kartu (nilai lengkap di §2.1).
 
-- Spasi basis 4px. Padding kartu 17px (14px di ≤600px) lewat token `p-card`; jarak antar kartu 14–16px (`gap-3.5`/`gap-4`); padding halaman 24px (`lg:p-6`), menyusut ke 16px dan 12px di layar lebih kecil.
-- Radius: kontrol/menu 9px (`rounded-md`), tile/tab/seller 10–12px (`rounded-lg`), kartu 15px (`rounded-xl`), hero 18px (`rounded-2xl`), pil/badge `rounded-full`.
-- Bayangan kartu `shadow-card` = `0 2px 8px rgba(18,39,66,.06), 0 1px 2px rgba(18,39,66,.05)`. Hero: `shadow-hero` = `0 12px 24px rgba(18,79,128,.125)`. Tidak ada bayangan lain; popover memakai `shadow-md` bawaan.
-- Transisi: 150ms (hover `translateY(-2px)` hanya untuk tile aksi cepat), bar/progress 350ms ease. Hormati `prefers-reduced-motion`.
-
-## 3. Layout & Responsif
+## 3. Layout Shell
 
 ```
-┌─────────┬──────────────────────────────────────────────┐
-│ Sidebar │ Topbar (64px, sticky, blur putih 85%)        │
-│ 220px   ├──────────────────────────────────────────────┤
-│ biru    │ Konten: padding 24px                          │
-│ fixed   │  Hero → Metrik (4 kol) → Konten (1.65fr/.8fr)  │
-│         │  → Lower (2 kol) → Pending (3 kol)            │
-└─────────┴──────────────────────────────────────────────┘
+ bg-background (krem), padding 20px
+ ┌────────────┐  ┌───────────────────────────────────────┐
+ │ Sidebar    │  │ Header (panel krem terang, rounded-md)  │
+ │ 270px      │  └───────────────────────────────────────┘
+ │ panel hijau│  ┌───────────────────────────────────────┐
+ │ rounded-md │  │ Konten: kartu-kartu (gap-6)            │
+ │ shadow-md  │  │                                       │
+ │ melayang   │  └───────────────────────────────────────┘
+ └────────────┘
 ```
 
-| Breakpoint | Perilaku (dari mockup)                                                                      |
-| ---------- | ------------------------------------------------------------------------------------------- |
-| >1050px    | Sidebar 220px (label + ikon). Metrik 4 kolom. Konten 2 kolom 1.65fr/.8fr.                   |
-| ≤1050px    | Sidebar 190px, padding halaman 17px, grid konten 1.4fr/.8fr.                                |
-| ≤780px     | Metrik & hero-stat 2 kolom; konten, lower, pending → 1 kolom; sidebar menyempit jadi ikon 65px di mockup. |
-| ≤480px     | Search disembunyikan, topbar 58px, hero-stat/metrik padding lebih rapat, summary 2 kolom.   |
+- **Sidebar**: lebar 270px, **panel hijau tua mengambang** (`bg-sidebar shadow-card rounded-md`, `xl:` fixed di kiri dengan jarak 20px dari tepi), bukan penuh-tinggi. Di bawah `xl` (<1280px) menjadi *drawer* geser dari kiri (overlay backdrop `rgba(0,0,0,.5)`) dibuka tombol menu di header. Konten digeser `margin-left: 270px` di `xl`.
+- **Header**: panel `bg-card rounded-md shadow-card py-4 px-6`, kiri: tombol menu (hanya <xl) + ikon notifikasi; kanan: aksi utama (tombol kapsul) + avatar profil (dropdown).
+- **Top strip** gelap di atas (opsional; dipakai template untuk promosi) — **tidak dipakai** di aplikasi.
+- **Konten**: `container max-w-7xl`, `flex flex-col gap-6`. Satu judul halaman per halaman.
 
-**Penyesuaian aplikasi (sengaja, terdokumentasi):** pada ≤768px sidebar menjadi _drawer_ (bukan strip ikon 65px) karena aplikasi punya 13 menu dan menu harus dapat dibaca; strip ikon tetap dipakai sebagai mode _collapsed_ di desktop. Lebar sidebar 220px.
+### Sidebar item (struktur template, warna palet)
 
-Tidak boleh ada scroll horizontal di lebar 375px (diuji di `e2e/responsive.spec.ts`).
+- Grup: label `text-xs font-semibold` uppercase `sidebar-muted` (HOME, UI COMPONENTS, APPS…), `mt-6 mb-4`.
+- Item: `gap-3 py-2.5 my-1 text-base flex items-center rounded-md text-sidebar-foreground`, ikon `text-2xl ps-2`.
+- **Hover & aktif**: latar `sidebar-accent` yang menyapu dari kiri sebagai pil sudut-kanan membulat (`0 24px 24px 0`, transisi 0.4s), teks `sidebar-accent-foreground`.
+- Badge menu (mis. "Pro"): `bg-sidebar-primary text-white rounded-3xl px-2 text-xs py-0.5`.
+- Submenu: accordion dengan chevron; judul aktif `text-sidebar-primary`.
 
-## 4. Anatomi Shell
+## 4. Responsif
 
-- **Sidebar**: brand (nama 17px/700 + caption 12px `#c8e2f5`, pemisah bawah), grup menu `gap-1.5`, item `h-10` `px-3` `rounded-md` `text-sm`, ikon 17px. Aktif/hover → `sidebar-accent` + teks putih. Footer: avatar bulat 34px `#e7f1fb` teks `primary` weight 800 + nama (13px) + email (11px `#c5dced`), pemisah atas.
-- **Topbar**: tinggi 64px, `bg-card/85` + `backdrop-blur`, border bawah. Kiri: `h1` judul halaman (21px) + subjudul 12px muted (dari `nav.ts`). Kanan: pencarian (220px, `muted`, radius 9px, ikon search) → notifikasi → avatar-dot 27px `#1765e9` → chevron.
-- **Konten**: `bg-background`, `p-6` (menyusut sesuai breakpoint). Satu `h1` per halaman (di topbar); judul dalam konten adalah `h2`/`h3`.
+| Breakpoint | Perilaku template                                                          |
+| ---------- | -------------------------------------------------------------------------- |
+| ≥1280px (`xl`) | Sidebar 270px tetap; grid kartu 4 kolom                               |
+| 1024–1279px (`lg`) | Sidebar jadi drawer; grid 2 kolom; grid 3 kolom untuk kartu lebar  |
+| <1024px    | 1 kolom; `px-0` konten                                                      |
 
-## 5. Pola Komponen
+Tidak boleh ada scroll horizontal di 375px (`e2e/responsive.spec.ts`). Tabel lebar dibungkus `overflow-x-auto`.
 
-Semua ada di `src/components/shared/` kecuali dinyatakan lain.
+## 5. Komponen Template → Padanan Aplikasi
 
-| Pola              | Komponen              | Aturan inti                                                                                              |
-| ----------------- | --------------------- | -------------------------------------------------------------------------------------------------------- |
-| Kartu / Panel     | `ui/card` (`Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`) | `rounded-xl border bg-card shadow-card`. Header: judul 17px + deskripsi 12px muted + aksi di kanan. |
-| Hero banner       | `HeroBanner`, `HeroStat` | Gradien `hero`, radius 18, dua lingkaran dekoratif, teks putih; stat = kaca (`white/10`, border `white/17`). Maks 1 per halaman, hanya di dashboard/landing modul. |
-| Kartu metrik (KPI)| `StatCard`            | Ikon tile 36px (tone soft) + `TrendBadge` kanan atas; angka 27px; label 13px; sub 12px; progress 5px; footer "vs bulan lalu". |
-| Badge tren        | `TrendBadge`          | Pil, 12px/650, tone green (naik) / red (turun) + panah. Tidak pernah hanya warna.                         |
-| Progress          | `ProgressBar`         | Track `muted` 5px, isi tone solid, radius penuh.                                                         |
-| Ikon tile         | `IconTile`            | Kotak rounded 10px, latar tone soft, ikon tone ink. Ukuran 27 / 36.                                       |
-| Tab segmen        | `ui/tabs` → `<TabsList variant="segment">` | Tombol 12px, border `input`, radius 8; aktif = `primary` + teks putih + bayangan biru tipis.     |
-| Aksi cepat        | `QuickAction`         | Tile gradien 88px, radius 12, ikon 19px, judul 13px/700, sub 11px (opasitas .82), lingkaran dekoratif, hover naik 2px. |
-| Kartu pending     | `PendingCard`         | Latar tone soft + border tone border, ikon tile solid, pil jumlah solid, judul 15px, deskripsi 13px, tombol penuh tone solid. |
-| Daftar aktivitas  | pola `ActivityItem` (dibuat di fitur) | Ikon tile 27px tone bergilir, teks 12px (nama tebal), nominal hijau 12px/700, waktu 11px muted, pemisah `border`. Indikator "Live": titik hijau 6px + 11px/700. |
-| Peringkat         | pola `RankRow`        | Baris `#fafbfd` radius 11, badge medali 39px gradien + angka rank di pin putih 16px, nama 13px/600, meta 11px, nominal 13px/700 kanan. |
-| Tombol            | `ui/button`           | Radius 9. `default` = primary biru solid; `outline` = border `input` putih; `ghost`; `destructive`. Di atas hero: `HeroButton` (outline putih: `white/8` + border `white/28`). Tinggi: `default` 36px, `lg` 40px (aksi utama di form/halaman), `sm` 32px (aksi di baris tabel/hero). |
-| Input             | `ui/input`, `ui/input-group` | Tinggi 36px, latar `card`, border `input`, radius 9, teks 14px, fokus ring `primary`/50.            |
-| Pencarian topbar  | `CommandPalette`      | Latar `muted`, border `border`, lebar 220px, radius 9, teks 13px, hint `Ctrl K`; hanya ikon di mobile.   |
-| Tabel (data padat)| `ui/table`            | Header 12px/600 `muted-foreground` (tanpa uppercase); baris 14px, tinggi 44px, pemisah `border`, hover `accent`. Angka rata kanan `tabular-nums`. Dibungkus `Card` tanpa padding. |
-| Empty state       | `EmptyState`          | Border putus-putus, ikon dalam lingkaran `muted`, judul 14px/600, deskripsi 13px muted.                  |
-| Toast             | `sonner`              | `richColors`; sukses green, error red.                                                                  |
+> Kolom "struktur" meniru kelas template (radius, padding, ukuran, layout). **Kelas warna template** (`blue-600`, `teal-500`, `gray-400`, …) dibaca lewat peta §2.1 — di kode selalu pakai token (`bg-primary`, `text-muted-foreground`, `bg-tone-green-soft`, …).
 
-Densitas data tinggi (PRD §10.2): untuk tabel/daftar panjang pakai baris 44px dan teks 14px — jangan menambah padding mockup.
+Gunakan tabel ini sebagai **daftar pertama** sebelum membuat komponen. Semua tampilan mengikuti kelas template; primitif Radix/shadcn hanya untuk perilaku.
+
+| Komponen template (`package/src`)           | Struktur / kelas inti                                                                 | Padanan di aplikasi                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Card** (`components/cards.html`, `.card`) | `rounded-md shadow-md bg-white`; isi `.card-body` = `p-6`; judul `text-lg font-semibold text-gray-500` | `ui/card` (restyle: radius 18, shadow-card, padding 24) |
+| **Buttons** (`components/buttons.html`)     | `.btn`: `rounded-2xl bg-blue-600 text-white text-sm py-3 px-7`; varian solid (primary/secondary/success/warning/danger/info/dark/light), **outline** (border + teks warna, hover isi penuh), **link** (teks biru), ukuran `py-2 px-7 text-base font-medium` | `ui/button` (restyle: radius 30, padding, varian sesuai) |
+| **Forms** (`components/forms.html`)         | Input/select/textarea: `py-3 px-4 block w-full border-gray-200 rounded-sm text-sm focus:border-blue-600 focus:ring-0`; disabled `bg-gray-200 opacity-60 shadow-xl`; label `text-sm text-gray-400 mb-2`; helper `text-sm text-gray-400 opacity-75 mt-2`; checkbox/radio `rounded-[4px] border-gray-400 text-blue-600` | `ui/input`, `ui/textarea`, `ui/select`, `ui/checkbox`, `ui/label`, `shared/form-field`, `shared/select-field` |
+| **Alerts** (`components/alerts.html`)       | `border text-sm rounded-sm p-4` + tint: primary `bg-blue-500 text-blue-600`, success `bg-teal-400 text-teal-500`, warning `bg-yellow-400 text-yellow-500`, danger `bg-red-400 text-red-500`, info `bg-blue-200 text-blue-300`, light/dark | `ui/alert` bila belum ada → buat dari template; toast `sonner` bertone sama |
+| **Badge / pil status** (`pages/index.html`) | `inline-flex items-center py-2 px-4 rounded-3xl font-semibold` + `bg-{tint} text-{solid}` (blue/teal/yellow/red). Varian kecil: `px-2 text-xs py-0.5` | `shared/tone-badge` (restyle), `ui/badge` |
+| **Tabel** (`pages/index.html` §Table)       | `text-left w-full whitespace-nowrap text-sm text-gray-500`; `th`: `p-4 font-semibold`; `td`: `p-4`; dibungkus `.card` + `overflow-x-auto` | `ui/table`, `shared/data-table` (restyle) |
+| **Typography** (`components/typography.html`)| Heading `text-2xl/3xl/4xl`, teks `text-base`, link `text-blue-600 underline hover:text-blue-700`, muted `text-gray-400` | kelas utilitas langsung |
+| **Header** (`partials/header.html`)         | Panel putih `rounded-md shadow-md py-4 px-6`, tombol menu mobile, notifikasi, aksi + profil | `layout/app-topbar` |
+| **Dropdown notifikasi** (`header-components/dd-notification.html`) | Ikon lonceng + dot, menu `card hs-dropdown-menu` | `notifications/notification-bell` + `ui/dropdown-menu` |
+| **Dropdown profil** (`header-components/dd-profile.html`) | Avatar bulat + menu `card`, item `px-4 py-2.5 hover:bg-gray-200 text-gray-400` | `layout/user-menu` + `ui/dropdown-menu` |
+| **Sidebar** (`partials/sidebar.html`, `logo-sidebar.html`) | Lihat §3. Logo di atas (`p-4`), nav `px-4`, scroll sidebar | `layout/app-sidebar` + `ui/sidebar` (restyle penuh) |
+| **Auth** (`pages/authentication-login.html`, `-register.html`) | Kartu form di tengah, latar `radial-gradient` lembut | `(auth)/layout`, `shared/auth-card` |
+| **Stat/ikon bulat** (`pages/index.html`)    | Lingkaran `w-5 h-5 rounded-full bg-{tint}` + ikon; angka `text-[22px] font-semibold`; delta `font-medium text-teal-500` | `shared/stat-card`, `shared/icon-tile`, `shared/trend-badge` (restyle) |
+| **Grafik** (`assets/js/dashboard.js`)       | ApexCharts | grafik aplikasi (Recharts) memakai `chart-1…5` (hijau tua → hijau → kuning → teal → merah-oranye) |
+| **Icons** (`pages/icons.html`)              | Tabler Icons                                                                           | `lucide-react` (padanan terdekat)                      |
+
+### Pola yang TIDAK ada di template (boleh dibuat, ikuti gaya template)
+
+Hanya bila tidak ada padanan di tabel di atas. Gunakan token & radius template; daftarkan di sini saat dibuat.
+
+| Pola | Komponen | Catatan gaya |
+| ---- | -------- | ------------ |
+| Tab segmen / sub-nav Settings | `ui/tabs`, `layout/settings-nav` | aktif = tint primary + teks primary, radius `md`/`full`, tanpa border tebal |
+| Empty state | `shared/empty-state` | border putus-putus `border`, ikon dalam lingkaran `muted`, teks `gray-400` |
+| Skeleton, Dialog, Sheet, Command palette, Tooltip | `ui/*` | latar `card`, radius `md`, shadow `sm` (popover) |
+| Progress bar | `shared/progress-bar` | track `muted`, isi warna tone, `rounded-full` |
+| Detail field, Page actions, Entity sheet, Rich text editor | `shared/*` | label `text-sm text-gray-400`, nilai `text-sm text-gray-500` |
+
+Komponen mockup lama yang **dihentikan** (tidak ada di template; jangan dipakai di halaman baru, hapus saat menyentuh file terkait): `HeroBanner`/`HeroStat`, `QuickAction`, `PendingCard` bergradien, medali/peringkat bergradien, token `tone-*`/`gradient-*` lama. Gantikan dengan `Card` + `Badge`/`Alert` bertone template.
 
 ## 6. Interaksi & Aksesibilitas
 
-- Fokus terlihat: ring 3px `primary/50` pada semua kontrol; jangan `outline-none` tanpa pengganti.
-- Target sentuh ≥ 36px (≥ 44px pada ≤480px untuk tombol utama).
-- Kontras: teks 14px+ ≥ 4.5:1. Catatan: `muted-foreground #7d8796` di atas putih ≈ 3.7:1 — **hanya** untuk teks sekunder ≥12px non-esensial; informasi penting memakai `foreground` atau tone `ink`.
-- Status tidak boleh hanya warna: sertakan ikon atau teks (panah tren, label status).
-- Hormati `prefers-reduced-motion` dan `prefers-color-scheme` (via `next-themes`).
-- Semua ikon-saja punya `aria-label`.
+- Fokus terlihat: template memakai `focus:border-blue-600 focus:ring-0` pada input; **tambahkan** ring/outline tipis `primary/40` agar tetap terlihat oleh keyboard (aksesibilitas menang atas template).
+- Target sentuh ≥ 40px (tombol template `py-2/py-3` sudah ≥ 36–44px).
+- Kontras: `muted-foreground #666b63` di atas krem ≈ 4.7:1 (cukup untuk ≥14px). Kuning `#e0a030` dan merah-oranye `#ff4b26` **bukan** warna teks di atas krem — pakai pada tint/ikon/tombol dan tulis teksnya dengan `foreground` atau `tone-*-ink`. Teks putih di atas `#ff4b26` ≈ 3.3:1: hanya untuk tombol/label ≥14px tebal.
+- Status tidak boleh hanya warna: sertakan ikon atau teks.
+- Hormati `prefers-reduced-motion`; transisi menu 0.4s ease-in-out hanya untuk efek sapuan sidebar.
+- Semua tombol ikon-saja punya `aria-label`.
 
 ## 7. Bahasa & Konten
 
-UI berbahasa Indonesia. Format uang `Rp 84 jt` / `Rp 2,4 M` pada KPI ringkas dan `Rp 4.500.000` pada tabel (`Intl.NumberFormat("id-ID")`). Tanggal `Rabu, 1 April 2026` (hero) dan `1 Apr 2026` (tabel) lewat `date-fns/locale/id`. Mockup memakai PKR/Inggris hanya sebagai data contoh.
+UI berbahasa Indonesia. Uang `Rp 84 jt` / `Rp 2,4 M` pada KPI ringkas dan `Rp 4.500.000` pada tabel (`Intl.NumberFormat("id-ID")`). Tanggal `1 Apr 2026` lewat `date-fns/locale/id`.
 
-## 8. Pemetaan Mockup → Aplikasi CRM
+## 8. Status Migrasi
 
-| Mockup                          | Padanan di CRM                                              |
-| ------------------------------- | ----------------------------------------------------------- |
-| Welcome hero + 4 hero-stat      | Sapaan + Lead hari ini, Deal baru, Revenue hari ini, Conversion |
-| 4 kartu metrik                  | Total Lead, Deal aktif, Deal Won (bulan ini), Revenue      |
-| Revenue Analytics (bar bulanan) | Revenue per bulan / kuartal (Reports)                       |
-| Live Activity                   | Aktivitas terbaru (lead masuk, deal pindah stage, quotation) |
-| Quick Actions                   | Tambah Lead, Buat Deal, Buat Quotation, Jadwalkan Aktivitas |
-| Top Sellers                     | Top Sales (peringkat per revenue)                           |
-| Pending Actions                 | Follow-up overdue, Quotation menunggu, Complaint terbuka    |
+Seluruh frontend sudah memakai template untuk struktur dan palet proyek (§2.0) untuk warna: token & font (`globals.css`, Plus Jakarta Sans), radius/shadow, shell (sidebar hijau tua melayang + header panel krem), dan komponen `ui/*` serta `shared/*`. Nama token `tone-blue/green/orange/purple/red` **dipertahankan** tetapi nilainya dipetakan ke palet (blue=primary hijau tua, green=sukses, orange=peringatan, purple=info teal, red=bahaya merah-oranye) — lihat §2.1. Teks error memakai `text-tone-red-ink`.
+
+Dihapus: `HeroBanner`, `QuickAction`, `PendingCard` (tidak ada di template, tidak dipakai halaman mana pun).
+
+Tab segmen & sub-nav Settings: pil tint (`bg-secondary text-primary`), pola tanpa padanan template (§5).
+
+Sisa: tinjauan visual per halaman di browser (tabel padat, form panjang, kalender, quotation builder).
 
 ## 9. Checklist Review UI
 
+- [ ] Sudah mencari padanan di template (`spike-tailwind`) sebelum membuat komponen baru? Alasan bila baru tercatat di §5?
 - [ ] Hanya token (tidak ada hex/px warna/shadow baru)?
-- [ ] Tone dipakai sesuai makna §2.3?
-- [ ] Ukuran teks sesuai skala §2.5, tidak ada < 11px?
+- [ ] Radius sesuai §2.3 (kartu `md` 18, tombol `2xl` 30, input `sm` 7, badge `3xl`)?
+- [ ] Warna sesuai makna §2.1; status tidak hanya warna?
 - [ ] Tampil benar di 375 / 768 / 1440 tanpa scroll horizontal?
-- [ ] Fokus keyboard terlihat, ikon-saja berlabel, status tidak hanya warna?
+- [ ] Fokus keyboard terlihat, tombol ikon berlabel?
 - [ ] Light dan dark sama-sama terbaca?
-- [ ] Pola baru sudah didokumentasikan di §5?
+
+> **Ukuran tombol (seragam):** semua tombol teks `h-10 px-6 text-sm`, semua tombol ikon `size-10` bulat. Prop `size` (`sm`/`lg`/`xs`) hanya alias dan tidak mengubah ukuran; jangan menambah `className` tinggi/padding pada Button.

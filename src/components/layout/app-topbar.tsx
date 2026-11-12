@@ -14,17 +14,17 @@ function currentItem(pathname: string) {
   )[0];
 }
 
-/** Topbar mockup: 64px, sticky, blur; judul halaman (satu-satunya h1) + subjudul di kiri. */
+/** Header template Spike: panel putih rounded-md shadow-card; judul halaman (satu-satunya h1) + subjudul di kiri. */
 export function AppTopbar({ bell }: { bell?: React.ReactNode }) {
   const item = currentItem(usePathname());
   return (
-    <header className="bg-card/85 border-border sticky top-0 z-20 flex h-[58px] shrink-0 items-center gap-3 border-b px-4 backdrop-blur-md sm:h-16 md:px-6">
+    <header className="bg-card shadow-card sticky top-3 z-20 flex shrink-0 items-center gap-3 rounded-md px-4 py-3 sm:px-6 sm:py-4">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="h-4" />
       <div className="min-w-0">
-        <h1 className="text-page-title truncate font-bold">{item?.title ?? "CRM"}</h1>
+        <h1 className="truncate text-xl font-semibold">{item?.title ?? "CRM"}</h1>
         {item && (
-          <p className="text-muted-foreground hidden truncate text-xs sm:block">
+          <p className="text-muted-foreground hidden truncate text-sm sm:block">
             {item.description}
           </p>
         )}

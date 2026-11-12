@@ -8,6 +8,7 @@ import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Textarea } from "@/components/ui/textarea";
 import { CURRENCY_CODES } from "@/lib/money";
 import { URGENCIES, URGENCY_LABEL } from "@/modules/leads/constants";
@@ -105,7 +106,18 @@ export function LeadForm({
       </FormField>
       <div className="grid grid-cols-[1fr_6rem] gap-3">
         <FormField id="budget" label="Budget" error={errors.budget?.message}>
-          <Input id="budget" inputMode="decimal" {...register("budget")} />
+          <Controller
+            control={control}
+            name="budget"
+            render={({ field }) => (
+              <NumberInput
+                id="budget"
+                decimals={2}
+                value={String(field.value ?? "")}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
         </FormField>
         <FormField id="currency" label="Mata uang">
           <Controller

@@ -3,7 +3,7 @@ import { Forbidden } from "@/components/shared/forbidden";
 import { requireTenant } from "@/lib/context";
 import { ConnectorHub } from "@/modules/connectors/components/connector-hub";
 import { listConnectors } from "@/modules/connectors/server/queries";
-import { EmailConnectorCard } from "@/modules/connectors/components/email-connector-card";
+import { EmailConnectorList } from "@/modules/connectors/components/email-connector-list";
 import { WebhookCard } from "@/modules/webhooks/components/webhook-card";
 import { getWebhookView } from "@/modules/webhooks/server/queries";
 
@@ -20,7 +20,7 @@ export default async function Page() {
       canManage={canManage}
       extra={{
         webhook: <WebhookCard webhook={webhook} canManage={canManage} />,
-        email: <EmailConnectorCard connectors={connectors} canManage={canManage} />,
+        email: <EmailConnectorList connectors={connectors} canManage={canManage} />,
       }}
     />
   );

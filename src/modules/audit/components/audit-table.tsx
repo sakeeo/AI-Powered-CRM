@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { PageSizeSelect } from "@/components/shared/data-table";
+import { DEFAULT_PAGE_SIZE } from "@/lib/list-params";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -29,17 +31,20 @@ function Diff({ before, after }: { before: unknown; after: unknown }) {
 export function AuditTable({
   data,
   page,
+  pageSize,
   entityType,
   timeZone,
 }: {
   data: Data;
   page: number;
+  pageSize: number;
   entityType?: string;
   timeZone: string;
 }) {
   const qs = (p: number, t = entityType) => {
     const params = new URLSearchParams();
     if (t) params.set("type", t);
+    if (pageSize !== DEFAULT_PAGE_SIZE) params.set("pageSize", String(pageSize));
     if (p > 1) params.set("page", String(p));
     const s = params.toString();
     return `/settings/audit-log${s ? `?${s}` : ""}`;
@@ -51,18 +56,23 @@ export function AuditTable({
         <CardDescription>
           Jejak perubahan penting: siapa, apa, kapan, dan nilai sebelum/sesudah. Hanya dapat dibaca.
         </CardDescription>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {[undefined, ...data.entityTypes].map((t) => (
-            <Link
-              key={t ?? "all"}
-              href={qs(1, t)}
-              className={`border-input h-7 rounded-[8px] border px-2.5 text-xs leading-[26px] ${
-                t === entityType ? "border-primary bg-primary text-primary-foreground" : "bg-card"
-              }`}
-            >
-              {t ?? "Semua"}
-            </Link>
-          ))}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1.5">
+            {[undefined, ...data.entityTypes].map((t) => (
+              <Link
+                key={t ?? "all"}
+                href={qs(1, t)}
+                className={`border-input h-7 rounded-[8px] border px-2.5 text-xs leading-[26px] ${
+                  t === entityType ? "border-primary bg-primary text-primary-foreground" : "bg-card"
+                }`}
+              >
+                {t ?? "Semua"}
+              </Link>
+            ))}
+          </div>
+          <div className="text-xs">
+            <PageSizeSelect pageSize={pageSize} />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="overflow-x-auto">

@@ -8,6 +8,7 @@ import { SelectField } from "@/components/shared/select-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CURRENCY_CODES } from "@/lib/money";
@@ -82,11 +83,18 @@ export function ProductForm({
       </div>
       <div className="grid grid-cols-[1fr_6rem] gap-3">
         <FormField id="price" label="Harga" error={errors.price?.message}>
-          <Input
-            id="price"
-            inputMode="decimal"
-            aria-invalid={!!errors.price}
-            {...register("price")}
+          <Controller
+            control={control}
+            name="price"
+            render={({ field }) => (
+              <NumberInput
+                id="price"
+                decimals={2}
+                value={String(field.value ?? "")}
+                onValueChange={field.onChange}
+                aria-invalid={!!errors.price}
+              />
+            )}
           />
         </FormField>
         <FormField id="currency" label="Mata uang">

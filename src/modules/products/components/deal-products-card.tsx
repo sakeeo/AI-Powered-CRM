@@ -8,7 +8,8 @@ import { SelectField } from "@/components/shared/select-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { formatMoney } from "@/lib/money";
+import { NumberInput } from "@/components/ui/number-input";
+import { formatMoney, formatNumber } from "@/lib/money";
 import { addDealProduct, removeDealProduct } from "@/modules/products/server/actions";
 
 export type DealItem = {
@@ -58,15 +59,14 @@ export function DealProductsCard({
                 <li key={i.id} className="flex items-center justify-between gap-3 py-2">
                   <span className="min-w-0 flex-1 truncate">{i.name}</span>
                   <span className="text-muted-foreground tabular-nums">
-                    {i.quantity} × {formatMoney(i.unitPrice, i.currency)}
+                    {formatNumber(i.quantity)} × {formatMoney(i.unitPrice, i.currency)}
                   </span>
                   <span className="w-32 text-right font-medium tabular-nums">
                     {formatMoney(i.quantity * Number(i.unitPrice), i.currency)}
                   </span>
                   {canEdit && (
                     <Button
-                      size="icon"
-                      variant="ghost"
+                      variant="destructive"
                       aria-label={`Hapus ${i.name}`}
                       disabled={pending}
                       onClick={() =>
@@ -77,7 +77,7 @@ export function DealProductsCard({
                         })
                       }
                     >
-                      <Trash2 className="size-4" />
+                      <Trash2 /> Hapus
                     </Button>
                   )}
                 </li>
@@ -106,18 +106,12 @@ export function DealProductsCard({
                 label: `${p.name} — ${formatMoney(p.price, p.currency)}`,
               }))}
             />
-            <Input
-              aria-label="Jumlah"
-              inputMode="numeric"
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-            />
-            <Input
+            <NumberInput aria-label="Jumlah" decimals={0} value={qty} onValueChange={setQty} />
+            <NumberInput
               aria-label="Harga satuan"
-              inputMode="decimal"
-              placeholder={selected ? selected.price : "Harga katalog"}
+              placeholder={selected ? formatNumber(selected.price) : "Harga katalog"}
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onValueChange={setPrice}
             />
             <Button
               disabled={pending || !productId}

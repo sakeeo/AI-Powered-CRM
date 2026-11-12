@@ -33,7 +33,7 @@ export function CalendarView({ events }: { events: CalendarEvent[] }) {
 
   return (
     <div
-      className="bg-card rounded-xl border p-3 [&_.fc]:text-sm [&_.fc-button]:!text-xs"
+      className="bg-card rounded-md border p-3 [&_.fc]:text-sm [&_.fc-button]:!text-xs"
       data-testid="calendar"
     >
       <FullCalendar

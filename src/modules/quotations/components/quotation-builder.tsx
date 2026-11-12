@@ -10,8 +10,9 @@ import { ToneBadge } from "@/components/shared/tone-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Textarea } from "@/components/ui/textarea";
-import { CURRENCY_CODES, formatMoney } from "@/lib/money";
+import { CURRENCY_CODES, formatMoney, formatNumber } from "@/lib/money";
 import {
   calculateQuotation,
   QUOTATION_DISCLAIMER,
@@ -182,7 +183,7 @@ export function QuotationBuilder({
               ) : (
                 "Tanpa deal"
               )}
-              {" · "}Pajak {q.taxLabel} {Number(q.taxRate)}%{" "}
+              {" · "}Pajak {q.taxLabel} {formatNumber(q.taxRate)}%{" "}
               {q.taxInclusive ? "(termasuk)" : "(eksklusif)"}
             </p>
           </div>
@@ -224,7 +225,7 @@ export function QuotationBuilder({
                   })
                 }
               >
-                Hapus
+                <Trash2 /> Hapus
               </Button>
             )}
           </div>
@@ -277,12 +278,11 @@ export function QuotationBuilder({
             />
           </FormField>
           <FormField id="qb-gdisc" label="Diskon global (%)" error={errors.globalDiscountPercent}>
-            <Input
+            <NumberInput
               id="qb-gdisc"
-              inputMode="decimal"
               value={globalDiscount}
               disabled={!editable}
-              onChange={(e) => setGlobalDiscount(e.target.value)}
+              onValueChange={setGlobalDiscount}
             />
           </FormField>
         </CardContent>
@@ -307,41 +307,37 @@ export function QuotationBuilder({
                     onChange={(e) => set(l.key, { name: e.target.value })}
                   />
                   {errors[`items.${i}.name`] && (
-                    <p role="alert" className="text-destructive text-xs">
+                    <p role="alert" className="text-tone-red-ink text-xs">
                       {errors[`items.${i}.name`]}
                     </p>
                   )}
                 </div>
-                <Input
+                <NumberInput
                   aria-label={`Jumlah ${i + 1}`}
-                  inputMode="decimal"
                   value={l.quantity}
                   disabled={!editable}
-                  onChange={(e) => set(l.key, { quantity: e.target.value })}
+                  onValueChange={(v) => set(l.key, { quantity: v })}
                 />
-                <Input
+                <NumberInput
                   aria-label={`Harga satuan ${i + 1}`}
-                  inputMode="decimal"
                   value={l.unitPrice}
                   disabled={!editable}
-                  onChange={(e) => set(l.key, { unitPrice: e.target.value })}
+                  onValueChange={(v) => set(l.key, { unitPrice: v })}
                 />
-                <Input
+                <NumberInput
                   aria-label={`Diskon % ${i + 1}`}
-                  inputMode="decimal"
                   value={l.discountPercent}
                   disabled={!editable}
-                  onChange={(e) => set(l.key, { discountPercent: e.target.value })}
+                  onValueChange={(v) => set(l.key, { discountPercent: v })}
                 />
                 {editable && (
                   <Button
                     type="button"
-                    size="icon"
-                    variant="ghost"
+                    variant="destructive"
                     aria-label={`Hapus item ${i + 1}`}
                     onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))}
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 /> Hapus
                   </Button>
                 )}
                 <p className="text-muted-foreground text-xs tabular-nums sm:col-span-5">
@@ -380,7 +376,7 @@ export function QuotationBuilder({
             </div>
           )}
           {errors.items && (
-            <p role="alert" className="text-destructive text-xs">
+            <p role="alert" className="text-tone-red-ink text-xs">
               {errors.items}
             </p>
           )}
@@ -398,7 +394,7 @@ export function QuotationBuilder({
             </div>
             <div className="flex justify-between">
               <dt>
-                {q.taxLabel} {Number(q.taxRate)}%{q.taxInclusive ? " (termasuk)" : ""}
+                {q.taxLabel} {formatNumber(q.taxRate)}%{q.taxInclusive ? " (termasuk)" : ""}
               </dt>
               <dd>{calc ? formatMoney(calc.taxTotal, currency) : "—"}</dd>
             </div>

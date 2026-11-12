@@ -164,13 +164,12 @@ export function ActivityItem({
           )}
           {can("delete", "Activity", a) && (
             <Button
-              size="icon"
-              variant="ghost"
+              variant="destructive"
               aria-label={`Hapus ${a.subject}`}
               disabled={pending}
               onClick={() => run(() => deleteActivity({ id: a.id }) as never)}
             >
-              <Trash2 className="size-4" />
+              <Trash2 /> Hapus
             </Button>
           )}
         </div>

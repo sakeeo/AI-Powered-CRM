@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { QUOTATION_DISCLAIMER } from "@/modules/quotations/calc";
@@ -63,21 +64,20 @@ export function QuotationSettingsForm({ initial, canEdit }: { initial: S; canEdi
               />
             </FormField>
             <FormField id="qs-rate" label="Tarif pajak (%)" error={errors.taxRate}>
-              <Input
+              <NumberInput
                 id="qs-rate"
-                inputMode="decimal"
                 value={s.taxRate}
                 disabled={!canEdit}
-                onChange={(e) => setS({ ...s, taxRate: e.target.value })}
+                onValueChange={(v) => setS({ ...s, taxRate: v })}
               />
             </FormField>
             <FormField id="qs-days" label="Masa berlaku default (hari)" error={errors.validityDays}>
-              <Input
+              <NumberInput
                 id="qs-days"
-                inputMode="numeric"
+                decimals={0}
                 value={s.validityDays}
                 disabled={!canEdit}
-                onChange={(e) => setS({ ...s, validityDays: e.target.value })}
+                onValueChange={(v) => setS({ ...s, validityDays: v })}
               />
             </FormField>
             <div className="flex items-end gap-2 pb-2">

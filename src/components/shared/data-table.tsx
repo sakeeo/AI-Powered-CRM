@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { cn } from "cn";
+import { PAGE_SIZE_OPTIONS } from "@/lib/list-params";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -86,6 +87,31 @@ export function UrlFilterSelect({
   );
 }
 
+/** Pilihan jumlah item per halaman (menulis `pageSize` ke URL, kembali ke halaman 1). */
+export function PageSizeSelect({ pageSize }: { pageSize: number }) {
+  const { set } = useUrlState();
+  const options = PAGE_SIZE_OPTIONS.includes(pageSize as (typeof PAGE_SIZE_OPTIONS)[number])
+    ? [...PAGE_SIZE_OPTIONS]
+    : [...PAGE_SIZE_OPTIONS, pageSize].sort((a, b) => a - b);
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-muted-foreground">Per halaman</span>
+      <Select value={String(pageSize)} onValueChange={(v) => set({ pageSize: v })}>
+        <SelectTrigger size="sm" className="w-20" aria-label="Jumlah item per halaman">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((n) => (
+            <SelectItem key={n} value={String(n)}>
+              {n}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 export type DataTableProps<T> = {
   columns: ColumnDef<T, unknown>[];
   data: T[];
@@ -155,6 +181,9 @@ export function DataTable<T>({
           />
         </div>
         {toolbar}
+        <div className="text-xs sm:ml-auto">
+          <PageSizeSelect pageSize={pageSize} />
+        </div>
       </div>
       <div className="overflow-x-auto">
         <Table>

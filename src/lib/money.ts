@@ -43,3 +43,15 @@ export function formatMoney(
     maximumFractionDigits: currency === "IDR" || currency === "JPY" ? 0 : 2,
   }).format(Number(value));
 }
+
+/** Angka biasa berformat Indonesia (1.234,5). Untuk jumlah, persentase, hitungan — bukan uang. */
+export function formatNumber(
+  value: string | number | null | undefined,
+  maximumFractionDigits = 2,
+  locale = "id-ID",
+) {
+  if (value === null || value === undefined || value === "") return "—";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  return new Intl.NumberFormat(locale, { maximumFractionDigits }).format(n);
+}

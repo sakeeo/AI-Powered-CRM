@@ -91,7 +91,7 @@ export async function getQuotation(ctx: TenantContext, id: string) {
   });
   if (!row) throw NotFoundError("Quotation");
   assertCan(ctx, "view", "Quotation", row);
-  return {
+  const detail = {
     ...ser(row),
     items: row.items.map((i) => ({
       ...i,
@@ -101,6 +101,7 @@ export async function getQuotation(ctx: TenantContext, id: string) {
       lineTotal: i.lineTotal.toFixed(2),
     })),
   };
+  return detail;
 }
 export type QuotationDetail = Awaited<ReturnType<typeof getQuotation>>;
 

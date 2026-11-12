@@ -1,13 +1,13 @@
 import * as React from "react";
 import { cn } from "cn";
 
-/** Kartu/panel mockup: putih, border tipis, radius 15, bayangan lembut (design-system §5). */
+/** Kartu template Spike: putih, radius 18, shadow-card, body p-6 (design-system §5). */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground border-border shadow-card flex flex-col rounded-xl border",
+        "bg-card text-card-foreground shadow-card relative flex flex-col rounded-md",
         className,
       )}
       {...props}
@@ -32,7 +32,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {
   return (
     <h3
       data-slot="card-title"
-      className={cn("text-panel-title font-semibold", className)}
+      className={cn("text-lg font-semibold", className)}
       {...props}
     />
   );
@@ -42,7 +42,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
       data-slot="card-description"
-      className={cn("text-muted-foreground mt-0.5 text-xs", className)}
+      className={cn("text-muted-foreground mt-0.5 text-sm", className)}
       {...props}
     />
   );

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { LogoUploader } from "@/modules/organizations/components/logo-uploader";
 import { OrganizationFields } from "@/modules/organizations/components/organization-fields";
 import {
   organizationProfileSchema,
@@ -15,9 +16,11 @@ import { updateOrganizationProfile } from "@/modules/organizations/server/action
 export function OrganizationProfileForm({
   defaults,
   canEdit,
+  logoUrl,
 }: {
   defaults: OrganizationProfileInput;
   canEdit: boolean;
+  logoUrl: string | null;
 }) {
   const form = useForm<OrganizationProfileInput>({
     resolver: zodResolver(organizationProfileSchema),
@@ -44,7 +47,8 @@ export function OrganizationProfileForm({
           {!canEdit && " Hanya Owner/Admin yang dapat mengubah."}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
+        <LogoUploader name={defaults.name} logoUrl={logoUrl} canEdit={canEdit} />
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           <OrganizationFields form={form} withDateFormat disabled={!canEdit} />
           {canEdit && (

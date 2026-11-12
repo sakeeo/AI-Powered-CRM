@@ -107,7 +107,12 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
 }
 
 /** Tandai objek sebagai instans subjek agar kondisi (ownerId, dst.) dievaluasi. */
-export const asSubject = <T extends object>(type: SubjectName, obj: T) => subject(type, obj);
+/**
+ * CASL `subject()` MENAMBAH properti tak-enumerable `__caslSubjectType__` pada objek yang diberikan.
+ * React menolak objek seperti itu sebagai props Client Component ("Only plain objects…"), sehingga
+ * kita menandai SALINAN dangkal — objek asli tetap polos dan aman dikirim ke client.
+ */
+export const asSubject = <T extends object>(type: SubjectName, obj: T) => subject(type, { ...obj });
 
 type Query = Record<string, unknown>;
 

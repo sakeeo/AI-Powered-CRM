@@ -44,7 +44,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
   const stageName = new Map(pipeline.stages.map((s) => [s.id, s.name]));
   const stages = pipeline.stages.map((s) => ({ id: s.id, name: s.name }));
   return (
-    <div className="space-y-4">
+    <div className="grid items-stretch gap-6 md:grid-cols-2 [&>*]:min-w-0">
       <Card>
         <CardHeader>
           <div>
@@ -90,7 +90,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           />
         </CardHeader>
         <CardContent>
-          <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="grid gap-4 sm:grid-cols-2">
             <DetailField label="Nilai">{formatMoney(deal.value, deal.currency)}</DetailField>
             <DetailField label="Probabilitas">{`${deal.probability ?? deal.stage.probability}%${deal.probability == null ? " (stage)" : ""}`}</DetailField>
             <DetailField label="Perkiraan closing">
@@ -152,12 +152,14 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           </p>
         </CardContent>
       </Card>
-      <DealProductsCard
-        dealId={deal.id}
-        items={dealItems}
-        products={productOptions}
-        canEdit={ctx.ability.can("update", subject) && deal.status === "open"}
-      />
+      <div className="flex flex-col [&>*]:flex-1">
+        <DealProductsCard
+          dealId={deal.id}
+          items={dealItems}
+          products={productOptions}
+          canEdit={ctx.ability.can("update", subject) && deal.status === "open"}
+        />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Quotation</CardTitle>
@@ -200,7 +202,9 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           )}
         </CardContent>
       </Card>
-      <ActivitiesPanel ctx={ctx} link={{ dealId: deal.id }} />
+      <div className="flex flex-col [&>*]:flex-1">
+        <ActivitiesPanel ctx={ctx} link={{ dealId: deal.id }} />
+      </div>
     </div>
   );
 }

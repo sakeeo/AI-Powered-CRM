@@ -21,8 +21,8 @@ export function IconTile({
       className={cn(
         "grid shrink-0 place-items-center",
         size === "md"
-          ? "size-9 rounded-lg [&_svg]:size-[17px]"
-          : "size-[27px] rounded-[9px] [&_svg]:size-3.5",
+          ? "size-10 rounded-full [&_svg]:size-[17px]"
+          : "size-7 rounded-full [&_svg]:size-3.5",
         t.soft,
         t.ink,
         className,

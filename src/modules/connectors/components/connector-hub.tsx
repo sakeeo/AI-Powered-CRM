@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AiConnectorCard } from "@/modules/connectors/components/ai-connector-card";
-import { AI_PROVIDERS, AI_PROVIDER_INFO, FUTURE_CONNECTORS } from "@/modules/connectors/registry";
+import { AiConnectorList } from "@/modules/connectors/components/ai-connector-list";
+import { FUTURE_CONNECTORS } from "@/modules/connectors/registry";
 import type { ConnectorView } from "@/modules/connectors/server/queries";
 
 function Section({
@@ -34,34 +34,23 @@ export function ConnectorHub({
   /** Kartu tambahan per kategori (webhook, email) dari plan berikutnya. */
   extra?: { webhook?: React.ReactNode; email?: React.ReactNode };
 }) {
-  const byType = new Map(connectors.map((c) => [c.type, c]));
   return (
     <div className="space-y-6">
-      <Section
-        title="AI Models (BYOK)"
-        description="Bawa API key Anda sendiri. Semua fitur AI hanya menghasilkan draf yang perlu Anda setujui."
-      >
-        {AI_PROVIDERS.map((p) => (
-          <AiConnectorCard
-            key={p}
-            provider={p}
-            connector={byType.get(AI_PROVIDER_INFO[p].type)}
-            canManage={canManage}
-          />
-        ))}
-      </Section>
+      <AiConnectorList connectors={connectors} canManage={canManage} />
       <Section
         title="Inbound Webhooks"
         description="Terima lead dari form website dan sistem lain."
       >
         {extra?.webhook ?? <SoonCard title="Webhook masuk" note="Segera tersedia" />}
       </Section>
-      <Section
-        title="Email Delivery"
-        description="Kirim email transaksional (undangan, reset password, reminder)."
-      >
-        {extra?.email ?? <SoonCard title="Email delivery" note="Segera tersedia" />}
-      </Section>
+      {extra?.email ?? (
+        <Section
+          title="Email Delivery"
+          description="Kirim email transaksional (undangan, reset password, reminder)."
+        >
+          <SoonCard title="Email delivery" note="Segera tersedia" />
+        </Section>
+      )}
       <Section title="WhatsApp" description="Percakapan pelanggan melalui WhatsApp Business.">
         {FUTURE_CONNECTORS.filter((c) => c.category === "whatsapp").map((c) => (
           <SoonCard key={c.title} title={c.title} description={c.description} note={c.note} />

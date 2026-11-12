@@ -7,6 +7,7 @@ import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Textarea } from "@/components/ui/textarea";
 import { CURRENCY_CODES } from "@/lib/money";
 import { dealSchema, type DealData, type DealInput } from "@/modules/deals/schemas";
@@ -103,7 +104,18 @@ export function DealForm({
       </div>
       <div className="grid grid-cols-[1fr_6rem] gap-3">
         <FormField id="value" label="Nilai deal" error={errors.value?.message}>
-          <Input id="value" inputMode="decimal" {...register("value")} />
+          <Controller
+            control={control}
+            name="value"
+            render={({ field }) => (
+              <NumberInput
+                id="value"
+                decimals={2}
+                value={String(field.value ?? "")}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
         </FormField>
         <FormField id="currency" label="Mata uang">
           <Controller

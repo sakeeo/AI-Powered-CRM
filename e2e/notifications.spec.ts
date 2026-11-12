@@ -17,10 +17,10 @@ test("notifikasi: bell, inbox, dan preferensi; kartu email delivery tersedia", a
   await page.keyboard.press("Escape");
 
   await page.goto("/settings/connectors");
-  await expect(page.getByRole("heading", { name: "Email delivery", level: 4 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Email Delivery" })).toBeVisible();
   await page
-    .getByRole("button", { name: /Konfigurasi|Ubah/ })
-    .last()
+    .getByTestId("email-row-smtp")
+    .getByRole("button", { name: /Hubungkan|Ubah/ })
     .click();
   await page.getByLabel("Alamat pengirim").fill("x");
   await page.getByLabel("Host").fill("smtp.example.com");

@@ -9,7 +9,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-/** Slide-over standar untuk Quick Add / edit / preview record. */
+/** Slide-over standar untuk Quick Add / edit / preview record. Lebar 30% layar (min 22rem); penuh di mobile. */
 export function EntitySheet({
   open,
   onOpenChange,
@@ -25,7 +25,7 @@ export function EntitySheet({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent className="overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:w-[30vw] data-[side=right]:sm:max-w-none data-[side=right]:sm:min-w-[22rem]">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}

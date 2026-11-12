@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireTenant } from "@/lib/context";
 import { OrganizationProfileForm } from "@/modules/organizations/components/organization-profile-form";
-import { getOrganization } from "@/modules/organizations/server/queries";
+import { getOrganization, orgLogoUrl } from "@/modules/organizations/server/queries";
 import { CURRENCIES, DATE_FORMATS } from "@/modules/organizations/schemas";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -12,6 +12,7 @@ export default async function Page() {
   return (
     <OrganizationProfileForm
       canEdit={ctx.ability.can("update", "Organization")}
+      logoUrl={orgLogoUrl(org)}
       defaults={{
         name: org.name,
         timezone: org.timezone,

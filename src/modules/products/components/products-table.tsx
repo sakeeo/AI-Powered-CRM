@@ -74,12 +74,11 @@ export function ProductsTable({
               return (
                 <div className="flex justify-end gap-1">
                   <Button
-                    size="sm"
-                    variant="ghost"
+                    variant="outline"
                     aria-label={`Ubah ${r.name}`}
                     onClick={() => setSheet({ row: r })}
                   >
-                    <Pencil />
+                    <Pencil /> Ubah
                   </Button>
                   <Button
                     size="sm"

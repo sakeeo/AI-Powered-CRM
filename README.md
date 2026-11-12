@@ -10,7 +10,7 @@ CRM berbasis cloud (multi-tenant, SaaS-ready) untuk Lead Acquisition, Sales Conv
 - [docs/PROGRESS.md](docs/PROGRESS.md) — status pengerjaan plan
 - [docs/decisions.md](docs/decisions.md) — keputusan produk & teknis
 - [docs/database.md](docs/database.md) — konvensi database, tenant scope, migrasi
-- [docs/design-system.md](docs/design-system.md) — **satu-satunya** referensi desain UI/UX (bersumber dari [mockup](docs/mockup-dasboard.html))
+- [docs/design-system.md](docs/design-system.md) — **satu-satunya** referensi desain UI/UX (acuan: template [docs/spike-tailwind](docs/spike-tailwind))
 
 ## Prasyarat
 

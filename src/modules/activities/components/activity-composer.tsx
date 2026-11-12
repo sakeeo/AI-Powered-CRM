@@ -88,7 +88,7 @@ export function ActivityComposer({
         <span className="text-sm font-medium">Catatan</span>
         <RichTextEditor key={editorKey} value={body} onChange={setBody} label="Catatan aktivitas" />
         {errors.body && (
-          <p role="alert" className="text-destructive text-xs">
+          <p role="alert" className="text-tone-red-ink text-xs">
             {errors.body}
           </p>
         )}

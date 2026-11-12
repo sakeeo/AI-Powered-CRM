@@ -74,22 +74,20 @@ function StageItem({
       {canEdit && (
         <div className="ml-auto flex gap-1.5">
           <Button
-            size="icon-sm"
             variant="outline"
             aria-label="Naikkan"
             disabled={pending || index === 0}
             onClick={() => run(() => reorderStage({ id: stage.id, direction: "up" }))}
           >
-            <ArrowUp />
+            <ArrowUp /> Naik
           </Button>
           <Button
-            size="icon-sm"
             variant="outline"
             aria-label="Turunkan"
             disabled={pending || index === total - 1}
             onClick={() => run(() => reorderStage({ id: stage.id, direction: "down" }))}
           >
-            <ArrowDown />
+            <ArrowDown /> Turun
           </Button>
           <Button
             size="sm"

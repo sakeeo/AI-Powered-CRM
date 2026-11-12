@@ -13,7 +13,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { isRole, ROLE_LABEL } from "@/lib/roles";
 
-export type OrgOption = { id: string; name: string; role: string };
+export type OrgOption = { id: string; name: string; role: string; logoUrl?: string | null };
 
 /** Brand sidebar sekaligus switcher organisasi (satu pengguna bisa di banyak organisasi). */
 export function OrgSwitcher({
@@ -38,8 +38,16 @@ export function OrgSwitcher({
         <button
           type="button"
           aria-label="Ganti organisasi"
-          className="hover:bg-sidebar-accent/40 focus-visible:ring-sidebar-ring flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left outline-none group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 focus-visible:ring-2"
+          className="hover:bg-sidebar-accent/40 focus-visible:ring-sidebar-ring flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left outline-none group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-full group-data-[collapsible=icon]:px-0 focus-visible:ring-2"
         >
+          {current?.logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={current.logoUrl}
+              alt=""
+              className="size-9 shrink-0 rounded-md bg-white object-contain group-data-[collapsible=icon]:hidden"
+            />
+          )}
           <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <strong className="block truncate text-[17px] leading-tight font-bold tracking-tight">
               {current?.name ?? "CRM"}
@@ -49,7 +57,16 @@ export function OrgSwitcher({
             </span>
           </span>
           <strong className="hidden text-lg font-bold group-data-[collapsible=icon]:block">
-            {(current?.name ?? "C").charAt(0).toUpperCase()}
+            {current?.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={current.logoUrl}
+                alt=""
+                className="size-8 rounded-full bg-white object-contain"
+              />
+            ) : (
+              (current?.name ?? "C").charAt(0).toUpperCase()
+            )}
           </strong>
           <ChevronsUpDown className="size-4 shrink-0 opacity-70 group-data-[collapsible=icon]:hidden" />
         </button>

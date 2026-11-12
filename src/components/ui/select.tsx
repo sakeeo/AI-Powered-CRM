@@ -20,7 +20,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input bg-card text-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive data-[placeholder]:text-muted-foreground flex w-fit min-w-0 items-center justify-between gap-2 rounded-md border px-3 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 [&_svg]:size-4 [&_svg]:shrink-0",
+        "border-input bg-card text-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive data-[placeholder]:text-muted-foreground flex w-fit min-w-0 items-center justify-between gap-2 rounded-sm border px-4 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-11 data-[size=sm]:h-9 [&_svg]:size-4 [&_svg]:shrink-0",
         className,
       )}
       {...props}
@@ -45,7 +45,7 @@ function SelectContent({
         data-slot="select-content"
         position={position}
         className={cn(
-          "bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 relative z-50 max-h-72 min-w-[8rem] overflow-hidden rounded-md shadow-md ring-1",
+          "bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 relative z-50 max-h-72 min-w-[8rem] overflow-hidden rounded-sm shadow-popover ring-1",
           position === "popper" &&
             "w-(--radix-select-trigger-width) data-[side=bottom]:translate-y-1",
           className,

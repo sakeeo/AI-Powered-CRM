@@ -235,7 +235,7 @@ export function ImportLeadsDialog({
               </div>
               <p
                 className={
-                  previewInvalid ? "text-destructive text-xs" : "text-muted-foreground text-xs"
+                  previewInvalid ? "text-tone-red-ink text-xs" : "text-muted-foreground text-xs"
                 }
               >
                 Pratinjau {preview.length} baris pertama: {preview.length - previewInvalid} valid,{" "}

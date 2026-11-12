@@ -1,5 +1,7 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
+
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCan } from "@/components/providers/ability-provider";
@@ -169,7 +171,7 @@ export function TeamsPanel({ teams, people }: { teams: TeamRow[]; people: Person
                           })
                         }
                       >
-                        Hapus
+                        <Trash2 /> Hapus
                       </Button>
                     )}
                   </div>

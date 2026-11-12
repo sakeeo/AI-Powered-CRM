@@ -10,6 +10,7 @@ import { LEAD_STATUS_LABEL, type LeadStatus } from "@/modules/leads/constants";
 import { listOwnerOptions } from "@/modules/organizations/server/queries";
 import { ACTIVITY_TYPE_LABEL, type ActivityType } from "@/modules/activities/constants";
 import { REPORT_LABEL, UNCATEGORIZED, type ReportType } from "@/modules/reports/constants";
+import type { ChartSpec } from "@/modules/reports/chart-spec";
 
 export type Cell = string | number;
 export type Section = { title: string; columns: string[]; rows: Cell[][]; note?: string };
@@ -18,6 +19,8 @@ export type Report = {
   title: string;
   periodLabel: string;
   sections: Section[];
+  /** Grafik pendamping tabel (angka mentah; format tampilan diatur komponen). */
+  charts: ChartSpec[];
   note?: string;
 };
 
@@ -56,6 +59,9 @@ export async function getReport(
   });
   const periodLabel = `${dateInTz(start, tz)} s.d. ${dateInTz(end, tz)}`;
   const base = { type, title: REPORT_LABEL[type], periodLabel };
+  const cur = org.defaultCurrency;
+  /** Nilai numerik untuk grafik: hanya mata uang default organisasi (tabel tetap menampilkan semua). */
+  const num = (m: Record<string, string>) => Number(m[cur] ?? 0);
   const owners = new Map((await listOwnerOptions(ctx)).map((o) => [o.userId, o.name]));
   const ownerName = (id: string | null) => (id ? (owners.get(id) ?? "—") : "Belum ditugaskan");
 
@@ -67,8 +73,28 @@ export async function getReport(
         _count: { _all: true },
       });
       const total = grouped.reduce((n, g) => n + g._count._all, 0);
+      const leadData = grouped.map((g) => ({
+        name: LEAD_STATUS_LABEL[g.status as LeadStatus] ?? g.status,
+        jumlah: g._count._all,
+      }));
       return {
         ...base,
+        charts: [
+          {
+            title: "Lead per status",
+            kind: "bar",
+            data: leadData,
+            xKey: "name",
+            series: [{ key: "jumlah", name: "Lead" }],
+          },
+          {
+            title: "Komposisi status lead",
+            kind: "donut",
+            data: leadData,
+            xKey: "name",
+            series: [{ key: "jumlah", name: "Lead" }],
+          },
+        ],
         sections: [
           {
             title: "Lead dibuat pada periode, per status",
@@ -99,8 +125,35 @@ export async function getReport(
         for (const [c, v] of Object.entries(s.totals)) add(totals, c, { toString: () => v });
         for (const [c, v] of Object.entries(s.weighted)) add(weighted, c, { toString: () => v });
       }
+      const stageData = summary.map((s) => ({
+        name: s.name,
+        deal: s.count,
+        nilai: num(s.totals),
+        tertimbang: num(s.weighted),
+      }));
       return {
         ...base,
+        charts: [
+          {
+            title: "Deal terbuka per stage",
+            kind: "bar",
+            data: stageData,
+            xKey: "name",
+            series: [{ key: "deal", name: "Deal" }],
+          },
+          {
+            title: `Nilai pipeline per stage (${cur})`,
+            kind: "bar",
+            data: stageData,
+            xKey: "name",
+            format: "money",
+            unit: cur,
+            series: [
+              { key: "nilai", name: "Nilai total" },
+              { key: "tertimbang", name: "Tertimbang" },
+            ],
+          },
+        ],
         periodLabel: "Kondisi saat ini (deal terbuka)",
         sections: [
           {
@@ -147,8 +200,28 @@ export async function getReport(
           cats.set(k, c);
         }
       }
+      const lostCats = [...cats.entries()].sort((a, b) => b[1].n - a[1].n);
       return {
         ...base,
+        charts: [
+          {
+            title: "Won vs Lost",
+            kind: "donut",
+            xKey: "name",
+            series: [{ key: "jumlah", name: "Deal" }],
+            data: [
+              { name: "Won", jumlah: won.n },
+              { name: "Lost", jumlah: lost.n },
+            ],
+          },
+          {
+            title: "Alasan Lost per kategori",
+            kind: "hbar",
+            xKey: "name",
+            series: [{ key: "jumlah", name: "Deal Lost" }],
+            data: lostCats.map(([k, c]) => ({ name: k, jumlah: c.n })),
+          },
+        ],
         sections: [
           {
             title: "Ringkasan",
@@ -215,8 +288,31 @@ export async function getReport(
         const qualified = rows.filter((r) => r.status === "qualified" || r.convertedAt).length;
         const converted = rows.filter((r) => r.convertedAt).length;
         const won = rows.filter((r) => r.convertedDealId && wonDeals.has(r.convertedDealId)).length;
+        const funnel = [
+          { name: "Lead dibuat", jumlah: total, persen: total ? 100 : 0 },
+          { name: "Qualified", jumlah: qualified, persen: total ? (qualified / total) * 100 : 0 },
+          { name: "Dikonversi", jumlah: converted, persen: total ? (converted / total) * 100 : 0 },
+          { name: "Deal Won", jumlah: won, persen: total ? (won / total) * 100 : 0 },
+        ];
         return {
           ...base,
+          charts: [
+            {
+              title: "Funnel konversi lead",
+              kind: "hbar",
+              data: funnel,
+              xKey: "name",
+              series: [{ key: "jumlah", name: "Lead" }],
+            },
+            {
+              title: "Persentase dari lead dibuat",
+              kind: "bar",
+              data: funnel,
+              xKey: "name",
+              format: "percent",
+              series: [{ key: "persen", name: "% dari lead" }],
+            },
+          ],
           sections: [
             {
               title: "Funnel konversi lead (cohort)",
@@ -247,8 +343,41 @@ export async function getReport(
         if (r.convertedDealId && wonDeals.has(r.convertedDealId)) e.won++;
         by.set(k, e);
       }
+      const srcData = [...by.entries()]
+        .sort((a, b) => b[1].n - a[1].n)
+        .map(([k, e]) => ({
+          name: k ? (sources.get(k) ?? "—") : "Tanpa sumber",
+          lead: e.n,
+          terkonversi: e.conv,
+          won: e.won,
+          konversi: e.n ? Math.round((e.conv / e.n) * 1000) / 10 : 0,
+          winRate: e.n ? Math.round((e.won / e.n) * 1000) / 10 : 0,
+        }));
       return {
         ...base,
+        charts: [
+          {
+            title: "Lead & konversi per sumber",
+            kind: "hbar",
+            data: srcData,
+            xKey: "name",
+            series: [
+              { key: "lead", name: "Lead" },
+              { key: "terkonversi", name: "Terkonversi" },
+            ],
+          },
+          {
+            title: "Tingkat konversi & win per sumber",
+            kind: "bar",
+            data: srcData,
+            xKey: "name",
+            format: "percent",
+            series: [
+              { key: "konversi", name: "Konversi" },
+              { key: "winRate", name: "Win dari lead" },
+            ],
+          },
+        ],
         sections: [
           {
             title: "Performa lead source (cohort)",
@@ -330,6 +459,7 @@ export async function getReport(
       for (const r of doneG) row(r.ownerId).done += r._count._all;
       return {
         ...base,
+        charts: [],
         sections: [
           {
             title: "Performa sales per pemilik",
@@ -400,6 +530,7 @@ export async function getReport(
         for (const k of Object.keys(sum) as (keyof typeof sum)[]) sum[k] += v[k];
       return {
         ...base,
+        charts: [],
         sections: [
           {
             title: "Aktivitas dibuat pada periode, per jenis",
@@ -457,8 +588,29 @@ export async function getReport(
         tot.n++;
         add(tot.v, d.currency, d.value);
       }
+      const monthly = [...by.entries()]
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([k, e]) => ({ name: k, nilai: num(e.v), deal: e.n }));
       return {
         ...base,
+        charts: [
+          {
+            title: `Nilai deal Won per bulan (${cur})`,
+            kind: "line",
+            data: monthly,
+            xKey: "name",
+            format: "money",
+            unit: cur,
+            series: [{ key: "nilai", name: "Nilai Won" }],
+          },
+          {
+            title: "Jumlah deal Won per bulan",
+            kind: "bar",
+            data: monthly,
+            xKey: "name",
+            series: [{ key: "deal", name: "Deal Won" }],
+          },
+        ],
         note: "Nilai deal Won adalah nilai kesepakatan penjualan di CRM — BUKAN uang yang sudah diterima (cash received) maupun pendapatan menurut akuntansi.",
         sections: [
           {
