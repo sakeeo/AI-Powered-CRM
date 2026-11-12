@@ -23,17 +23,17 @@ export function AuthCard({
           >
             <BrainCircuit className="size-6" />
           </span>
-          <strong className="text-lg font-bold tracking-wide">SMART CRM</strong>
-          <span className="text-muted-foreground text-xs">
+          <strong className="text-2xl font-bold tracking-wide">SMART CRM</strong>
+          <span className="text-muted-foreground text-sm">
             AI Powered Customer Relation Management
           </span>
         </div>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-2xl">{title}</CardTitle>
+        <CardDescription className="text-base">{description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5 px-6 sm:px-8">
+      <CardContent className="space-y-5 px-6 sm:px-8 [&_a]:text-base [&_button]:h-12 [&_button]:text-base [&_input]:h-12 [&_input]:text-base [&_label]:text-base [&_p]:text-base">
         {children}
-        {footer && <div className="text-muted-foreground text-label text-center">{footer}</div>}
+        {footer && <div className="text-muted-foreground text-center text-base">{footer}</div>}
       </CardContent>
     </Card>
   );
