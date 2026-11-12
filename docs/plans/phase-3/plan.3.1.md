@@ -14,10 +14,10 @@ Skor lead berbasis riwayat aktivitas, read-only.
 
 ## Tugas
 
-- [ ] Definisi fitur & evaluasi kualitas data.
-- [ ] Pipeline skoring (read-only, transparan: tampilkan faktor).
-- [ ] Badge skor di list/detail lead.
-- [ ] Test: skor tidak mengubah status/assignment.
+- [x] Definisi fitur & evaluasi kualitas data.
+- [x] Pipeline skoring (read-only, transparan: tampilkan faktor).
+- [x] Badge skor di list/detail lead.
+- [x] Test: skor tidak mengubah status/assignment.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -25,8 +25,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Vercel AI SDK`.
 
 ## Acceptance Criteria
 
-- [ ] Skor informatif dan dapat dijelaskan.
-- [ ] Tidak ada perubahan data otomatis.
+- [x] Skor informatif dan dapat dijelaskan.
+- [x] Tidak ada perubahan data otomatis.
 
 ## Verifikasi
 

@@ -18,7 +18,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
 | [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 19 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 7 / 7 | Done |
-| [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
+| [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 1 / 7 | In progress |
 | **Total** | **32 / 39** | |
 
 ## Phase 0 — Project Setup
@@ -72,7 +72,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 
 | Plan                             | Judul                                           | Status      | Selesai | Catatan |
 | -------------------------------- | ----------------------------------------------- | ----------- | ------- | ------- |
-| [3.1](plans/phase-3/plan.3.1.md) | AI lead scoring                                 | Not started |         |         |
+| [3.1](plans/phase-3/plan.3.1.md) | AI lead scoring                                 | Done | 2026-11-12 | Skor 0–100 (Hot ≥70 / Warm 40–69 / Cold <40) dari 8 faktor transparan: kelengkapan kontak, kebutuhan, budget (relatif median), urgensi, status, jumlah & kebaruan interaksi, konversi historis sumber (hanya bila sampel ≥5). Dihitung saat dibaca (tidak disimpan) → tidak ada perubahan data; badge di daftar lead, rincian faktor di detail, terhormat izin (rep hanya miliknya). Modul kualitas data (`evaluateQuality`) menetapkan ambang kesiapan fitur prediktif. decisions.md #20. 12 test unit/integrasi (termasuk snapshot seluruh tabel tak berubah). |
 | [3.2](plans/phase-3/plan.3.2.md) | Predictive sales assistant                      | Not started |         |         |
 | [3.3](plans/phase-3/plan.3.3.md) | AI follow-up recommendation                     | Not started |         |         |
 | [3.4](plans/phase-3/plan.3.4.md) | Automated customer insights & anomaly detection | Not started |         |         |

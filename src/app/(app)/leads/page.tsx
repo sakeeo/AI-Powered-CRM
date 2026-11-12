@@ -14,6 +14,7 @@ import { ExportButton } from "@/modules/import-export/components/export-button";
 import { ImportLeadsDialog } from "@/modules/import-export/components/import-leads-dialog";
 import { TextToLeadDialog } from "@/modules/leads/components/text-to-lead-dialog";
 import { LeadsTable } from "@/modules/leads/components/leads-table";
+import { scoreLeads } from "@/modules/intelligence/server/lead-scoring";
 import { listLeadSources, listLeads } from "@/modules/leads/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
@@ -39,6 +40,11 @@ export default async function Page(props: PageProps<"/leads">) {
     listOwnerOptions(ctx),
     getOrganization(ctx),
   ]);
+  const scores = await scoreLeads(ctx, data.rows);
+  const rows = data.rows.map((r) => {
+    const s = scores.get(r.id);
+    return { ...r, score: s ? { score: s.score, band: s.band } : null };
+  });
   const [custom, viewsBar] = await Promise.all([
     buildListCustomization(ctx, "lead", cust, data.rows),
     loadSavedViewsBar(ctx, "lead"),
@@ -48,7 +54,7 @@ export default async function Page(props: PageProps<"/leads">) {
   return (
     <LeadsTable
       table={{
-        data: data.rows,
+        data: rows,
         total: data.total,
         page: params.page,
         pageSize: params.pageSize,

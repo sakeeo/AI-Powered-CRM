@@ -21,6 +21,8 @@ import { findLeadDuplicates } from "@/modules/duplicates/server/detect";
 import { ConvertLeadDialog } from "@/modules/leads/components/convert-lead-dialog";
 import { getConversionSuggestions } from "@/modules/leads/server/conversion";
 import { LeadActions } from "@/modules/leads/components/lead-actions";
+import { LeadScoreCard } from "@/modules/intelligence/components/lead-score-card";
+import { getLeadScore } from "@/modules/intelligence/server/lead-scoring";
 import { getLead, listLeadSources } from "@/modules/leads/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
@@ -42,7 +44,8 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
     !lead.archivedAt &&
     !lead.convertedAt &&
     ctx.ability.can("update", subject);
-  const [suggestions, dups] = await Promise.all([
+  const [score, suggestions, dups] = await Promise.all([
+    getLeadScore(ctx, lead.id),
     canConvert ? getConversionSuggestions(ctx, lead.id) : null,
     lead.convertedAt || lead.archivedAt
       ? []
@@ -204,6 +207,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
           </CardContent>
         </Card>
       )}
+      {score && <LeadScoreCard result={score} />}
       <DuplicatesCard
         entity="lead"
         currentId={lead.id}

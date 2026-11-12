@@ -25,6 +25,8 @@ import {
   type LeadStatus,
   type Urgency,
 } from "@/modules/leads/constants";
+import { LeadScoreBadge } from "@/modules/intelligence/components/lead-score-badge";
+import type { LeadBand } from "@/modules/intelligence/lead-score";
 import {
   LeadForm,
   type OwnerOption,
@@ -42,6 +44,8 @@ export type LeadRow = {
   ownerId: string | null;
   createdAt: Date;
   source: { id: string; name: string } | null;
+  /** Skor lead (plan 3.1); null bila sudah terkonversi/diarsipkan. */
+  score?: { score: number; band: LeadBand } | null;
 };
 
 export function LeadsTable({
@@ -87,6 +91,14 @@ export function LeadsTable({
         return (
           <ToneBadge tone={LEAD_STATUS_TONE[s] ?? "blue"}>{LEAD_STATUS_LABEL[s] ?? s}</ToneBadge>
         );
+      },
+    },
+    {
+      header: "Skor",
+      id: "score",
+      cell: (c) => {
+        const sc = c.row.original.score;
+        return sc ? <LeadScoreBadge score={sc.score} band={sc.band} /> : "—";
       },
     },
     { header: "Sumber", id: "source", cell: (c) => c.row.original.source?.name ?? "—" },
