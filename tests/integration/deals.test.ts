@@ -204,13 +204,13 @@ describe("Deal CRUD & validasi", () => {
       });
     }
     const c = await ctxNow();
-    const p1 = await q.listDeals(c, params({ sort: "title", dir: "asc" }));
+    const p1 = await q.listDeals(c, params({ sort: "title", dir: "asc", pageSize: "20" }));
     expect(p1.total).toBe(22);
     expect(p1.rows).toHaveLength(20);
     expect(
-      (await q.listDeals(c, params({ sort: "title", dir: "asc", page: "2" }))).rows.map(
-        (r) => r.title,
-      ),
+      (
+        await q.listDeals(c, params({ sort: "title", dir: "asc", page: "2", pageSize: "20" }))
+      ).rows.map((r) => r.title),
     ).toEqual(["Deal 21", "Deal 22"]);
     expect((await q.listDeals(c, params({ sort: "value", dir: "desc" }))).rows[0].title).toBe(
       "Deal 22",

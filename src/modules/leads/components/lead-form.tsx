@@ -1,5 +1,6 @@
 "use client";
 
+import { CustomizationSection } from "@/modules/customization/components/customization-section";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -186,6 +187,7 @@ export function LeadForm({
       <FormField id="notes" label="Catatan" error={errors.notes?.message}>
         <Textarea id="notes" rows={3} {...register("notes")} />
       </FormField>
+      <CustomizationSection entity="lead" control={control} />
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Menyimpan…" : "Simpan"}
       </Button>

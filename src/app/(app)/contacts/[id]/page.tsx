@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CustomizationCard } from "@/modules/customization/components/customization-card";
+import { getEntityCustomization } from "@/modules/customization/server/queries";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
@@ -26,6 +28,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
   ]);
   const owner = owners.find((o) => o.userId === contact.ownerId)?.name;
   const subject = asSubject("Contact", contact);
+  const cust = await getEntityCustomization(ctx, "contact", contact.id, contact.customFields);
   const dups = await findContactDuplicates(ctx, {
     name: contact.name,
     email: contact.email ?? undefined,
@@ -50,6 +53,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
             companies={companies}
             owners={owners}
             defaults={{
+              ...cust.formDefaults,
               name: contact.name,
               email: contact.email ?? "",
               phone: contact.phone ?? "",
@@ -86,6 +90,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
           </dl>
         </CardContent>
       </Card>
+      <CustomizationCard defs={cust.defs} values={cust.values} tags={cust.tags} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

@@ -120,13 +120,16 @@ describe("Contact CRUD & relasi company", () => {
     }
     const ctx = (await getTenantContext())!;
 
-    const p1 = await contactQ.listContacts(ctx, listParams({ sort: "name", dir: "asc" }));
+    const p1 = await contactQ.listContacts(
+      ctx,
+      listParams({ sort: "name", dir: "asc", pageSize: "20" }),
+    );
     expect(p1.total).toBe(25);
     expect(p1.rows).toHaveLength(20);
     expect(p1.rows[0].name).toBe("Kontak 01");
     const p2 = await contactQ.listContacts(
       ctx,
-      listParams({ sort: "name", dir: "asc", page: "2" }),
+      listParams({ sort: "name", dir: "asc", page: "2", pageSize: "20" }),
     );
     expect(p2.rows.map((r) => r.name)).toEqual([
       "Kontak 21",

@@ -9,6 +9,11 @@ import { DataTable, UrlFilterSelect, type DataTableProps } from "@/components/sh
 import { EmptyState } from "@/components/shared/empty-state";
 import { EntitySheet } from "@/components/shared/entity-sheet";
 import { PageActions } from "@/components/shared/page-actions";
+import { CustomizationFilters } from "@/modules/customization/components/customization-filters";
+import {
+  useCustomColumns,
+  type ListCustomization,
+} from "@/modules/customization/components/customization-columns";
 import { Button } from "@/components/ui/button";
 import { CompanyForm } from "@/modules/companies/components/company-form";
 import type { OwnerOption } from "@/modules/contacts/components/contact-form";
@@ -29,11 +34,14 @@ export function CompaniesTable({
   owners,
   canAssignOwner,
   actions,
+  custom,
 }: {
   table: Omit<DataTableProps<CompanyRow>, "columns" | "rowHref" | "empty" | "toolbar">;
   owners: OwnerOption[];
   canAssignOwner: boolean;
   actions?: React.ReactNode;
+  /** Tag & custom field untuk kolom/filter (plan 2.1). */
+  custom?: ListCustomization;
 }) {
   const can = useCan();
   const router = useRouter();
@@ -41,6 +49,7 @@ export function CompaniesTable({
   const ownerName = new Map(owners.map((o) => [o.userId, o.name]));
   const canCreate = can("create", "Company");
 
+  const customColumns = useCustomColumns<CompanyRow>(custom);
   const columns: ColumnDef<CompanyRow, unknown>[] = [
     { header: "Perusahaan", accessorKey: "name", meta: { sortKey: "name" } },
     {
@@ -82,16 +91,19 @@ export function CompaniesTable({
       </PageActions>
       <DataTable
         {...table}
-        columns={columns}
+        columns={[...columns, ...customColumns]}
         rowHref={(r) => `/companies/${r.id}`}
         searchPlaceholder="Cari nama, industri, email…"
         toolbar={
-          <UrlFilterSelect
-            param="owner"
-            label="Filter pemilik"
-            allLabel="Semua pemilik"
-            options={owners.map((o) => ({ value: o.userId, label: o.name }))}
-          />
+          <>
+            <UrlFilterSelect
+              param="owner"
+              label="Filter pemilik"
+              allLabel="Semua pemilik"
+              options={owners.map((o) => ({ value: o.userId, label: o.name }))}
+            />
+            <CustomizationFilters custom={custom} />
+          </>
         }
         empty={
           <EmptyState

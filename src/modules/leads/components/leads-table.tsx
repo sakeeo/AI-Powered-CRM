@@ -11,6 +11,11 @@ import { EntitySheet } from "@/components/shared/entity-sheet";
 import { PageActions } from "@/components/shared/page-actions";
 import { ToneBadge } from "@/components/shared/tone-badge";
 import { Button } from "@/components/ui/button";
+import { CustomizationFilters } from "@/modules/customization/components/customization-filters";
+import {
+  useCustomColumns,
+  type ListCustomization,
+} from "@/modules/customization/components/customization-columns";
 import { formatMoney } from "@/lib/money";
 import {
   LEAD_STATUSES,
@@ -47,6 +52,7 @@ export function LeadsTable({
   defaultCurrency,
   archived,
   actions,
+  custom,
 }: {
   table: Omit<DataTableProps<LeadRow>, "columns" | "rowHref" | "empty" | "toolbar">;
   sources: SourceOption[];
@@ -55,6 +61,8 @@ export function LeadsTable({
   defaultCurrency: string;
   archived: boolean;
   actions?: React.ReactNode;
+  /** Tag & custom field untuk kolom/filter (plan 2.1). */
+  custom?: ListCustomization;
 }) {
   const can = useCan();
   const router = useRouter();
@@ -62,6 +70,7 @@ export function LeadsTable({
   const ownerName = new Map(owners.map((o) => [o.userId, o.name]));
   const canCreate = can("create", "Lead");
 
+  const customColumns = useCustomColumns<LeadRow>(custom);
   const columns: ColumnDef<LeadRow, unknown>[] = [
     { header: "Lead", accessorKey: "name", meta: { sortKey: "name" } },
     {
@@ -129,11 +138,12 @@ export function LeadsTable({
       </PageActions>
       <DataTable
         {...table}
-        columns={columns}
+        columns={[...columns, ...customColumns]}
         rowHref={(r) => `/leads/${r.id}`}
         searchPlaceholder="Cari nama, email, perusahaan…"
         toolbar={
           <>
+            <CustomizationFilters custom={custom} />
             <UrlFilterSelect
               param="status"
               label="Filter status"

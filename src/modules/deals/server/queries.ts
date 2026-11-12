@@ -26,6 +26,8 @@ export type DealFilters = {
   closeTo?: string;
   /** Batasi ke beberapa pemilik (mis. anggota tim) — dipakai filter dashboard. */
   ownerIds?: string[];
+  /** Kondisi tambahan (AND) dari filter tag & custom field (plan 2.1). */
+  extra?: Record<string, unknown>[];
 };
 
 const include = {
@@ -47,6 +49,7 @@ export function dealWhere(ctx: TenantContext, filters: DealFilters, q?: string):
     AND: [
       { deletedAt: null },
       scopeWhere(ctx, "view", "Deal") as Where,
+      ...((filters.extra ?? []) as Where[]),
       ...(filters.stageId ? [{ stageId: filters.stageId }] : []),
       ...(filters.status ? [{ status: filters.status }] : []),
       ...(filters.closeFrom || filters.closeTo

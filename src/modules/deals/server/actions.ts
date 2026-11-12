@@ -19,6 +19,7 @@ import {
   updateDealSchema,
   updateStageSchema,
 } from "@/modules/deals/schemas";
+import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
 import { ensureDefaultPipeline } from "@/modules/deals/server/pipeline";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
@@ -54,14 +55,25 @@ async function assertParties(ctx: ActionContext, contactId?: string, companyId?:
 
 export const createDeal = tenantAction(dealSchema, async (ctx, input) => {
   assertCan(ctx, "create", "Deal");
-  const { value, ownerId: requested, pipelineId, stageId, expectedCloseDate, ...data } = input;
+  const {
+    value,
+    ownerId: requested,
+    pipelineId,
+    stageId,
+    expectedCloseDate,
+    customFields,
+    tagIds,
+    ...data
+  } = input;
   const ownerId = resolveOwner(ctx, requested);
   if (ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
   await assertParties(ctx, data.contactId, data.companyId);
   const place = await resolvePipelineStage(ctx, pipelineId, stageId);
+  const cf = await prepareCustomFields(ctx, "deal", customFields);
   const deal = await ctx.db.deal.create({
     data: {
       ...data,
+      customFields: cf,
       ...place,
       value: toDecimal(value ?? "0")!,
       expectedCloseDate: toDate(expectedCloseDate),
@@ -69,6 +81,7 @@ export const createDeal = tenantAction(dealSchema, async (ctx, input) => {
       createdBy: ctx.userId,
     } as never,
   });
+  if (tagIds?.length) await applyTags(ctx, "deal", deal.id, tagIds);
   await writeAudit(ctx, {
     action: "deal.created",
     entityType: "Deal",
@@ -80,7 +93,17 @@ export const createDeal = tenantAction(dealSchema, async (ctx, input) => {
 });
 
 export const updateDeal = tenantAction(updateDealSchema, async (ctx, input) => {
-  const { id, value, ownerId: requested, pipelineId, stageId, expectedCloseDate, ...data } = input;
+  const {
+    id,
+    value,
+    ownerId: requested,
+    pipelineId,
+    stageId,
+    expectedCloseDate,
+    customFields,
+    tagIds,
+    ...data
+  } = input;
   const existing = await ctx.db.deal.findFirst({ where: { id, deletedAt: null } });
   if (!existing) throw NotFoundError("Deal");
   assertCan(ctx, "update", "Deal", existing);
@@ -91,10 +114,14 @@ export const updateDeal = tenantAction(updateDealSchema, async (ctx, input) => {
   // Perpindahan stage lewat moveDealStage; di sini stage hanya dipertahankan.
   void pipelineId;
   void stageId;
+  const cf = customFields
+    ? await prepareCustomFields(ctx, "deal", customFields, existing.customFields)
+    : undefined;
   await ctx.db.deal.update({
     where: { id },
     data: {
       ...data,
+      ...(cf ? { customFields: cf } : {}),
       contactId: data.contactId ?? null,
       companyId: data.companyId ?? null,
       probability: data.probability ?? null,
@@ -104,6 +131,7 @@ export const updateDeal = tenantAction(updateDealSchema, async (ctx, input) => {
       updatedBy: ctx.userId,
     },
   });
+  if (tagIds) await applyTags(ctx, "deal", id, tagIds);
   await writeAudit(ctx, {
     action: "deal.updated",
     entityType: "Deal",

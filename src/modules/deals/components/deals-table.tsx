@@ -10,6 +10,11 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { EntitySheet } from "@/components/shared/entity-sheet";
 import { PageActions } from "@/components/shared/page-actions";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { CustomizationFilters } from "@/modules/customization/components/customization-filters";
+import {
+  useCustomColumns,
+  type ListCustomization,
+} from "@/modules/customization/components/customization-columns";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/money";
 import {
@@ -43,6 +48,7 @@ export function DealsTable({
   canAssignOwner,
   defaultCurrency,
   actions,
+  custom,
 }: {
   table: Omit<DataTableProps<DealRow>, "columns" | "rowHref" | "empty" | "toolbar">;
   contacts: Opt[];
@@ -52,6 +58,8 @@ export function DealsTable({
   canAssignOwner: boolean;
   defaultCurrency: string;
   actions?: React.ReactNode;
+  /** Tag & custom field untuk kolom/filter (plan 2.1). */
+  custom?: ListCustomization;
 }) {
   const can = useCan();
   const router = useRouter();
@@ -59,6 +67,7 @@ export function DealsTable({
   const ownerName = new Map(owners.map((o) => [o.userId, o.name]));
   const canCreate = can("create", "Deal");
 
+  const customColumns = useCustomColumns<DealRow>(custom);
   const columns: ColumnDef<DealRow, unknown>[] = [
     { header: "Deal", accessorKey: "title", meta: { sortKey: "title" } },
     {
@@ -122,11 +131,12 @@ export function DealsTable({
       </PageActions>
       <DataTable
         {...table}
-        columns={columns}
+        columns={[...columns, ...customColumns]}
         rowHref={(r) => `/deals/${r.id}`}
         searchPlaceholder="Cari deal, contact, company…"
         toolbar={
           <>
+            <CustomizationFilters custom={custom} />
             <UrlFilterSelect
               param="stage"
               label="Filter stage"

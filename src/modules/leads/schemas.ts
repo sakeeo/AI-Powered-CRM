@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { currencySchema, optionalMoney } from "@/lib/money";
 import { optionalEmail, optionalPhone, optionalText, optionalUuid } from "@/lib/schema-helpers";
+import { customizationFields } from "@/modules/customization/schemas";
 import { LEAD_STATUSES, URGENCIES } from "@/modules/leads/constants";
 
 const optionalEnum = <T extends readonly [string, ...string[]]>(values: T) =>
@@ -18,6 +19,7 @@ export const leadSchema = z.object({
   notes: optionalText(5000),
   sourceId: optionalUuid,
   ownerId: optionalUuid,
+  ...customizationFields,
 });
 export type LeadInput = z.input<typeof leadSchema>;
 export type LeadData = z.output<typeof leadSchema>;

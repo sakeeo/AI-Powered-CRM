@@ -42,6 +42,8 @@ const SUBJECT_LABEL: Record<string, string> = {
   Feedback: "Feedback",
   Report: "Laporan",
   Notification: "Notifikasi",
+  Tag: "Tag",
+  CustomField: "Custom field",
 };
 
 function Cell({ grant }: { grant: Grant }) {

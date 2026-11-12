@@ -1,5 +1,6 @@
 "use client";
 
+import { CustomizationSection } from "@/modules/customization/components/customization-section";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -180,6 +181,7 @@ export function ContactForm({
       <FormField id="notes" label="Catatan internal" error={errors.notes?.message}>
         <Textarea id="notes" rows={4} {...register("notes")} />
       </FormField>
+      <CustomizationSection entity="contact" control={control} />
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Menyimpan…" : "Simpan"}
       </Button>

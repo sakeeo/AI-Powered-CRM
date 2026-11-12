@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import type { FieldDef } from "@/modules/customization/custom-fields";
 import type { OwnerOption, SourceOption } from "@/modules/leads/components/lead-form";
 import {
   applyMapping,
@@ -52,10 +53,13 @@ export function ImportLeadsDialog({
   sources,
   owners,
   canAssignOwner,
+  customFields = [],
 }: {
   sources: SourceOption[];
   owners: OwnerOption[];
   canAssignOwner: boolean;
+  /** Custom field lead aktif: dapat dipetakan dari kolom CSV. */
+  customFields?: FieldDef[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -86,7 +90,7 @@ export function ImportLeadsDialog({
             `Maksimal ${MAX_IMPORT_ROWS} baris per impor (berkas berisi ${res.data.length})`,
           );
         setParsed({ headers, rows: res.data });
-        setMapping(guessMapping(headers));
+        setMapping(guessMapping(headers, customFields));
       },
       error: () => toast.error("Gagal membaca berkas CSV"),
     });
@@ -205,6 +209,23 @@ export function ImportLeadsDialog({
                       id={`map-${f.key}`}
                       value={mapping[f.key]}
                       onChange={(v) => setMapping((m) => ({ ...m, [f.key]: v || undefined }))}
+                      noneLabel="— Abaikan —"
+                      options={parsed.headers.map((h) => ({ value: h, label: h }))}
+                    />
+                  </FormField>
+                ))}
+                {customFields.map((d) => (
+                  <FormField
+                    key={d.key}
+                    id={`map-cf-${d.key}`}
+                    label={`${d.label}${d.required ? " *" : ""} (custom)`}
+                  >
+                    <SelectField
+                      id={`map-cf-${d.key}`}
+                      value={mapping[`cf:${d.key}`]}
+                      onChange={(v) =>
+                        setMapping((m) => ({ ...m, [`cf:${d.key}`]: v || undefined }))
+                      }
                       noneLabel="— Abaikan —"
                       options={parsed.headers.map((h) => ({ value: h, label: h }))}
                     />

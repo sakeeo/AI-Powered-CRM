@@ -7,6 +7,7 @@ import { assertCan, resolveOwner } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
 import { normalizePhone } from "@/lib/phone";
 import { idInput } from "@/lib/schema-helpers";
+import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
 import { contactSchema, updateContactSchema } from "@/modules/contacts/schemas";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
@@ -26,14 +27,16 @@ function linkRows(companyIds: string[], contactId: string) {
 
 export const createContact = tenantAction(contactSchema, async (ctx, input) => {
   assertCan(ctx, "create", "Contact");
-  const { companyIds, ownerId: requested, ...data } = input;
+  const { companyIds, ownerId: requested, customFields, tagIds, ...data } = input;
   const ownerId = resolveOwner(ctx, requested);
   if (ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
   await assertCompanies(ctx, companyIds);
+  const cf = await prepareCustomFields(ctx, "contact", customFields);
   const contact = await ctx.db.$transaction(async (tx) => {
     const c = await tx.contact.create({
       data: {
         ...data,
+        customFields: cf,
         phoneNormalized: normalizePhone(data.phone),
         ownerId,
         createdBy: ctx.userId,
@@ -47,6 +50,7 @@ export const createContact = tenantAction(contactSchema, async (ctx, input) => {
     }
     return c;
   });
+  if (tagIds?.length) await applyTags(ctx, "contact", contact.id, tagIds);
   await writeAudit(ctx, {
     action: "contact.created",
     entityType: "Contact",
@@ -58,18 +62,22 @@ export const createContact = tenantAction(contactSchema, async (ctx, input) => {
 });
 
 export const updateContact = tenantAction(updateContactSchema, async (ctx, input) => {
-  const { id, companyIds, ownerId: requested, ...data } = input;
+  const { id, companyIds, ownerId: requested, customFields, tagIds, ...data } = input;
   const existing = await ctx.db.contact.findFirst({ where: { id, deletedAt: null } });
   if (!existing) throw NotFoundError("Contact");
   assertCan(ctx, "update", "Contact", existing);
   const ownerId = ctx.role === "sales_rep" ? existing.ownerId : (requested ?? existing.ownerId);
   if (ownerId && ownerId !== existing.ownerId) await assertActiveMember(ctx, ownerId);
   await assertCompanies(ctx, companyIds);
+  const cf = customFields
+    ? await prepareCustomFields(ctx, "contact", customFields, existing.customFields)
+    : undefined;
   await ctx.db.$transaction(async (tx) => {
     await tx.contact.update({
       where: { id },
       data: {
         ...data,
+        ...(cf ? { customFields: cf } : {}),
         phoneNormalized: normalizePhone(data.phone),
         ownerId,
         updatedBy: ctx.userId,
@@ -82,6 +90,7 @@ export const updateContact = tenantAction(updateContactSchema, async (ctx, input
       });
     }
   });
+  if (tagIds) await applyTags(ctx, "contact", id, tagIds);
   await writeAudit(ctx, {
     action: "contact.updated",
     entityType: "Contact",

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CustomizationCard } from "@/modules/customization/components/customization-card";
+import { getEntityCustomization } from "@/modules/customization/server/queries";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import { DetailField } from "@/components/shared/detail-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
@@ -34,6 +36,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
     getOrganization(ctx),
   ]);
   const subject = asSubject("Lead", lead);
+  const cust = await getEntityCustomization(ctx, "lead", lead.id, lead.customFields);
   const canConvert =
     lead.status === "qualified" &&
     !lead.archivedAt &&
@@ -90,6 +93,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
                   companyName={lead.companyName}
                   suggestions={suggestions}
                   defaults={{
+                    ...cust.formDefaults,
                     title: `${lead.name} — ${lead.needs?.slice(0, 40) || "Peluang baru"}`,
                     value: lead.budget ?? "",
                   }}
@@ -144,6 +148,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
           </dl>
         </CardContent>
       </Card>
+      <CustomizationCard defs={cust.defs} values={cust.values} tags={cust.tags} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>

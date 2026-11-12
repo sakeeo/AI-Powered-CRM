@@ -7,7 +7,13 @@ import { assertCan } from "@/lib/authz";
 import { AppError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
 import { normalizePhone } from "@/lib/phone";
-import { validateLeadRow } from "@/modules/import-export/mapping";
+import {
+  readValues,
+  validateCustomValues,
+  type CustomValues,
+} from "@/modules/customization/custom-fields";
+import { loadFieldDefs } from "@/modules/customization/server/queries";
+import { CF_IMPORT_PREFIX, validateLeadRow } from "@/modules/import-export/mapping";
 import { importLeadsBatchSchema } from "@/modules/import-export/schemas";
 import { ensureLeadSources } from "@/modules/leads/server/queries";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
@@ -29,6 +35,7 @@ export const importLeadsBatch = tenantAction(importLeadsBatchSchema, async (ctx,
   const ownerId = ctx.role === "sales_rep" ? ctx.userId : (input.ownerId ?? null);
   if (ownerId && ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
 
+  const defs = await loadFieldDefs(ctx.db, "lead", { activeOnly: true });
   const errors: ImportRowError[] = [];
   const data: Record<string, unknown>[] = [];
   input.rows.forEach((raw, i) => {
@@ -41,11 +48,31 @@ export const importLeadsBatch = tenantAction(importLeadsBatchSchema, async (ctx,
       errors.push({ row, message: msg });
       return;
     }
+    // Custom field: kolom `cf:<key>`; multiselect dipisah titik koma.
+    const cfRaw: CustomValues = {};
+    for (const d of defs) {
+      const v = raw[`${CF_IMPORT_PREFIX}${d.key}`];
+      if (v === undefined || v.trim() === "") continue;
+      cfRaw[d.key] =
+        d.type === "multiselect"
+          ? v
+              .split(/[;,]/)
+              .map((x) => x.trim())
+              .filter(Boolean)
+          : v.trim();
+    }
+    const cf = validateCustomValues(defs, cfRaw);
+    const cfError = Object.values(cf.errors)[0];
+    if (cfError) {
+      errors.push({ row, message: cfError });
+      return;
+    }
     const { budget, ...rest } = res.data;
     data.push({
       ...rest,
       phoneNormalized: normalizePhone(rest.phone),
       budget: toDecimal(budget),
+      customFields: readValues(cf.values),
       sourceId: input.sourceId ?? null,
       ownerId,
       createdBy: ctx.userId,

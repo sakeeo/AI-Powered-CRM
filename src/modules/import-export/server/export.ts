@@ -4,6 +4,8 @@ import { writeAudit } from "@/lib/audit";
 import { safeCell } from "@/lib/csv";
 import type { TenantContext } from "@/lib/context";
 import { pickParam, type SearchParams } from "@/lib/list-params";
+import { customExportColumns } from "@/modules/customization/server/export";
+import { listingCustomization } from "@/modules/customization/server/queries";
 import { listCompaniesForExport } from "@/modules/companies/server/queries";
 import { listContactsForExport } from "@/modules/contacts/server/queries";
 import type { ExportEntity } from "@/modules/import-export/schemas";
@@ -17,6 +19,8 @@ import { listLeadsForExport } from "@/modules/leads/server/queries";
 
 export const EXPORT_MAX_ROWS = 20_000;
 
+const ENTITY_OF = { leads: "lead", contacts: "contact", companies: "company" } as const;
+
 export type Dataset = { columns: string[]; rows: (string | number | boolean)[][] };
 
 const date = (d: Date | null | undefined) => (d ? d.toISOString().slice(0, 10) : "");
@@ -29,6 +33,7 @@ export async function buildDataset(
 ): Promise<Dataset> {
   const q = pickParam(sp, "q");
   const owner = pickParam(sp, "owner");
+  const cust = await listingCustomization(ctx, ENTITY_OF[entity], (k) => pickParam(sp, k));
   if (entity === "leads") {
     const rows = await listLeadsForExport(
       ctx,
@@ -38,9 +43,11 @@ export async function buildDataset(
         sourceId: pickParam(sp, "source"),
         owner,
         archived: pickParam(sp, "archived") === "1",
+        extra: cust.where,
       },
       EXPORT_MAX_ROWS,
     );
+    const extra = await customExportColumns(ctx, "lead", cust, rows);
     return {
       columns: [
         "Nama",
@@ -55,8 +62,9 @@ export async function buildDataset(
         "Kebutuhan",
         "Catatan",
         "Dibuat",
+        ...extra.columns,
       ],
-      rows: rows.map((r) =>
+      rows: rows.map((r, i) =>
         [
           r.name,
           r.email,
@@ -70,12 +78,15 @@ export async function buildDataset(
           r.needs,
           r.notes,
           date(r.createdAt),
-        ].map(safeCell),
+        ]
+          .map(safeCell)
+          .concat(extra.cells[i]),
       ),
     };
   }
   if (entity === "contacts") {
-    const rows = await listContactsForExport(ctx, q, owner, EXPORT_MAX_ROWS);
+    const rows = await listContactsForExport(ctx, q, owner, EXPORT_MAX_ROWS, cust.where);
+    const extra = await customExportColumns(ctx, "contact", cust, rows);
     return {
       columns: [
         "Nama",
@@ -87,8 +98,9 @@ export async function buildDataset(
         "Negara",
         "Catatan",
         "Dibuat",
+        ...extra.columns,
       ],
-      rows: rows.map((r) =>
+      rows: rows.map((r, i) =>
         [
           r.name,
           r.email,
@@ -99,11 +111,14 @@ export async function buildDataset(
           r.country,
           r.notes,
           date(r.createdAt),
-        ].map(safeCell),
+        ]
+          .map(safeCell)
+          .concat(extra.cells[i]),
       ),
     };
   }
-  const rows = await listCompaniesForExport(ctx, q, owner, EXPORT_MAX_ROWS);
+  const rows = await listCompaniesForExport(ctx, q, owner, EXPORT_MAX_ROWS, cust.where);
+  const extra = await customExportColumns(ctx, "company", cust, rows);
   return {
     columns: [
       "Nama",
@@ -116,8 +131,9 @@ export async function buildDataset(
       "Negara",
       "Catatan",
       "Dibuat",
+      ...extra.columns,
     ],
-    rows: rows.map((r) =>
+    rows: rows.map((r, i) =>
       [
         r.name,
         r.industry,
@@ -129,7 +145,9 @@ export async function buildDataset(
         r.country,
         r.notes,
         date(r.createdAt),
-      ].map(safeCell),
+      ]
+        .map(safeCell)
+        .concat(extra.cells[i]),
     ),
   };
 }

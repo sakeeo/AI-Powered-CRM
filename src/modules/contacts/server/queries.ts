@@ -27,12 +27,13 @@ const companyInclude = {
 export async function listContacts(
   ctx: TenantContext,
   params: ListParams,
-  filters: { ownerId?: string } = {},
+  filters: { ownerId?: string; extra?: Record<string, unknown>[] } = {},
 ) {
   const where: Where = {
     AND: [
       { deletedAt: null },
       scopeWhere(ctx, "view", "Contact") as Where,
+      ...((filters.extra ?? []) as Where[]),
       ...(searchWhere(params.q) ? [searchWhere(params.q)!] : []),
       ...(filters.ownerId ? [{ ownerId: filters.ownerId }] : []),
     ],
@@ -94,6 +95,7 @@ export async function listContactsForExport(
   q: string | undefined,
   ownerId: string | undefined,
   take: number,
+  extra: Record<string, unknown>[] = [],
 ) {
   assertCan(ctx, "export", "Contact");
   return ctx.db.contact.findMany({
@@ -101,6 +103,7 @@ export async function listContactsForExport(
       AND: [
         { deletedAt: null },
         scopeWhere(ctx, "view", "Contact") as Where,
+        ...(extra as Where[]),
         ...(searchWhere(q) ? [searchWhere(q)!] : []),
         ...(ownerId ? [{ ownerId }] : []),
       ],

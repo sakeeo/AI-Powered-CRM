@@ -1,5 +1,6 @@
 "use client";
 
+import { CustomizationSection } from "@/modules/customization/components/customization-section";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -185,6 +186,7 @@ export function DealForm({
       <FormField id="notes" label="Catatan" error={errors.notes?.message}>
         <Textarea id="notes" rows={3} {...register("notes")} />
       </FormField>
+      <CustomizationSection entity="deal" control={control} />
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Menyimpan…" : "Simpan"}
       </Button>

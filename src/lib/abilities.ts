@@ -24,6 +24,8 @@ export const SUBJECTS = [
   "Feedback",
   "Report",
   "Notification",
+  "Tag",
+  "CustomField",
 ] as const;
 export type SubjectName = (typeof SUBJECTS)[number];
 
@@ -75,6 +77,8 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
       can(["view", "export"], "Report");
       can("export", [...OWNED, ...SHARED]);
       can("view", "Notification");
+      can("view", ["Tag", "CustomField"]);
+      can(["create", "update"], "Tag");
       break;
     case "sales_rep":
       can("view", OWNED, { ownerId: userId });
@@ -85,6 +89,8 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
       can(["update", "delete"], SHARED, { ownerId: userId });
       can("view", "Report");
       can("view", "Notification");
+      can("view", ["Tag", "CustomField"]);
+      can("create", "Tag");
       break;
     case "viewer":
       can("view", [
@@ -96,6 +102,8 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
         "Team",
         "Member",
         "Report",
+        "Tag",
+        "CustomField",
       ]);
       can("view", "Notification");
       break;

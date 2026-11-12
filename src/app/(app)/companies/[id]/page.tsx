@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CustomizationCard } from "@/modules/customization/components/customization-card";
+import { getEntityCustomization } from "@/modules/customization/server/queries";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
@@ -23,6 +25,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
   ]);
   const owner = owners.find((o) => o.userId === company.ownerId)?.name;
   const subject = asSubject("Company", company);
+  const cust = await getEntityCustomization(ctx, "company", company.id, company.customFields);
   return (
     <div className="space-y-4">
       <Card>
@@ -39,6 +42,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
             canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
             owners={owners}
             defaults={{
+              ...cust.formDefaults,
               name: company.name,
               industry: company.industry ?? "",
               website: company.website ?? "",
@@ -64,6 +68,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
           </dl>
         </CardContent>
       </Card>
+      <CustomizationCard defs={cust.defs} values={cust.values} tags={cust.tags} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>

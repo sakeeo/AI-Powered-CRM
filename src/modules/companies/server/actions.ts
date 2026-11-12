@@ -6,17 +6,20 @@ import { writeAudit } from "@/lib/audit";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import { NotFoundError } from "@/lib/errors";
 import { idInput } from "@/lib/schema-helpers";
+import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
 import { companySchema, updateCompanySchema } from "@/modules/contacts/schemas";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
 export const createCompany = tenantAction(companySchema, async (ctx, input) => {
   assertCan(ctx, "create", "Company");
-  const { ownerId: requested, ...data } = input;
+  const { ownerId: requested, customFields, tagIds, ...data } = input;
   const ownerId = resolveOwner(ctx, requested);
   if (ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
+  const cf = await prepareCustomFields(ctx, "company", customFields);
   const company = await ctx.db.company.create({
-    data: { ...data, ownerId, createdBy: ctx.userId } as never,
+    data: { ...data, customFields: cf, ownerId, createdBy: ctx.userId } as never,
   });
+  if (tagIds?.length) await applyTags(ctx, "company", company.id, tagIds);
   await writeAudit(ctx, {
     action: "company.created",
     entityType: "Company",
@@ -28,13 +31,20 @@ export const createCompany = tenantAction(companySchema, async (ctx, input) => {
 });
 
 export const updateCompany = tenantAction(updateCompanySchema, async (ctx, input) => {
-  const { id, ownerId: requested, ...data } = input;
+  const { id, ownerId: requested, customFields, tagIds, ...data } = input;
   const existing = await ctx.db.company.findFirst({ where: { id, deletedAt: null } });
   if (!existing) throw NotFoundError("Company");
   assertCan(ctx, "update", "Company", existing);
   const ownerId = ctx.role === "sales_rep" ? existing.ownerId : (requested ?? existing.ownerId);
   if (ownerId && ownerId !== existing.ownerId) await assertActiveMember(ctx, ownerId);
-  await ctx.db.company.update({ where: { id }, data: { ...data, ownerId, updatedBy: ctx.userId } });
+  const cf = customFields
+    ? await prepareCustomFields(ctx, "company", customFields, existing.customFields)
+    : undefined;
+  await ctx.db.company.update({
+    where: { id },
+    data: { ...data, ...(cf ? { customFields: cf } : {}), ownerId, updatedBy: ctx.userId },
+  });
+  if (tagIds) await applyTags(ctx, "company", id, tagIds);
   await writeAudit(ctx, {
     action: "company.updated",
     entityType: "Company",

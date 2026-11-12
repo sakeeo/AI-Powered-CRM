@@ -44,6 +44,8 @@ const PAGES = [
   "/notifications",
   "/settings/connectors",
   "/settings/quotations",
+  "/settings/tags",
+  "/settings/custom-fields",
 ];
 for (const [name, width, height] of [
   ["smartphone", 375, 812],

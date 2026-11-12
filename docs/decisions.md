@@ -15,6 +15,8 @@ Mengacu pada PRD §14.1. Status: **Diusulkan** = default sementara yang fleksibe
 | 9   | Default provider AI?                       | Gemini sebagai rekomendasi awal; semua provider tetap BYOK.                       | Diusulkan | 1.4          |
 | 10  | Simpan log prompt/response AI?             | Tidak menyimpan isi; hanya metadata (fitur, waktu, status) hingga kebijakan privasi diputuskan. | Diusulkan | 1.4          |
 | 11  | Definisi "customer"?                       | Turunan, bukan input manual: contact atau company dengan ≥1 deal berstatus Won (tertaut langsung pada deal). Status hilang bila semua deal Won dibuka kembali/dihapus. Nilai pembelian = jumlah nilai deal Won (Decimal, per mata uang). | Diputuskan | 1.16 |
+| 12  | Di mana nilai custom field disimpan?       | Kolom JSONB `custom_fields` pada tabel entitas (lead, contact, company, deal), bukan tabel `custom_field_values` terpisah (PRD §7.5 menyebut tabel nilai; JSONB dipilih karena satu query tanpa join untuk tabel/filter/export, validasi tetap di server terhadap definisi). Definisi di `custom_field_definitions` (kunci stabil, tipe tidak dapat diubah). Nilai field yang dihapus/dinonaktifkan tetap di JSONB tetapi tidak ditampilkan. | Diputuskan | 2.1 |
+| 13  | Siapa boleh mengelola tag, custom field, saved view? | Tag: semua role (kecuali Viewer) membuat; Owner/Admin mengubah & menghapus (Sales Manager boleh mengubah). Custom field: hanya Owner/Admin (Sales Manager/Rep/Viewer hanya melihat). Saved view: milik pengguna (pribadi), dibagikan ke tim yang ia ikuti, atau ke organisasi (Owner/Admin/Sales Manager); hanya pemilik atau Owner/Admin yang mengubah/menghapus. Tidak ada subjek izin sendiri untuk saved view. | Diputuskan | 2.1 |
 
 ## Keputusan Teknis (sudah ditetapkan)
 

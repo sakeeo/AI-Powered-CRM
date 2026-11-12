@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CustomizationCard } from "@/modules/customization/components/customization-card";
+import { getEntityCustomization } from "@/modules/customization/server/queries";
 import { ActivitiesPanel } from "@/modules/activities/components/activities-panel";
 import Link from "next/link";
 import { DetailField } from "@/components/shared/detail-field";
@@ -33,6 +35,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
     getOrganization(ctx),
   ]);
   const subject = asSubject("Deal", deal);
+  const cust = await getEntityCustomization(ctx, "deal", deal.id, deal.customFields);
   const status = deal.status as DealStatus;
   const owner = owners.find((o) => o.userId === deal.ownerId)?.name;
   const [history, dealItems, productOptions, dealQuotations] = await Promise.all([
@@ -77,6 +80,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
             }
             canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
             defaults={{
+              ...cust.formDefaults,
               title: deal.title,
               contactId: deal.contactId ?? undefined,
               companyId: deal.companyId ?? undefined,
@@ -142,6 +146,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
           </dl>
         </CardContent>
       </Card>
+      <CustomizationCard defs={cust.defs} values={cust.values} tags={cust.tags} />
       <Card>
         <CardHeader>
           <CardTitle>Catatan</CardTitle>

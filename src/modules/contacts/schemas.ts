@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { customizationFields } from "@/modules/customization/schemas";
 import {
   optionalEmail,
   optionalPhone,
@@ -18,6 +19,7 @@ export const contactSchema = z.object({
   notes: optionalText(5000),
   ownerId: optionalUuid,
   companyIds: z.array(z.uuid()).max(20).default([]),
+  ...customizationFields,
 });
 export type ContactInput = z.input<typeof contactSchema>;
 export type ContactData = z.output<typeof contactSchema>;
@@ -34,6 +36,7 @@ export const companySchema = z.object({
   country: optionalText(80),
   notes: optionalText(5000),
   ownerId: optionalUuid,
+  ...customizationFields,
 });
 export type CompanyInput = z.input<typeof companySchema>;
 export type CompanyData = z.output<typeof companySchema>;

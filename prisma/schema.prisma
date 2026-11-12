@@ -133,6 +133,10 @@ model Organization {
   customerSegments        CustomerSegment[]
   customerSegmentMembers  CustomerSegmentMember[]
   feedbacks               Feedback[]
+  tags                    Tag[]
+  taggables               Taggable[]
+  customFieldDefinitions  CustomFieldDefinition[]
+  savedViews              SavedView[]
 
   @@map("organizations")
 }
@@ -190,6 +194,7 @@ model Team {
   @@unique([organizationId, name])
   @@index([organizationId])
   @@map("teams")
+  savedViews SavedView[]
 }
 
 model TeamMember {
@@ -298,6 +303,8 @@ model Company {
   createdBy      String?   @map("created_by") @db.Uuid
   updatedBy      String?   @map("updated_by") @db.Uuid
   deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+  /// Nilai custom field (plan 2.1): { [key]: nilai }
+  customFields Json @default("{}") @map("custom_fields")
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   contacts     ContactCompany[]
@@ -339,6 +346,8 @@ model Contact {
   createdBy       String?   @map("created_by") @db.Uuid
   updatedBy       String?   @map("updated_by") @db.Uuid
   deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
+  /// Nilai custom field (plan 2.1): { [key]: nilai }
+  customFields Json @default("{}") @map("custom_fields")
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   companies    ContactCompany[]
@@ -430,6 +439,8 @@ model Lead {
   updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy          String?   @map("created_by") @db.Uuid
   updatedBy          String?   @map("updated_by") @db.Uuid
+  /// Nilai custom field (plan 2.1): { [key]: nilai }
+  customFields Json @default("{}") @map("custom_fields")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   source       LeadSource?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
@@ -513,6 +524,8 @@ model Deal {
   createdBy         String?   @map("created_by") @db.Uuid
   updatedBy         String?   @map("updated_by") @db.Uuid
   deletedAt         DateTime? @map("deleted_at") @db.Timestamptz(3)
+  /// Nilai custom field (plan 2.1): { [key]: nilai }
+  customFields Json @default("{}") @map("custom_fields")
 
   organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   pipeline     Pipeline           @relation(fields: [pipelineId], references: [id])
@@ -882,4 +895,107 @@ model Feedback {
   @@index([organizationId, contactId])
   @@index([organizationId, companyId])
   @@map("feedbacks")
+}
+
+// ---------------------------------------------------------------------------
+// Kustomisasi data (plan 2.1): tags, custom fields, saved views.
+// ---------------------------------------------------------------------------
+
+/// Label bebas per organisasi (SET-07). Nama unik per organisasi tanpa membedakan huruf besar/kecil.
+model Tag {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  /// Kunci warna dari palet tone (lihat TAG_COLORS)
+  color          String   @default("blue")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?  @map("created_by") @db.Uuid
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  taggables    Taggable[]
+
+  @@index([organizationId])
+  @@map("tags")
+}
+
+/// Relasi polymorphic tag ↔ entitas (lead | contact | company | deal).
+model Taggable {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  tagId          String   @map("tag_id") @db.Uuid
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tag          Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, entityType, entityId])
+  @@index([organizationId, entityType, entityId])
+  @@map("taggables")
+}
+
+/// Definisi custom field per entitas (SET-08). Nilai disimpan di kolom JSONB `custom_fields` entitas.
+model CustomFieldDefinition {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  /// lead | contact | company | deal
+  entityType     String   @map("entity_type")
+  /// Kunci stabil (slug) — kunci di JSONB; tidak berubah setelah dibuat
+  key            String
+  label          String
+  /// text | textarea | number | date | boolean | select | multiselect | url
+  type           String
+  /// Untuk select/multiselect: [{ value, label }]
+  options        Json     @default("[]")
+  required       Boolean  @default(false)
+  /// Tampilkan sebagai kolom di tabel daftar
+  showInTable    Boolean  @default(false) @map("show_in_table")
+  /// Tampilkan sebagai filter di tabel daftar
+  filterable     Boolean  @default(false)
+  /// Logika kondisional: { fieldKey, op: "equals"|"not_equals"|"filled"|"empty", value? } atau null
+  visibleWhen    Json?    @map("visible_when")
+  position       Int      @default(0)
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?  @map("created_by") @db.Uuid
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, entityType, key])
+  @@index([organizationId, entityType, position])
+  @@map("custom_field_definitions")
+}
+
+/// Tampilan tersimpan tabel data: filter + sort + ukuran halaman (query string) + kolom custom field.
+model SavedView {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  /// Tabel pemilik view: leads | contacts | companies | deals
+  entityType     String   @map("entity_type")
+  name           String
+  /// personal (hanya pembuat) | team (anggota tim) | organization (semua)
+  visibility     String   @default("personal")
+  teamId         String?  @map("team_id") @db.Uuid
+  ownerId        String   @map("owner_id") @db.Uuid
+  /// Query string tanpa halaman: filter, sort, dir, q, pageSize
+  params         Json     @default("{}")
+  /// Kunci custom field yang ditampilkan sebagai kolom (null = ikut definisi)
+  columns        Json?
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?  @map("created_by") @db.Uuid
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, entityType])
+  @@index([organizationId, ownerId])
+  @@map("saved_views")
 }

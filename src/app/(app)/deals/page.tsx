@@ -1,4 +1,12 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { SavedViewsBar } from "@/modules/customization/components/saved-views-bar";
+import {
+  buildListCustomization,
+  defaultViewHref,
+  listingCustomization,
+  loadSavedViewsBar,
+} from "@/modules/customization/server/queries";
 import Link from "next/link";
 import { PageActions } from "@/components/shared/page-actions";
 import { Button } from "@/components/ui/button";
@@ -25,10 +33,14 @@ export default async function Page(props: PageProps<"/deals">) {
   const ctx = await requireTenant();
   const sp = (await props.searchParams) as SearchParams;
   const params = parseListParams(sp, DEAL_SORTS, "createdAt");
+  const defaultHref = await defaultViewHref(ctx, "deal", sp, "/deals");
+  if (defaultHref) redirect(defaultHref);
+  const cust = await listingCustomization(ctx, "deal", (k) => pickParam(sp, k));
   const filters = {
     stageId: pickParam(sp, "stage"),
     status: pickParam(sp, "status"),
     owner: pickParam(sp, "owner"),
+    extra: cust.where,
   };
   const pipeline = await getDefaultPipeline(ctx);
   const view = pickParam(sp, "view") === "board" ? "board" : "list";
@@ -91,9 +103,16 @@ export default async function Page(props: PageProps<"/deals">) {
     listOwnerOptions(ctx),
     getOrganization(ctx),
   ]);
+  const [custom, viewsBar] = await Promise.all([
+    buildListCustomization(ctx, "deal", cust, data.rows),
+    loadSavedViewsBar(ctx, "deal"),
+  ]);
   return (
     <div className="space-y-4">
-      <PageActions>{viewSwitch}</PageActions>
+      <PageActions>
+        {viewSwitch}
+        <SavedViewsBar {...viewsBar} />
+      </PageActions>
       <PipelineSummary stages={summary} defaultCurrency={org.defaultCurrency} />
       <DealsTable
         table={{
@@ -111,6 +130,7 @@ export default async function Page(props: PageProps<"/deals">) {
         owners={owners}
         canAssignOwner={ctx.role !== "sales_rep" && ctx.role !== "viewer"}
         defaultCurrency={org.defaultCurrency}
+        custom={custom}
       />
     </div>
   );

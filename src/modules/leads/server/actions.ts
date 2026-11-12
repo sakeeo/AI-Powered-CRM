@@ -18,6 +18,7 @@ import {
   toggleLeadSourceSchema,
   updateLeadSchema,
 } from "@/modules/leads/schemas";
+import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
 import { convertLeadService } from "@/modules/leads/server/conversion";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
@@ -30,19 +31,22 @@ async function assertSource(ctx: ActionContext, sourceId?: string) {
 /** Lead baru: Sales Rep otomatis menjadi owner; peran lain boleh membiarkan lead belum ditugaskan. */
 export const createLead = tenantAction(leadSchema, async (ctx, input) => {
   assertCan(ctx, "create", "Lead");
-  const { budget, ownerId: requested, ...data } = input;
+  const { budget, ownerId: requested, customFields, tagIds, ...data } = input;
   const ownerId = ctx.role === "sales_rep" ? ctx.userId : (requested ?? null);
   if (ownerId && ownerId !== ctx.userId) await assertActiveMember(ctx, ownerId);
   await assertSource(ctx, data.sourceId);
+  const cf = await prepareCustomFields(ctx, "lead", customFields);
   const lead = await ctx.db.lead.create({
     data: {
       ...data,
+      customFields: cf,
       phoneNormalized: normalizePhone(data.phone),
       budget: toDecimal(budget),
       ownerId,
       createdBy: ctx.userId,
     } as never,
   });
+  if (tagIds?.length) await applyTags(ctx, "lead", lead.id, tagIds);
   await writeAudit(ctx, {
     action: "lead.created",
     entityType: "Lead",
@@ -54,7 +58,7 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
 });
 
 export const updateLead = tenantAction(updateLeadSchema, async (ctx, input) => {
-  const { id, budget, ownerId: requested, ...data } = input;
+  const { id, budget, ownerId: requested, customFields, tagIds, ...data } = input;
   const existing = await ctx.db.lead.findFirst({ where: { id } });
   if (!existing) throw NotFoundError("Lead");
   assertCan(ctx, "update", "Lead", existing);
@@ -62,16 +66,21 @@ export const updateLead = tenantAction(updateLeadSchema, async (ctx, input) => {
   const ownerId = ctx.role === "sales_rep" ? existing.ownerId : (requested ?? existing.ownerId);
   if (ownerId && ownerId !== existing.ownerId) await assertActiveMember(ctx, ownerId);
   await assertSource(ctx, data.sourceId);
+  const cf = customFields
+    ? await prepareCustomFields(ctx, "lead", customFields, existing.customFields)
+    : undefined;
   await ctx.db.lead.update({
     where: { id },
     data: {
       ...data,
+      ...(cf ? { customFields: cf } : {}),
       phoneNormalized: normalizePhone(data.phone),
       budget: toDecimal(budget),
       ownerId,
       updatedBy: ctx.userId,
     },
   });
+  if (tagIds) await applyTags(ctx, "lead", id, tagIds);
   await writeAudit(ctx, {
     action: "lead.updated",
     entityType: "Lead",

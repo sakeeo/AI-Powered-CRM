@@ -36,6 +36,10 @@ export const TENANT_MODELS = new Set<string>([
   "CustomerSegment",
   "CustomerSegmentMember",
   "Feedback",
+  "Tag",
+  "Taggable",
+  "CustomFieldDefinition",
+  "SavedView",
 ]);
 
 const WHERE_OPS = new Set([

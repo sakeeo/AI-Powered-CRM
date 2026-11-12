@@ -35,6 +35,8 @@ export type LeadFilters = {
   /** uuid pemilik, atau "unassigned" untuk lead tanpa owner */
   owner?: string;
   archived?: boolean;
+  /** Kondisi tambahan (AND) dari filter tag & custom field (plan 2.1). */
+  extra?: Record<string, unknown>[];
 };
 
 function leadWhere(ctx: TenantContext, q: string | undefined, filters: LeadFilters): Where {
@@ -42,6 +44,7 @@ function leadWhere(ctx: TenantContext, q: string | undefined, filters: LeadFilte
     AND: [
       filters.archived ? { archivedAt: { not: null } } : { archivedAt: null },
       scopeWhere(ctx, "view", "Lead") as Where,
+      ...((filters.extra ?? []) as Where[]),
       ...(filters.status ? [{ status: filters.status }] : []),
       ...(filters.sourceId ? [{ sourceId: filters.sourceId }] : []),
       ...(filters.owner

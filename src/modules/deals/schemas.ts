@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { currencySchema, optionalMoney } from "@/lib/money";
 import { optionalText, optionalUuid } from "@/lib/schema-helpers";
+import { customizationFields } from "@/modules/customization/schemas";
 import { LOST_CATEGORIES } from "@/modules/reports/constants";
 
 const optionalDate = z.preprocess(
@@ -29,6 +30,7 @@ const dealBase = z.object({
   expectedCloseDate: optionalDate,
   probability: optionalProbability,
   notes: optionalText(5000),
+  ...customizationFields,
 });
 
 const needsParty = (v: { contactId?: string; companyId?: string }) =>

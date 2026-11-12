@@ -8,6 +8,7 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 2. **Undang tim**: Users & Teams → Undang (peran: Admin, Sales Manager, Sales Rep, Viewer). Undangan dikirim lewat email (butuh Email Delivery, langkah 3).
 3. **Connectors** (Settings → Connectors): hubungkan **Email Delivery** (SMTP/Resend, klik _Kirim email uji_), **AI** (API key Anda sendiri — Gemini/OpenAI/Anthropic/OpenRouter), dan **Webhook** form website (salin URL & secret; secret hanya tampil sekali).
 4. Atur **Lead Source**, **Pipeline** (stage & probabilitas), dan **Quotation** (pajak, masa berlaku) di Settings.
+5. Sesuaikan data tanpa kode (Settings → **Tags** dan **Custom Fields**): tag berwarna untuk lead/contact/company/deal, dan isian tambahan (teks, angka, tanggal, ya/tidak, pilihan, URL) yang dapat wajib diisi, tampil di tabel, difilter, diimpor/diekspor, serta tampil hanya bila field lain bernilai tertentu (logika kondisional). Di tabel Leads/Contacts/Companies/Deals, **Simpan tampilan** menyimpan filter, pencarian, dan urutan (pribadi, tim, atau organisasi; bisa dijadikan bawaan ★).
 
 ## 2. Lead → Deal
 

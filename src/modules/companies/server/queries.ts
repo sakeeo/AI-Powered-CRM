@@ -6,11 +6,17 @@ import type { ListParams } from "@/lib/list-params";
 
 type Where = Prisma.CompanyWhereInput;
 
-function companyWhere(ctx: TenantContext, q: string | undefined, ownerId?: string): Where {
+function companyWhere(
+  ctx: TenantContext,
+  q: string | undefined,
+  ownerId?: string,
+  extra: Record<string, unknown>[] = [],
+): Where {
   return {
     AND: [
       { deletedAt: null },
       scopeWhere(ctx, "view", "Company") as Where,
+      ...(extra as Where[]),
       ...(q
         ? [
             {
@@ -31,9 +37,9 @@ function companyWhere(ctx: TenantContext, q: string | undefined, ownerId?: strin
 export async function listCompanies(
   ctx: TenantContext,
   params: ListParams,
-  filters: { ownerId?: string } = {},
+  filters: { ownerId?: string; extra?: Record<string, unknown>[] } = {},
 ) {
-  const where = companyWhere(ctx, params.q, filters.ownerId);
+  const where = companyWhere(ctx, params.q, filters.ownerId, filters.extra);
   const [total, rows] = await Promise.all([
     ctx.db.company.count({ where }),
     ctx.db.company.findMany({
@@ -70,10 +76,11 @@ export async function listCompaniesForExport(
   q: string | undefined,
   ownerId: string | undefined,
   take: number,
+  extra: Record<string, unknown>[] = [],
 ) {
   assertCan(ctx, "export", "Company");
   return ctx.db.company.findMany({
-    where: companyWhere(ctx, q, ownerId),
+    where: companyWhere(ctx, q, ownerId, extra),
     orderBy: { createdAt: "desc" },
     take,
   });

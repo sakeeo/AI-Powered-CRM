@@ -11,6 +11,8 @@ export const SETTINGS_LINKS: { href: string; label: string; subject?: SubjectNam
   { href: "/settings/roles", label: "Roles & Permissions" },
   { href: "/settings/lead-sources", label: "Lead Source" },
   { href: "/settings/pipelines", label: "Pipeline" },
+  { href: "/settings/tags", label: "Tags", subject: "Tag" },
+  { href: "/settings/custom-fields", label: "Custom Fields", subject: "CustomField" },
   { href: "/settings/quotations", label: "Quotation" },
   { href: "/settings/connectors", label: "Connectors", subject: "Connector" },
   { href: "/settings/audit-log", label: "Audit Log", subject: "AuditLog" },
@@ -33,8 +35,7 @@ export function SettingsNav({ hidden = [] }: { hidden?: string[] }) {
             aria-current={active ? "page" : undefined}
             className={cn(
               "text-muted-foreground hover:bg-secondary hover:text-primary focus-visible:ring-ring/50 inline-flex h-9 items-center rounded-3xl px-4 text-sm transition-colors outline-none focus-visible:ring-3",
-              active &&
-                "bg-secondary text-primary font-medium",
+              active && "bg-secondary text-primary font-medium",
             )}
           >
             {l.label}

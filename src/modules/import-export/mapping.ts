@@ -1,4 +1,8 @@
+import type { FieldDef } from "@/modules/customization/custom-fields";
 import { leadSchema } from "@/modules/leads/schemas";
+
+/** Prefix kunci pemetaan/baris untuk custom field: `cf:<key>`. */
+export const CF_IMPORT_PREFIX = "cf:";
 
 /** Kolom lead yang dapat diisi lewat impor, beserta sinonim header yang dikenali otomatis. */
 export const LEAD_IMPORT_FIELDS = [
@@ -25,18 +29,23 @@ export const LEAD_IMPORT_FIELDS = [
   { key: "notes", label: "Catatan", aliases: ["notes", "catatan", "note", "keterangan"] },
 ] as const;
 export type LeadImportKey = (typeof LEAD_IMPORT_FIELDS)[number]["key"];
-export type ColumnMapping = Partial<Record<LeadImportKey, string>>;
+/** Kunci: field lead bawaan, atau `cf:<key>` untuk custom field. */
+export type ColumnMapping = Partial<Record<LeadImportKey | `cf:${string}`, string>>;
 
 export const MAX_IMPORT_ROWS = 5000;
 export const IMPORT_BATCH_SIZE = 200;
 
 /** Tebak pemetaan kolom CSV → field lead dari nama header. */
-export function guessMapping(headers: string[]): ColumnMapping {
+export function guessMapping(headers: string[], customDefs: FieldDef[] = []): ColumnMapping {
   const norm = (s: string) => s.trim().toLowerCase();
   const out: ColumnMapping = {};
   for (const f of LEAD_IMPORT_FIELDS) {
     const hit = headers.find((h) => (f.aliases as readonly string[]).includes(norm(h)));
     if (hit) out[f.key] = hit;
+  }
+  for (const d of customDefs) {
+    const hit = headers.find((h) => [norm(d.label), d.key].includes(norm(h)));
+    if (hit) out[`${CF_IMPORT_PREFIX}${d.key}`] = hit;
   }
   return out;
 }
@@ -47,6 +56,9 @@ export function applyMapping(row: Record<string, string>, mapping: ColumnMapping
   for (const f of LEAD_IMPORT_FIELDS) {
     const col = mapping[f.key];
     if (col && row[col] !== undefined) out[f.key] = row[col];
+  }
+  for (const [key, col] of Object.entries(mapping)) {
+    if (key.startsWith(CF_IMPORT_PREFIX) && col && row[col] !== undefined) out[key] = row[col];
   }
   return out;
 }
