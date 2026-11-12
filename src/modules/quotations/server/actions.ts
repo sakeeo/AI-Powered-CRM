@@ -1,5 +1,7 @@
 "use server";
 
+import { emitBusinessEvent } from "@/lib/outbound-webhooks";
+import { quotationPayload } from "@/modules/integrations/payloads";
 import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
@@ -250,6 +252,14 @@ export const setQuotationStatus = tenantAction(
       before: { status: q.status },
       after: { status },
     });
+    if (status === "sent") {
+      await emitBusinessEvent(
+        ctx.organizationId,
+        "quotation.sent",
+        `quotation.sent:${id}:${Date.now()}`,
+        quotationPayload({ ...q, status }),
+      );
+    }
     revalidatePath("/quotations");
     revalidatePath(`/quotations/${id}`);
   },

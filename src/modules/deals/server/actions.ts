@@ -5,6 +5,11 @@ import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
 import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan, resolveOwner } from "@/lib/authz";
+import { emitBusinessEvent } from "@/lib/outbound-webhooks";
+import {
+  dealPayload,
+} from "@/modules/integrations/payloads";
+
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
 import { idInput } from "@/lib/schema-helpers";
@@ -83,6 +88,7 @@ export const createDeal = tenantAction(dealSchema, async (ctx, input) => {
     } as never,
   });
   if (tagIds?.length) await applyTags(ctx, "deal", deal.id, tagIds);
+  await emitBusinessEvent(ctx.organizationId, "deal.created", `deal.created:${deal.id}`, dealPayload(deal));
   await writeAudit(ctx, {
     action: "deal.created",
     entityType: "Deal",
@@ -200,6 +206,12 @@ export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
     where: { id },
     data: { status: "won", closedAt, lostReason: null, updatedBy: ctx.userId },
   });
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "deal.won",
+    `deal.won:${id}:${closedAt.getTime()}`,
+    dealPayload({ ...deal, status: "won", closedAt }),
+  );
   await emitAutomationEvent(ctx.db, {
     organizationId: ctx.organizationId,
     trigger: "deal_won",
@@ -221,11 +233,12 @@ export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
 export const markDealLost = tenantAction(closeLostSchema, async (ctx, { id, reason, category }) => {
   const deal = await loadOpenDeal(ctx, id);
   if (deal.status !== "open") throw new AppError("Deal sudah ditutup");
+  const lostAt = new Date();
   await ctx.db.deal.update({
     where: { id },
     data: {
       status: "lost",
-      closedAt: new Date(),
+      closedAt: lostAt,
       lostReason: reason,
       lostCategory: category ?? null,
       updatedBy: ctx.userId,
@@ -238,6 +251,12 @@ export const markDealLost = tenantAction(closeLostSchema, async (ctx, { id, reas
     before: { status: "open" },
     after: { status: "lost", reason, category },
   });
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "deal.lost",
+    `deal.lost:${id}:${lostAt.getTime()}`,
+    dealPayload({ ...deal, status: "lost", closedAt: lostAt, lostCategory: category ?? null }),
+  );
   revalidatePath("/deals");
   revalidatePath(`/deals/${id}`);
 });

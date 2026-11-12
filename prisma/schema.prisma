@@ -37,6 +37,7 @@ model User {
   teamMemberships TeamMember[]
 
   @@map("users")
+  googleIntegrations GoogleIntegration[]
 }
 
 model Session {
@@ -141,6 +142,11 @@ model Organization {
   automationRuns          AutomationRun[]
   conversations           Conversation[]
   messages                Message[]
+  outboundWebhooks        OutboundWebhook[]
+  outboundDeliveries      OutboundDelivery[]
+  googleIntegrations      GoogleIntegration[]
+  calendarEventLinks      CalendarEventLink[]
+  emailSyncLogs           EmailSyncLog[]
 
   @@map("organizations")
 }
@@ -1120,4 +1126,128 @@ model Message {
   @@unique([organizationId, externalId])
   @@index([conversationId, createdAt])
   @@map("messages")
+}
+
+// ---------------------------------------------------------------------------
+// Integrasi (plan 2.4): webhook keluar (Zapier/Make/kustom) + Google Calendar/Gmail.
+// ---------------------------------------------------------------------------
+
+/// Endpoint webhook keluar per tenant. Secret penandatangan dienkripsi; URL wajib HTTPS publik.
+model OutboundWebhook {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  name            String
+  /// zapier | make | custom
+  provider        String
+  url             String
+  secretEncrypted String   @map("secret_encrypted")
+  maskedHint      String   @map("masked_hint")
+  /// Daftar event yang diteruskan, mis. ["lead.created","deal.won"]
+  events          Json     @default("[]")
+  isActive        Boolean  @default(true) @map("is_active")
+  lastDeliveryAt  DateTime? @map("last_delivery_at") @db.Timestamptz(3)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy       String?  @map("created_by") @db.Uuid
+  updatedBy       String?  @map("updated_by") @db.Uuid
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries   OutboundDelivery[]
+
+  @@index([organizationId, isActive])
+  @@map("outbound_webhooks")
+}
+
+/// Log pengiriman webhook keluar (payload disimpan untuk replay/diagnosis; tanpa rahasia).
+model OutboundDelivery {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  webhookId      String   @map("webhook_id") @db.Uuid
+  event          String
+  /// ID unik kejadian (idempotensi: satu event hanya satu pengiriman per endpoint)
+  eventId        String   @map("event_id")
+  payload        Json
+  /// pending | success | failed
+  status         String   @default("pending")
+  attempts       Int      @default(0)
+  httpStatus     Int?     @map("http_status")
+  error          String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  webhook      OutboundWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@unique([webhookId, eventId])
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@map("outbound_deliveries")
+}
+
+/// Koneksi Google per pengguna (Calendar dan/atau Gmail read-only). Token dienkripsi (AES-GCM).
+model GoogleIntegration {
+  id                    String    @id @default(uuid(7)) @db.Uuid
+  organizationId        String    @map("organization_id") @db.Uuid
+  userId                String    @map("user_id") @db.Uuid
+  googleEmail           String    @map("google_email")
+  refreshTokenEncrypted String    @map("refresh_token_encrypted")
+  accessTokenEncrypted  String?   @map("access_token_encrypted")
+  accessExpiresAt       DateTime? @map("access_expires_at") @db.Timestamptz(3)
+  scopes                String
+  syncCalendar          Boolean   @default(true) @map("sync_calendar")
+  syncEmail             Boolean   @default(false) @map("sync_email")
+  /// Token sinkronisasi inkremental Google Calendar
+  calendarSyncToken     String?   @map("calendar_sync_token")
+  /// Batas waktu pemindaian email berikutnya
+  emailSyncedAt         DateTime? @map("email_synced_at") @db.Timestamptz(3)
+  /// active | error | revoked
+  status                String    @default("active")
+  lastError             String?   @map("last_error")
+  lastSyncAt            DateTime? @map("last_sync_at") @db.Timestamptz(3)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventLinks   CalendarEventLink[]
+  emailLogs    EmailSyncLog[]
+
+  @@unique([organizationId, userId])
+  @@map("google_integrations")
+}
+
+/// Pemetaan Activity ↔ event Google. Tanpa FK ke activity agar tautan bertahan saat activity dihapus
+/// (event di Google tetap perlu dihapus).
+model CalendarEventLink {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  integrationId  String   @map("integration_id") @db.Uuid
+  activityId     String   @map("activity_id") @db.Uuid
+  externalId     String   @map("external_id")
+  /// ETag event hasil push terakhir kita (untuk mengenali "gema" perubahan sendiri)
+  etag           String?
+  lastPushedAt   DateTime? @map("last_pushed_at") @db.Timestamptz(3)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integration  GoogleIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, activityId])
+  @@unique([integrationId, externalId])
+  @@map("calendar_event_links")
+}
+
+/// Pesan Gmail yang sudah diproses (dengan atau tanpa kecocokan contact) agar tidak diproses ulang.
+model EmailSyncLog {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  integrationId  String   @map("integration_id") @db.Uuid
+  messageId      String   @map("message_id")
+  activityId     String?  @map("activity_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integration  GoogleIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, messageId])
+  @@map("email_sync_logs")
 }

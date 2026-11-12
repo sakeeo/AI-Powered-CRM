@@ -14,6 +14,9 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 
 7. **WhatsApp** (Settings → Connectors → WhatsApp Business, Owner/Admin): hubungkan Fonnte atau gateway HTTP kustom, klik _Test Connection_, lalu salin **URL webhook** dan **secret** (tampil sekali) ke pengaturan gateway Anda. Pesan masuk muncul di **Inbox WhatsApp** (tertaut otomatis ke contact/lead lewat nomor telepon, dan tercatat di timeline). Tugaskan percakapan ke anggota tim (Sales Rep dapat _Ambil_ percakapan yang belum ditugaskan), tutup/buka kembali, atau _Buat lead_ dari nomor baru. Balasan terkirim **hanya** saat Anda menekan Kirim.
 
+8. **Zapier / Make** (Settings → Connectors → "Zapier, Make & webhook keluar", Owner/Admin): tambahkan URL _Catch Hook_ (HTTPS), pilih event (lead/contact/deal/quotation), klik _Kirim uji_. Pengiriman bertanda tangan `X-CRM-Signature`, diulang otomatis bila gagal, dan tercatat di log.
+9. **Google** (Settings → Integrasi Saya, tiap pengguna): hubungkan akun Google untuk menyinkronkan task/meeting/call berjadwal ke Google Calendar (dua arah) dan, opsional, mencatat email dengan contact CRM ke timeline (read-only). Server perlu `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (lihat `.env.example`).
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

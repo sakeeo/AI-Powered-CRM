@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
 import { assertCan } from "@/lib/authz";
+import { enqueueCalendarSync } from "@/lib/calendar-sync";
 import { NotFoundError } from "@/lib/errors";
 import { idInput } from "@/lib/schema-helpers";
 import { sanitizeRichText } from "@/lib/sanitize";
@@ -63,6 +64,7 @@ export const createActivity = tenantAction(createActivitySchema, async (ctx, inp
     entityId: a.id,
     after: { type, subject, ownerId, dueAt },
   });
+  await enqueueCalendarSync(ctx.db, [ownerId], a.id);
   revalidateLinks(links);
   return { id: a.id };
 });
@@ -97,6 +99,7 @@ export const updateActivity = tenantAction(updateActivitySchema, async (ctx, inp
     before: { subject: a.subject, ownerId: a.ownerId },
     after: { subject, ownerId },
   });
+  await enqueueCalendarSync(ctx.db, [a.ownerId, ownerId], id);
   revalidateLinks(a);
 });
 
@@ -117,6 +120,7 @@ export const setActivityStatus = tenantAction(
       before: { status: a.status },
       after: { status },
     });
+    await enqueueCalendarSync(ctx.db, [a.ownerId], id);
     revalidateLinks(a);
   },
 );
@@ -131,5 +135,6 @@ export const deleteActivity = tenantAction(idInput, async (ctx, { id }) => {
     entityId: id,
     before: { subject: a.subject, type: a.type },
   });
+  await enqueueCalendarSync(ctx.db, [a.ownerId], id);
   revalidateLinks(a);
 });

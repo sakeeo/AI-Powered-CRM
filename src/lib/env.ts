@@ -15,6 +15,9 @@ const schema = z.object({
     .string()
     .refine((v) => Buffer.from(v, "base64").length === 32, "ENCRYPTION_KEY harus 32 byte (base64)"),
   BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
+  /** OAuth client Google (opsional) untuk sinkronisasi Calendar/Gmail per pengguna. */
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   /** "true" → pengguna wajib verifikasi email sebelum bisa login. */
   REQUIRE_EMAIL_VERIFICATION: z
     .enum(["true", "false"])

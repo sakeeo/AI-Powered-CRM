@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
 import { assertCan, resolveOwner } from "@/lib/authz";
+import { emitBusinessEvent } from "@/lib/outbound-webhooks";
+import {
+  contactPayload,
+} from "@/modules/integrations/payloads";
+
 import { AppError, NotFoundError } from "@/lib/errors";
 import { normalizePhone } from "@/lib/phone";
 import { idInput } from "@/lib/schema-helpers";
@@ -51,6 +56,7 @@ export const createContact = tenantAction(contactSchema, async (ctx, input) => {
     return c;
   });
   if (tagIds?.length) await applyTags(ctx, "contact", contact.id, tagIds);
+  await emitBusinessEvent(ctx.organizationId, "contact.created", `contact.created:${contact.id}`, contactPayload(contact));
   await writeAudit(ctx, {
     action: "contact.created",
     entityType: "Contact",

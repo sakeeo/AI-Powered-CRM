@@ -32,7 +32,12 @@ export function ConnectorHub({
   connectors: ConnectorView[];
   canManage: boolean;
   /** Kartu tambahan per kategori (webhook, email) dari plan berikutnya. */
-  extra?: { webhook?: React.ReactNode; email?: React.ReactNode; whatsapp?: React.ReactNode };
+  extra?: {
+    webhook?: React.ReactNode;
+    email?: React.ReactNode;
+    whatsapp?: React.ReactNode;
+    outbound?: React.ReactNode;
+  };
 }) {
   return (
     <div className="space-y-6">
@@ -51,6 +56,7 @@ export function ConnectorHub({
           <SoonCard title="Email delivery" note="Segera tersedia" />
         </Section>
       )}
+      {extra?.outbound}
       {extra?.whatsapp ?? (
         <Section title="WhatsApp" description="Percakapan pelanggan melalui WhatsApp Business.">
           {FUTURE_CONNECTORS.filter((c) => c.category === "whatsapp").map((c) => (

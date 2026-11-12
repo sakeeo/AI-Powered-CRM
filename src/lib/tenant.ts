@@ -44,6 +44,11 @@ export const TENANT_MODELS = new Set<string>([
   "AutomationRun",
   "Conversation",
   "Message",
+  "OutboundWebhook",
+  "OutboundDelivery",
+  "GoogleIntegration",
+  "CalendarEventLink",
+  "EmailSyncLog",
 ]);
 
 const WHERE_OPS = new Set([

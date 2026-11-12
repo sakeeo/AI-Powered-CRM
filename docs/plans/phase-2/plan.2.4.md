@@ -14,10 +14,10 @@ Sinkronisasi kalender/email dan integrasi no-code.
 
 ## Tugas
 
-- [ ] Google Calendar sync dua arah untuk activity.
-- [ ] Email provider sync (read-only dulu) ke timeline.
-- [ ] Outbound webhook & dukungan Zapier/Make sebagai provider Connector Hub.
-- [ ] Test token refresh, rate limit, dan isolasi tenant.
+- [x] Google Calendar sync dua arah untuk activity.
+- [x] Email provider sync (read-only dulu) ke timeline.
+- [x] Outbound webhook & dukungan Zapier/Make sebagai provider Connector Hub.
+- [x] Test token refresh, rate limit, dan isolasi tenant.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -25,8 +25,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Google APIs`, `
 
 ## Acceptance Criteria
 
-- [ ] Aktivitas tersinkron ke kalender pengguna.
-- [ ] Event bisnis dapat diteruskan ke Zapier/Make.
+- [x] Aktivitas tersinkron ke kalender pengguna.
+- [x] Event bisnis dapat diteruskan ke Zapier/Make.
 
 ## Verifikasi
 

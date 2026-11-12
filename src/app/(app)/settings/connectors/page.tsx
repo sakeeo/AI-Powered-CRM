@@ -5,6 +5,11 @@ import { ConnectorHub } from "@/modules/connectors/components/connector-hub";
 import { listConnectors } from "@/modules/connectors/server/queries";
 import { EmailConnectorList } from "@/modules/connectors/components/email-connector-list";
 import { WhatsappConnectorList } from "@/modules/whatsapp/components/whatsapp-connector-list";
+import { OutboundWebhooksCard } from "@/modules/integrations/components/outbound-webhooks-card";
+import {
+  listOutboundDeliveries,
+  listOutboundWebhooks,
+} from "@/modules/integrations/server/queries";
 import { WebhookCard } from "@/modules/webhooks/components/webhook-card";
 import { getWebhookView } from "@/modules/webhooks/server/queries";
 
@@ -13,7 +18,12 @@ export const metadata: Metadata = { title: "Connectors" };
 export default async function Page() {
   const ctx = await requireTenant();
   if (!ctx.ability.can("view", "Connector")) return <Forbidden what="connector" />;
-  const [connectors, webhook] = await Promise.all([listConnectors(ctx), getWebhookView(ctx)]);
+  const [connectors, webhook, outbound, deliveries] = await Promise.all([
+    listConnectors(ctx),
+    getWebhookView(ctx),
+    listOutboundWebhooks(ctx),
+    listOutboundDeliveries(ctx),
+  ]);
   const canManage = ctx.ability.can("update", "Connector");
   return (
     <ConnectorHub
@@ -22,6 +32,9 @@ export default async function Page() {
       extra={{
         webhook: <WebhookCard webhook={webhook} canManage={canManage} />,
         email: <EmailConnectorList connectors={connectors} canManage={canManage} />,
+        outbound: (
+          <OutboundWebhooksCard webhooks={outbound} deliveries={deliveries} canManage={canManage} />
+        ),
         whatsapp: <WhatsappConnectorList connectors={connectors} canManage={canManage} />,
       }}
     />

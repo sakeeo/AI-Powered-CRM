@@ -7,7 +7,14 @@ export function createQueueConnection() {
   return new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null });
 }
 
-export const QUEUES = { mail: "mail", reminders: "reminders", automation: "automation" } as const;
+export const QUEUES = {
+  mail: "mail",
+  reminders: "reminders",
+  automation: "automation",
+  outbound: "outbound",
+  calendar: "calendar",
+  googleSync: "google-sync",
+} as const;
 
 const globalForQueue = globalThis as unknown as {
   queueConn?: IORedis;
