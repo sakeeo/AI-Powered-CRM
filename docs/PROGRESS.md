@@ -19,6 +19,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 19 / 20 | In progress |
 | [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 7 / 7 | Done |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 7 / 7 | Done |
+| [Phase 4 — Backlog (usulan)](phase/phase-4-backlog.md) | 0 / – | Belum direncanakan |
 | **Total** | **38 / 39** | |
 
 ## Phase 0 — Project Setup
