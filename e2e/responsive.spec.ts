@@ -47,6 +47,7 @@ const PAGES = [
   "/settings/tags",
   "/settings/custom-fields",
   "/settings/automation",
+  "/inbox",
 ];
 for (const [name, width, height] of [
   ["smartphone", 375, 812],

@@ -7,6 +7,7 @@ import {
   FileText,
   Handshake,
   LayoutDashboard,
+  MessageCircle,
   MessageSquareHeart,
   Package,
   Plug,
@@ -65,6 +66,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/activities",
         icon: CheckSquare,
         description: "Task, call, meeting, dan follow-up.",
+      },
+      {
+        title: "Inbox WhatsApp",
+        href: "/inbox",
+        icon: MessageCircle,
+        description: "Percakapan WhatsApp pelanggan dalam satu inbox.",
       },
       {
         title: "Calendar",

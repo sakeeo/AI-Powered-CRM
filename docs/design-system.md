@@ -176,6 +176,7 @@ Hanya bila tidak ada padanan di tabel di atas. Gunakan token & radius template; 
 | Progress bar | `shared/progress-bar` | track `muted`, isi warna tone, `rounded-full` |
 | Detail field, Page actions, Entity sheet, Rich text editor | `shared/*` | label `text-sm text-gray-400`, nilai `text-sm text-gray-500` |
 | Panel Automation (daftar rule, dialog rule, log eksekusi) | `modules/automation/components/*` | Card + daftar `divide-y` seperti panel Settings lain; status = `ToneBadge` |
+| Inbox WhatsApp (daftar percakapan + thread + composer), daftar connector WhatsApp | `modules/whatsapp/components/*` | dua kolom dalam `Card`; gelembung masuk = `card` + border, keluar = `primary`; daftar connector mengikuti pola AI/Email |
 | Tag (chip), tag picker, input custom field, bar saved view, panel Settings Tags/Custom Fields | `modules/customization/components/*` | tag = `ToneBadge` (5 tone, tanpa warna baru); input memakai `FormField`/`SelectField`/`Checkbox` template; bar saved view = `SelectField` + `Button` outline + `Dialog`; panel Settings meniru `lead-sources-panel` (Card + daftar `divide-y`) |
 
 Komponen mockup lama yang **dihentikan** (tidak ada di template; jangan dipakai di halaman baru, hapus saat menyentuh file terkait): `HeroBanner`/`HeroStat`, `QuickAction`, `PendingCard` bergradien, medali/peringkat bergradien, token `tone-*`/`gradient-*` lama. Gantikan dengan `Card` + `Badge`/`Alert` bertone template.

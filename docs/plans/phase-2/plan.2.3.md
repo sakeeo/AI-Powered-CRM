@@ -14,11 +14,11 @@ Komunikasi WhatsApp terintegrasi di CRM dengan percakapan yang dapat ditugaskan.
 
 ## Tugas
 
-- [ ] Connector WhatsApp Business via gateway pihak ketiga (BYOK/token per tenant).
-- [ ] Webhook inbound pesan, model Conversation/Message, assignment percakapan.
-- [ ] UI shared inbox terkait lead/contact; log ke timeline.
-- [ ] Pengiriman pesan hanya atas aksi eksplisit user (tanpa auto-send AI).
-- [ ] Test: signature webhook, isolasi tenant.
+- [x] Connector WhatsApp Business via gateway pihak ketiga (BYOK/token per tenant).
+- [x] Webhook inbound pesan, model Conversation/Message, assignment percakapan.
+- [x] UI shared inbox terkait lead/contact; log ke timeline.
+- [x] Pengiriman pesan hanya atas aksi eksplisit user (tanpa auto-send AI).
+- [x] Test: signature webhook, isolasi tenant.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -26,8 +26,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Gateway WA (mis
 
 ## Acceptance Criteria
 
-- [ ] Pesan masuk tertaut ke record dan dapat ditugaskan.
-- [ ] Pesan keluar hanya via aksi user.
+- [x] Pesan masuk tertaut ke record dan dapat ditugaskan.
+- [x] Pesan keluar hanya via aksi user.
 
 ## Verifikasi
 

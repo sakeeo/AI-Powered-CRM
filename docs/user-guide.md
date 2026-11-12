@@ -12,6 +12,8 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 
 6. **Automation** (Settings → Automation, Owner/Admin): rule "ketika … maka …" — trigger: lead dibuat, deal Won, task jatuh tempo, quotation mendekati kedaluwarsa; aksi: tugaskan owner (tetap/bergiliran), buat task, kirim notifikasi (`{{name}}` = nama record). Tiap kejadian dieksekusi sekali, ada batas per jam, dan semuanya tercatat di Log eksekusi. Butuh proses worker (`npm run worker`).
 
+7. **WhatsApp** (Settings → Connectors → WhatsApp Business, Owner/Admin): hubungkan Fonnte atau gateway HTTP kustom, klik _Test Connection_, lalu salin **URL webhook** dan **secret** (tampil sekali) ke pengaturan gateway Anda. Pesan masuk muncul di **Inbox WhatsApp** (tertaut otomatis ke contact/lead lewat nomor telepon, dan tercatat di timeline). Tugaskan percakapan ke anggota tim (Sales Rep dapat _Ambil_ percakapan yang belum ditugaskan), tutup/buka kembali, atau _Buat lead_ dari nomor baru. Balasan terkirim **hanya** saat Anda menekan Kirim.
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

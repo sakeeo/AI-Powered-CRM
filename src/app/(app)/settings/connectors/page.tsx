@@ -4,6 +4,7 @@ import { requireTenant } from "@/lib/context";
 import { ConnectorHub } from "@/modules/connectors/components/connector-hub";
 import { listConnectors } from "@/modules/connectors/server/queries";
 import { EmailConnectorList } from "@/modules/connectors/components/email-connector-list";
+import { WhatsappConnectorList } from "@/modules/whatsapp/components/whatsapp-connector-list";
 import { WebhookCard } from "@/modules/webhooks/components/webhook-card";
 import { getWebhookView } from "@/modules/webhooks/server/queries";
 
@@ -21,6 +22,7 @@ export default async function Page() {
       extra={{
         webhook: <WebhookCard webhook={webhook} canManage={canManage} />,
         email: <EmailConnectorList connectors={connectors} canManage={canManage} />,
+        whatsapp: <WhatsappConnectorList connectors={connectors} canManage={canManage} />,
       }}
     />
   );

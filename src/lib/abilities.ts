@@ -27,6 +27,7 @@ export const SUBJECTS = [
   "Tag",
   "CustomField",
   "Automation",
+  "Conversation",
 ] as const;
 export type SubjectName = (typeof SUBJECTS)[number];
 
@@ -81,6 +82,7 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
       can("view", ["Tag", "CustomField"]);
       can(["create", "update"], "Tag");
       can("view", "Automation");
+      can(["view", "update"], "Conversation");
       break;
     case "sales_rep":
       can("view", OWNED, { ownerId: userId });
@@ -93,6 +95,9 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
       can("view", "Notification");
       can("view", ["Tag", "CustomField"]);
       can("create", "Tag");
+      // Inbox: lihat/tangani percakapan miliknya atau yang belum ditugaskan (boleh "mengambil").
+      can(["view", "update"], "Conversation", { assigneeId: userId });
+      can(["view", "update"], "Conversation", { assigneeId: null });
       break;
     case "viewer":
       can("view", [

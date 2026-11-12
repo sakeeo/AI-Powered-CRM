@@ -42,6 +42,8 @@ export const TENANT_MODELS = new Set<string>([
   "SavedView",
   "AutomationRule",
   "AutomationRun",
+  "Conversation",
+  "Message",
 ]);
 
 const WHERE_OPS = new Set([
