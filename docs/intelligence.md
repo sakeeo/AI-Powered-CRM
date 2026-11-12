@@ -41,3 +41,17 @@ Intelligence.
 Batasan: pengali sinyal aktivitas bersifat heuristik — tidak ikut di-backtest karena snapshot aktivitas historis
 tidak disimpan; titik evaluasi per stage saling berkorelasi (bukan sampel independen), jadi angka akurasi
 bersifat indikatif.
+
+## 3.3 Rekomendasi follow-up
+
+Dari interaksi selesai (call/email/meeting/WhatsApp) + pesan WhatsApp lead/contact dalam 180 hari: **kanal** = terbanyak
+berbobot (pesan masuk dari pelanggan dihitung 2×), **waktu** = hari-dalam-pekan & jam paling sering (zona waktu
+organisasi, jam dibatasi 08–17), **kadens** = median jeda antar interaksi (1–30 hari) → tidak disarankan lebih awal dari
+interaksi terakhir + kadens. Basis: pola pelanggan bila ≥ 3 interaksi; jika tidak, pola organisasi bila ≥ 10; jika tidak,
+"belum ada pola" (kanal kosong, draf generik) — tidak mengarang pola. **Isi** = draf templat deterministik per kanal.
+
+Kartu muncul di detail lead & Customer 360. **Terima** → membuat _task_ terbuka (dihitung ulang di server, tanpa pesan
+terkirim, tanpa duplikat) + umpan balik `accepted`; **Tidak relevan** → umpan balik `rejected` saja. AI Draft
+Acceptance Rate = diterima ÷ (diterima + ditolak), ditampilkan di `/intelligence`.
+
+Batasan: "respons pelanggan" hanya diketahui dari pesan WhatsApp masuk; belum ada sinyal balasan email/telepon.

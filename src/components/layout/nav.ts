@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BrainCircuit,
   Bell,
   Building2,
   CalendarDays,
@@ -114,6 +115,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/insights",
         icon: Sparkles,
         description: "Tanya data CRM dengan bahasa natural (hanya baca).",
+      },
+      {
+        title: "Intelligence",
+        href: "/intelligence",
+        icon: BrainCircuit,
+        description: "Kesiapan data, akurasi prediksi, anomali, dan forecast.",
       },
       {
         title: "Customer Feedback",

@@ -30,14 +30,14 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  sessions        Session[]
-  accounts        Account[]
-  members         Member[]
-  invitations     Invitation[]
-  teamMemberships TeamMember[]
+  sessions           Session[]
+  accounts           Account[]
+  members            Member[]
+  invitations        Invitation[]
+  teamMemberships    TeamMember[]
+  googleIntegrations GoogleIntegration[]
 
   @@map("users")
-  googleIntegrations GoogleIntegration[]
 }
 
 model Session {
@@ -144,6 +144,7 @@ model Organization {
   savedReports            SavedReport[]
   quotationVersions       QuotationVersion[]
   activityTemplates       ActivityTemplate[]
+  recommendationFeedback  RecommendationFeedback[]
   messages                Message[]
   outboundWebhooks        OutboundWebhook[]
   outboundDeliveries      OutboundDelivery[]
@@ -203,11 +204,11 @@ model Team {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   members      TeamMember[]
+  savedViews   SavedView[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
   @@map("teams")
-  savedViews SavedView[]
 }
 
 model TeamMember {
@@ -317,7 +318,7 @@ model Company {
   updatedBy      String?   @map("updated_by") @db.Uuid
   deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
   /// Nilai custom field (plan 2.1): { [key]: nilai }
-  customFields Json @default("{}") @map("custom_fields")
+  customFields   Json      @default("{}") @map("custom_fields")
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   contacts     ContactCompany[]
@@ -360,7 +361,7 @@ model Contact {
   updatedBy       String?   @map("updated_by") @db.Uuid
   deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(3)
   /// Nilai custom field (plan 2.1): { [key]: nilai }
-  customFields Json @default("{}") @map("custom_fields")
+  customFields    Json      @default("{}") @map("custom_fields")
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   companies    ContactCompany[]
@@ -370,15 +371,15 @@ model Contact {
 
   quotations Quotation[]
 
-  feedbacks    Feedback[]
-  segmentLinks CustomerSegmentMember[]
+  feedbacks     Feedback[]
+  segmentLinks  CustomerSegmentMember[]
+  conversations Conversation[]
 
   @@index([organizationId, name])
   @@index([organizationId, email])
   @@index([organizationId, phoneNormalized])
   @@index([organizationId, ownerId])
   @@map("contacts")
-  conversations Conversation[]
 }
 
 /// Relasi eksplisit many-to-many contact ↔ company (decisions #2).
@@ -454,12 +455,13 @@ model Lead {
   createdBy          String?   @map("created_by") @db.Uuid
   updatedBy          String?   @map("updated_by") @db.Uuid
   /// Nilai custom field (plan 2.1): { [key]: nilai }
-  customFields Json @default("{}") @map("custom_fields")
+  customFields       Json      @default("{}") @map("custom_fields")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   source       LeadSource?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 
-  activities Activity[]
+  activities    Activity[]
+  conversations Conversation[]
 
   @@index([organizationId, status])
   @@index([organizationId, ownerId])
@@ -467,7 +469,6 @@ model Lead {
   @@index([organizationId, email])
   @@index([organizationId, phoneNormalized])
   @@map("leads")
-  conversations Conversation[]
 }
 
 /// Pipeline penjualan (DEAL-06). Skema mendukung banyak pipeline; UI MVP mengelola satu default.
@@ -540,7 +541,7 @@ model Deal {
   updatedBy         String?   @map("updated_by") @db.Uuid
   deletedAt         DateTime? @map("deleted_at") @db.Timestamptz(3)
   /// Nilai custom field (plan 2.1): { [key]: nilai }
-  customFields Json @default("{}") @map("custom_fields")
+  customFields      Json      @default("{}") @map("custom_fields")
 
   organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   pipeline     Pipeline           @relation(fields: [pipelineId], references: [id])
@@ -765,17 +766,17 @@ model DealProduct {
 
 /// Konfigurasi quotation per organisasi (pajak, masa berlaku, syarat default). CRM bukan sistem perpajakan.
 model QuotationSettings {
-  id             String   @id @default(uuid(7)) @db.Uuid
-  organizationId String   @unique @map("organization_id") @db.Uuid
-  taxLabel       String   @default("PPN") @map("tax_label")
-  taxRate        Decimal  @default(11) @map("tax_rate") @db.Decimal(5, 2)
+  id                String   @id @default(uuid(7)) @db.Uuid
+  organizationId    String   @unique @map("organization_id") @db.Uuid
+  taxLabel          String   @default("PPN") @map("tax_label")
+  taxRate           Decimal  @default(11) @map("tax_rate") @db.Decimal(5, 2)
   /// true = harga sudah termasuk pajak
-  taxInclusive   Boolean  @default(false) @map("tax_inclusive")
-  validityDays   Int      @default(14) @map("validity_days")
-  terms          String?
+  taxInclusive      Boolean  @default(false) @map("tax_inclusive")
+  validityDays      Int      @default(14) @map("validity_days")
+  terms             String?
   /// Quotation dengan total ≥ nilai ini perlu persetujuan sebelum dikirim; null = tanpa approval (plan 2.7)
   approvalThreshold Decimal? @map("approval_threshold") @db.Decimal(18, 2)
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -826,10 +827,10 @@ model Quotation {
   updatedBy             String?   @map("updated_by") @db.Uuid
   deletedAt             DateTime? @map("deleted_at") @db.Timestamptz(3)
 
-  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  deal         Deal?           @relation(fields: [dealId], references: [id], onDelete: SetNull)
-  contact      Contact?        @relation(fields: [contactId], references: [id], onDelete: SetNull)
-  company      Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal         Deal?              @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  contact      Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company      Company?           @relation(fields: [companyId], references: [id], onDelete: SetNull)
   items        QuotationItem[]
   versions     QuotationVersion[]
 
@@ -1092,25 +1093,25 @@ model AutomationRun {
 
 /// Percakapan WhatsApp dengan satu nomor pelanggan. Unik per (organisasi, nomor ternormalisasi).
 model Conversation {
-  id               String    @id @default(uuid(7)) @db.Uuid
-  organizationId   String    @map("organization_id") @db.Uuid
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  organizationId     String   @map("organization_id") @db.Uuid
   /// Tipe connector WhatsApp yang dipakai (whatsapp_fonnte | whatsapp_http)
-  channel          String
-  phone            String
-  phoneNormalized  String    @map("phone_normalized")
-  displayName      String?   @map("display_name")
-  contactId        String?   @map("contact_id") @db.Uuid
-  leadId           String?   @map("lead_id") @db.Uuid
-  assigneeId       String?   @map("assignee_id") @db.Uuid
+  channel            String
+  phone              String
+  phoneNormalized    String   @map("phone_normalized")
+  displayName        String?  @map("display_name")
+  contactId          String?  @map("contact_id") @db.Uuid
+  leadId             String?  @map("lead_id") @db.Uuid
+  assigneeId         String?  @map("assignee_id") @db.Uuid
   /// open | closed
-  status           String    @default("open")
-  lastMessageAt    DateTime  @default(now()) @map("last_message_at") @db.Timestamptz(3)
-  lastMessagePreview String? @map("last_message_preview")
-  unreadCount      Int       @default(0) @map("unread_count")
-  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy        String?   @map("created_by") @db.Uuid
-  updatedBy        String?   @map("updated_by") @db.Uuid
+  status             String   @default("open")
+  lastMessageAt      DateTime @default(now()) @map("last_message_at") @db.Timestamptz(3)
+  lastMessagePreview String?  @map("last_message_preview")
+  unreadCount        Int      @default(0) @map("unread_count")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy          String?  @map("created_by") @db.Uuid
+  updatedBy          String?  @map("updated_by") @db.Uuid
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   contact      Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
@@ -1153,22 +1154,22 @@ model Message {
 
 /// Endpoint webhook keluar per tenant. Secret penandatangan dienkripsi; URL wajib HTTPS publik.
 model OutboundWebhook {
-  id              String   @id @default(uuid(7)) @db.Uuid
-  organizationId  String   @map("organization_id") @db.Uuid
+  id              String    @id @default(uuid(7)) @db.Uuid
+  organizationId  String    @map("organization_id") @db.Uuid
   name            String
   /// zapier | make | custom
   provider        String
   url             String
-  secretEncrypted String   @map("secret_encrypted")
-  maskedHint      String   @map("masked_hint")
+  secretEncrypted String    @map("secret_encrypted")
+  maskedHint      String    @map("masked_hint")
   /// Daftar event yang diteruskan, mis. ["lead.created","deal.won"]
-  events          Json     @default("[]")
-  isActive        Boolean  @default(true) @map("is_active")
+  events          Json      @default("[]")
+  isActive        Boolean   @default(true) @map("is_active")
   lastDeliveryAt  DateTime? @map("last_delivery_at") @db.Timestamptz(3)
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy       String?  @map("created_by") @db.Uuid
-  updatedBy       String?  @map("updated_by") @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy       String?   @map("created_by") @db.Uuid
+  updatedBy       String?   @map("updated_by") @db.Uuid
 
   organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   deliveries   OutboundDelivery[]
@@ -1225,8 +1226,8 @@ model GoogleIntegration {
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   eventLinks   CalendarEventLink[]
   emailLogs    EmailSyncLog[]
 
@@ -1237,15 +1238,15 @@ model GoogleIntegration {
 /// Pemetaan Activity ↔ event Google. Tanpa FK ke activity agar tautan bertahan saat activity dihapus
 /// (event di Google tetap perlu dihapus).
 model CalendarEventLink {
-  id             String   @id @default(uuid(7)) @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  integrationId  String   @map("integration_id") @db.Uuid
-  activityId     String   @map("activity_id") @db.Uuid
-  externalId     String   @map("external_id")
+  id             String    @id @default(uuid(7)) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  integrationId  String    @map("integration_id") @db.Uuid
+  activityId     String    @map("activity_id") @db.Uuid
+  externalId     String    @map("external_id")
   /// ETag event hasil push terakhir kita (untuk mengenali "gema" perubahan sendiri)
   etag           String?
   lastPushedAt   DateTime? @map("last_pushed_at") @db.Timestamptz(3)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   integration  GoogleIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
@@ -1357,4 +1358,27 @@ model ActivityTemplate {
 
   @@unique([organizationId, name])
   @@map("activity_templates")
+}
+
+/// Umpan balik pengguna atas rekomendasi AI/prediktif (diterima/ditolak) — dasar metrik AI Draft Acceptance Rate.
+model RecommendationFeedback {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  /// followup
+  kind           String
+  /// lead | contact | company
+  subjectType    String   @map("subject_type")
+  subjectId      String   @map("subject_id") @db.Uuid
+  /// accepted | rejected
+  decision       String
+  /// Kanal yang direkomendasikan (call | email | whatsapp | meeting) — null bila belum ada pola
+  channel        String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, kind, createdAt(sort: Desc)])
+  @@index([organizationId, subjectType, subjectId])
+  @@map("recommendation_feedback")
 }

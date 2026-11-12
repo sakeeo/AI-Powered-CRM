@@ -52,6 +52,7 @@ export const TENANT_MODELS = new Set<string>([
   "SavedReport",
   "QuotationVersion",
   "ActivityTemplate",
+  "RecommendationFeedback",
 ]);
 
 const WHERE_OPS = new Set([

@@ -14,14 +14,14 @@ Rekomendasi follow-up berdasarkan pola interaksi historis.
 
 ## Tugas
 
-- [ ] Analisis pola interaksi.
-- [ ] Rekomendasi waktu/kanal/isi follow-up sebagai draf.
-- [ ] Umpan balik user (diterima/ditolak) untuk metrik AI Draft Acceptance Rate.
+- [x] Analisis pola interaksi.
+- [x] Rekomendasi waktu/kanal/isi follow-up sebagai draf.
+- [x] Umpan balik user (diterima/ditolak) untuk metrik AI Draft Acceptance Rate.
 
 ## Acceptance Criteria
 
-- [ ] Rekomendasi bersifat draf.
-- [ ] Metrik penerimaan terekam.
+- [x] Rekomendasi bersifat draf.
+- [x] Metrik penerimaan terekam.
 
 ## Verifikasi
 
