@@ -3,6 +3,7 @@ import { Worker, type ConnectionOptions } from "bullmq";
 import { logger } from "@/lib/logger";
 import { deliverMail, type MailJob } from "@/lib/mailer";
 import { createQueueConnection, getQueue, QUEUES } from "@/lib/queue";
+import { runAutomations, scanAutomationTriggers, type AutomationEvent } from "@/lib/automation";
 import { scanQuotations, scanReminders } from "@/lib/reminders";
 
 /**
@@ -22,13 +23,18 @@ export function startWorkers() {
       const now = new Date();
       await scanReminders(now);
       await scanQuotations(now);
+      await scanAutomationTriggers(now);
     },
     {
       connection,
       concurrency: 1,
     },
   );
-  for (const w of [mail, reminders]) {
+  const automation = new Worker<AutomationEvent>(QUEUES.automation, (job) => runAutomations(job.data), {
+    connection,
+    concurrency: 3,
+  });
+  for (const w of [mail, reminders, automation]) {
     w.on("failed", (job, err) =>
       logger.error(
         { queue: w.name, jobId: job?.id, attempt: job?.attemptsMade, err: err.message },
@@ -37,7 +43,7 @@ export function startWorkers() {
     );
     w.on("error", (err) => logger.error({ queue: w.name, err: err.message }, "Worker error"));
   }
-  return { workers: [mail, reminders], connection };
+  return { workers: [mail, reminders, automation], connection };
 }
 
 async function main() {
@@ -47,7 +53,7 @@ async function main() {
     { every: 60_000 },
     { name: "scan", opts: { removeOnComplete: true, removeOnFail: 100 } },
   );
-  logger.info("Worker berjalan (mail, reminders)");
+  logger.info("Worker berjalan (mail, reminders, automation)");
   const stop = async () => {
     await Promise.all(workers.map((w) => w.close()));
     process.exit(0);

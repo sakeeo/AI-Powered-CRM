@@ -40,6 +40,8 @@ export const TENANT_MODELS = new Set<string>([
   "Taggable",
   "CustomFieldDefinition",
   "SavedView",
+  "AutomationRule",
+  "AutomationRun",
 ]);
 
 const WHERE_OPS = new Set([

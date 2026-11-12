@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
+import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
@@ -194,9 +195,16 @@ async function loadOpenDeal(ctx: ActionContext, id: string) {
 export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
   const deal = await loadOpenDeal(ctx, id);
   if (deal.status !== "open") throw new AppError("Deal sudah ditutup");
+  const closedAt = new Date();
   await ctx.db.deal.update({
     where: { id },
-    data: { status: "won", closedAt: new Date(), lostReason: null, updatedBy: ctx.userId },
+    data: { status: "won", closedAt, lostReason: null, updatedBy: ctx.userId },
+  });
+  await emitAutomationEvent(ctx.db, {
+    organizationId: ctx.organizationId,
+    trigger: "deal_won",
+    entityId: id,
+    eventKey: `deal_won:${id}:${closedAt.getTime()}`,
   });
   await writeAudit(ctx, {
     action: "deal.won",

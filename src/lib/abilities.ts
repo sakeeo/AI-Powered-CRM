@@ -26,6 +26,7 @@ export const SUBJECTS = [
   "Notification",
   "Tag",
   "CustomField",
+  "Automation",
 ] as const;
 export type SubjectName = (typeof SUBJECTS)[number];
 
@@ -79,6 +80,7 @@ export function defineAbilityFor({ role, userId, teamUserIds = [] }: AbilityInpu
       can("view", "Notification");
       can("view", ["Tag", "CustomField"]);
       can(["create", "update"], "Tag");
+      can("view", "Automation");
       break;
     case "sales_rep":
       can("view", OWNED, { ownerId: userId });

@@ -44,6 +44,7 @@ const SUBJECT_LABEL: Record<string, string> = {
   Notification: "Notifikasi",
   Tag: "Tag",
   CustomField: "Custom field",
+  Automation: "Automation",
 };
 
 function Cell({ grant }: { grant: Grant }) {

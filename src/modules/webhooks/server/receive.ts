@@ -1,3 +1,4 @@
+import { emitAutomationEvent } from "@/lib/automation";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { writeAudit } from "@/lib/audit";
 import { decryptSecret } from "@/lib/crypto";
@@ -113,6 +114,12 @@ export async function receiveWebhook(
       sourceId: source?.id ?? null,
       ownerId: null,
     } as never,
+  });
+  await emitAutomationEvent(db, {
+    organizationId: webhook.organizationId,
+    trigger: "lead_created",
+    entityId: lead.id,
+    eventKey: `lead_created:${lead.id}`,
   });
   await writeAudit(
     { db, userId: null, ip: req.ip },

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { tenantAction, type ActionContext } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
+import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan } from "@/lib/authz";
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
@@ -47,6 +48,12 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
     } as never,
   });
   if (tagIds?.length) await applyTags(ctx, "lead", lead.id, tagIds);
+  await emitAutomationEvent(ctx.db, {
+    organizationId: ctx.organizationId,
+    trigger: "lead_created",
+    entityId: lead.id,
+    eventKey: `lead_created:${lead.id}`,
+  });
   await writeAudit(ctx, {
     action: "lead.created",
     entityType: "Lead",

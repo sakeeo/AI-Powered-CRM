@@ -10,6 +10,8 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 4. Atur **Lead Source**, **Pipeline** (stage & probabilitas), dan **Quotation** (pajak, masa berlaku) di Settings.
 5. Sesuaikan data tanpa kode (Settings → **Tags** dan **Custom Fields**): tag berwarna untuk lead/contact/company/deal, dan isian tambahan (teks, angka, tanggal, ya/tidak, pilihan, URL) yang dapat wajib diisi, tampil di tabel, difilter, diimpor/diekspor, serta tampil hanya bila field lain bernilai tertentu (logika kondisional). Di tabel Leads/Contacts/Companies/Deals, **Simpan tampilan** menyimpan filter, pencarian, dan urutan (pribadi, tim, atau organisasi; bisa dijadikan bawaan ★).
 
+6. **Automation** (Settings → Automation, Owner/Admin): rule "ketika … maka …" — trigger: lead dibuat, deal Won, task jatuh tempo, quotation mendekati kedaluwarsa; aksi: tugaskan owner (tetap/bergiliran), buat task, kirim notifikasi (`{{name}}` = nama record). Tiap kejadian dieksekusi sekali, ada batas per jam, dan semuanya tercatat di Log eksekusi. Butuh proses worker (`npm run worker`).
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

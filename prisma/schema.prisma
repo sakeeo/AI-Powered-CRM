@@ -137,6 +137,8 @@ model Organization {
   taggables               Taggable[]
   customFieldDefinitions  CustomFieldDefinition[]
   savedViews              SavedView[]
+  automationRules         AutomationRule[]
+  automationRuns          AutomationRun[]
 
   @@map("organizations")
 }
@@ -998,4 +1000,59 @@ model SavedView {
   @@index([organizationId, entityType])
   @@index([organizationId, ownerId])
   @@map("saved_views")
+}
+
+// ---------------------------------------------------------------------------
+// Workflow automation (plan 2.2): rule event → aksi, dengan log eksekusi.
+// ---------------------------------------------------------------------------
+
+/// Rule: satu trigger + daftar aksi terbatas (assign owner, buat task, kirim notifikasi). Tanpa aksi AI.
+model AutomationRule {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  /// lead_created | deal_won | task_due | quotation_expiring
+  trigger        String
+  /// [{ type: "assign_owner" | "create_task" | "send_notification", ...params }]
+  actions        Json     @default("[]")
+  isActive       Boolean  @default(true) @map("is_active")
+  /// Batas laju: maksimum eksekusi per jam untuk rule ini
+  maxPerHour     Int      @default(100) @map("max_per_hour")
+  /// Penghitung eksekusi sukses (untuk round-robin assign)
+  runCount       Int      @default(0) @map("run_count")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?  @map("created_by") @db.Uuid
+  updatedBy      String?  @map("updated_by") @db.Uuid
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  runs         AutomationRun[]
+
+  @@index([organizationId, trigger, isActive])
+  @@map("automation_rules")
+}
+
+/// Log eksekusi. (ruleId, eventKey) unik → satu event hanya dieksekusi sekali per rule (idempotensi).
+model AutomationRun {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  ruleId         String   @map("rule_id") @db.Uuid
+  trigger        String
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id") @db.Uuid
+  eventKey       String   @map("event_key")
+  /// running | success | failed | rate_limited
+  status         String
+  /// Hasil per aksi: [{ type, ok, message }]
+  results        Json     @default("[]")
+  error          String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rule         AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, eventKey])
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([ruleId, createdAt(sort: Desc)])
+  @@map("automation_runs")
 }

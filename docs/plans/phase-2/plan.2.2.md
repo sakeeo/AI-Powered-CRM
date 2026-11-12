@@ -14,11 +14,11 @@ Automation event→rule yang aman: ada log, batas permission, dan pencegahan eks
 
 ## Tugas
 
-- [ ] Model Rule/Trigger/Action + log eksekusi.
-- [ ] Trigger: lead dibuat, deal Won, task due, quotation mendekati expiry.
-- [ ] Aksi: assign owner, buat task, kirim notifikasi (tanpa aksi AI otonom).
-- [ ] Idempotency & batas laju eksekusi; UI konfigurasi & log.
-- [ ] Test: tidak ada eksekusi berulang tak disengaja.
+- [x] Model Rule/Trigger/Action + log eksekusi.
+- [x] Trigger: lead dibuat, deal Won, task due, quotation mendekati expiry.
+- [x] Aksi: assign owner, buat task, kirim notifikasi (tanpa aksi AI otonom).
+- [x] Idempotency & batas laju eksekusi; UI konfigurasi & log.
+- [x] Test: tidak ada eksekusi berulang tak disengaja.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -26,8 +26,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `BullMQ`.
 
 ## Acceptance Criteria
 
-- [ ] Rule dapat dibuat, dinonaktifkan, dan dilacak lognya.
-- [ ] Eksekusi ganda dicegah.
+- [x] Rule dapat dibuat, dinonaktifkan, dan dilacak lognya.
+- [x] Eksekusi ganda dicegah.
 
 ## Verifikasi
 

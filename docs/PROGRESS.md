@@ -17,9 +17,9 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | ------------------------------------------------------------- | ----------------- | ----------- |
 | [Phase 0 — Project Setup](phase/phase-0-setup.md)             | 5 / 5 | Done |
 | [Phase 1 — MVP](phase/phase-1-mvp.md)                         | 19 / 20 | In progress |
-| [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 1 / 7 | In progress |
+| [Phase 2 — Business CRM](phase/phase-2-business-crm.md)       | 2 / 7 | In progress |
 | [Phase 3 — Intelligent CRM](phase/phase-3-intelligent-crm.md) | 0 / 7 | Not started |
-| **Total** | **26 / 39** | |
+| **Total** | **27 / 39** | |
 
 ## Phase 0 — Project Setup
 
@@ -61,7 +61,7 @@ File ini adalah **satu-satunya sumber status** pengerjaan plan. Diperbarui **set
 | Plan                             | Judul                                                       | Status      | Selesai | Catatan |
 | -------------------------------- | ----------------------------------------------------------- | ----------- | ------- | ------- |
 | [2.1](plans/phase-2/plan.2.1.md) | Tags, custom fields & saved views                           | Done | 2026-11-12 | Tag (+ `taggables` polymorphic, nama unik per org, filter di tabel), custom field 8 tipe (JSONB di entitas, kunci stabil, wajib, conditional logic `equals/not_equals/filled/empty` dengan rantai & deteksi siklus), muncul di form (dimuat otomatis tanpa prop drilling), detail, kolom tabel, filter, import CSV lead (`cf:<key>`), export (+ anti formula-injection); saved view pribadi/tim/organisasi + bawaan. Validasi tipe/wajib di server; nilai field tersembunyi dibuang. Izin: custom field hanya Owner/Admin; decisions.md #12–13. 16 test integrasi + 10 unit + 1 E2E (juga memperbaiki 2 test pagination yang basi sejak default page size 10). |
-| [2.2](plans/phase-2/plan.2.2.md) | Workflow automation engine                                  | Not started |         |         |
+| [2.2](plans/phase-2/plan.2.2.md) | Workflow automation engine                                  | Done | 2026-11-12 | Rule (trigger lead dibuat/deal Won/task due/quotation expiring × aksi assign owner [tetap/round-robin], buat task, notifikasi) + log eksekusi; event diantre BullMQ (queue `automation`, worker) dan pemindaian waktu tiap menit; idempoten via unique (rule,eventKey) + jobId deterministik, batas per jam, tanpa loop, penerima wajib anggota aktif. UI Settings → Automation. decisions.md #14. 10 test integrasi (paralel 5× = 1 eksekusi, rate limit, tenant, izin). |
 | [2.3](plans/phase-2/plan.2.3.md) | WhatsApp Business gateway & shared inbox                    | Not started |         |         |
 | [2.4](plans/phase-2/plan.2.4.md) | Calendar, email sync & Zapier/Make                          | Not started |         |         |
 | [2.5](plans/phase-2/plan.2.5.md) | AI: Quotation Narrative Drafter & Natural Language Insights | Not started |         |         |

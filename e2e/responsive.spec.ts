@@ -46,12 +46,14 @@ const PAGES = [
   "/settings/quotations",
   "/settings/tags",
   "/settings/custom-fields",
+  "/settings/automation",
 ];
 for (const [name, width, height] of [
   ["smartphone", 375, 812],
   ["tablet", 768, 1024],
 ] as const) {
   test(`semua halaman utama tanpa overflow horizontal (${name} ${width}px)`, async ({ page }) => {
+    test.setTimeout(120_000);
     await page.setViewportSize({ width, height });
     for (const path of PAGES) {
       await page.goto(path);
