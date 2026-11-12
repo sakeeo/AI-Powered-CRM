@@ -42,7 +42,7 @@ export function LoginForm() {
       footer={
         <>
           Belum punya akun?{" "}
-          <Link href="/sign-up" className="text-primary font-medium hover:underline">
+          <Link href="/sign-up" className="text-loud font-medium hover:underline">
             Daftar
           </Link>
         </>
@@ -76,7 +76,7 @@ export function LoginForm() {
           />
         </FormField>
         <div className="text-right">
-          <Link href="/forgot-password" className="text-primary text-xs hover:underline">
+          <Link href="/forgot-password" className="text-loud text-xs hover:underline">
             Lupa password?
           </Link>
         </div>

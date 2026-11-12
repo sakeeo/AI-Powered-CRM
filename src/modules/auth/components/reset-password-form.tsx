@@ -42,7 +42,7 @@ export function ResetPasswordForm() {
       title="Atur ulang password"
       description="Masukkan password baru Anda."
       footer={
-        <Link href="/login" className="text-primary font-medium hover:underline">
+        <Link href="/login" className="text-loud font-medium hover:underline">
           Kembali ke halaman masuk
         </Link>
       }

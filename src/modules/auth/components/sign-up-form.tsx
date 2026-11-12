@@ -40,7 +40,7 @@ export function SignUpForm() {
       footer={
         <>
           Sudah punya akun?{" "}
-          <Link href="/login" className="text-primary font-medium hover:underline">
+          <Link href="/login" className="text-loud font-medium hover:underline">
             Masuk
           </Link>
         </>

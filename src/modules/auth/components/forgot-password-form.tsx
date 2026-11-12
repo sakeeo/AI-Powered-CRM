@@ -39,7 +39,7 @@ export function ForgotPasswordForm() {
       title="Lupa password"
       description="Kami akan mengirim tautan untuk mengatur ulang password."
       footer={
-        <Link href="/login" className="text-primary font-medium hover:underline">
+        <Link href="/login" className="text-loud font-medium hover:underline">
           Kembali ke halaman masuk
         </Link>
       }

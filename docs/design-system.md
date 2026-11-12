@@ -28,7 +28,7 @@ Struktur token (radius, bayangan, tipografi, spasi) mengikuti `spike-tailwind/pa
 | ----- | ----- | --- | ----- |
 | **60% Main** | Krem hangat: latar halaman; kartu/panel sedikit lebih terang | `#efece6` (kartu `#faf8f4`) | `background`, `card`, `popover` |
 | **30% Second** | Hijau tua: aksi utama, link, tab/menu aktif, ring fokus, sidebar | `#1d4631` (hover/gelap `#173d2b`) | `primary`, `primary-strong`, `sidebar`, `brand-navy` |
-| **10% Loud** | Merah-oranye terang: aksen, aksi berbahaya, indikator sidebar | `#ff4b26` | `destructive`, `tone-red`, `sidebar-primary` |
+| **10% Loud** | Merah-oranye terang: aksen, aksi berbahaya, indikator sidebar | `#ff4b26` | `destructive`, `tone-red`, `sidebar-primary`, `loud` (alias `sidebar-primary`; logo & link aksen halaman auth) |
 
 Aturan pakai: Loud ≤ 10% permukaan — **bukan** warna tombol utama; Second untuk semua aksi utama; Main untuk semua permukaan netral.
 
