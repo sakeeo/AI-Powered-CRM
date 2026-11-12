@@ -182,6 +182,9 @@ describe("AI Red Zone — AI hanya membuat draf", () => {
       "src/modules/customers/server/ai.ts",
       "src/modules/leads/server/text-to-lead.ts",
       "src/modules/reports/server/lost-category.ts",
+      "src/modules/quotations/server/narrative.ts",
+      "src/modules/insights/server/plan-ai.ts",
+      "src/modules/insights/server/execute.ts",
     ];
     expect(files.length).toBeGreaterThanOrEqual(8);
     const forbidden =

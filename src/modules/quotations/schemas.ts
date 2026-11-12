@@ -52,6 +52,7 @@ export const saveQuotationSchema = z.object({
   companyId: optionalUuid,
   notes: optionalText(3000),
   terms: optionalText(5000),
+  narrative: optionalText(6000),
   globalDiscountPercent: percent,
   items: z.array(quotationItemSchema).min(1, "Tambahkan minimal satu item").max(100),
 });

@@ -17,6 +17,8 @@ Panduan singkat untuk alur kerja utama. Semua fitur AI hanya menghasilkan **draf
 8. **Zapier / Make** (Settings → Connectors → "Zapier, Make & webhook keluar", Owner/Admin): tambahkan URL _Catch Hook_ (HTTPS), pilih event (lead/contact/deal/quotation), klik _Kirim uji_. Pengiriman bertanda tangan `X-CRM-Signature`, diulang otomatis bila gagal, dan tercatat di log.
 9. **Google** (Settings → Integrasi Saya, tiap pengguna): hubungkan akun Google untuk menyinkronkan task/meeting/call berjadwal ke Google Calendar (dua arah) dan, opsional, mencatat email dengan contact CRM ke timeline (read-only). Server perlu `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (lihat `.env.example`).
 
+10. **AI tambahan** (butuh AI connector): di quotation, _Buat draf dengan AI_ menulis pengantar/ruang lingkup — selalu draf yang Anda edit lalu _Simpan_; harga tidak pernah dibuat AI (peringatan muncul bila ada nominal). **Tanya CRM (AI)** menjawab pertanyaan seperti "Berapa deal Won bulan ini?" dengan kueri baca-saja; hasil hanya mencakup data yang boleh Anda lihat dan "cara pertanyaan dipahami" ditampilkan untuk diperiksa.
+
 ## 2. Lead → Deal
 
 - **Leads**: tambah manual, **Impor CSV** (pemetaan kolom, laporan baris error), atau **Dari teks (AI)** (tempel pesan WA/email → draf → periksa → Simpan). Form website masuk otomatis lewat webhook (sumber "Website").

@@ -203,6 +203,7 @@ export const saveQuotation = tenantAction(saveQuotationSchema, async (ctx, input
         companyId: input.companyId ?? null,
         notes: input.notes ?? null,
         terms: input.terms ?? null,
+        narrative: input.narrative ?? null,
         globalDiscountPercent: toDecimal(input.globalDiscountPercent)!,
         subtotal: toDecimal(calc.subtotal)!,
         discountTotal: toDecimal(calc.discountTotal)!,

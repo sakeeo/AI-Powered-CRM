@@ -117,6 +117,12 @@ export function QuotationPdf({
           </View>
         </View>
 
+        {q.narrative ? (
+          <View style={s.block}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Pengantar</Text>
+            <Text>{q.narrative}</Text>
+          </View>
+        ) : null}
         {q.notes ? (
           <View style={s.block}>
             <Text style={{ fontFamily: "Helvetica-Bold" }}>Catatan</Text>

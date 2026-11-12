@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, Plus, Trash2 } from "lucide-react";
+import { aiDraftQuotationNarrative } from "@/modules/quotations/server/ai-actions";
+import { Download, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -74,6 +75,9 @@ export function QuotationBuilder({
   const [companyId, setCompanyId] = useState(q.companyId ?? "");
   const [notes, setNotes] = useState(q.notes ?? "");
   const [terms, setTerms] = useState(q.terms ?? "");
+  const [narrative, setNarrative] = useState(q.narrative ?? "");
+  const [guidance, setGuidance] = useState("");
+  const [aiDraft, setAiDraft] = useState<{ draft: string; warnings: string[] } | null>(null);
   const [globalDiscount, setGlobalDiscount] = useState<string>(q.globalDiscountPercent);
   const [seq, setSeq] = useState(q.items.length);
   const [lines, setLines] = useState<Line[]>(
@@ -138,6 +142,7 @@ export function QuotationBuilder({
         companyId,
         notes,
         terms,
+        narrative,
         globalDiscountPercent: globalDiscount,
         items: lines.map((l) => ({
           productId: l.productId,
@@ -405,6 +410,99 @@ export function QuotationBuilder({
               </dd>
             </div>
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Narasi pengantar</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <FormField
+            id="qb-narrative"
+            label="Pengantar / ruang lingkup (tampil di PDF)"
+            hint="Bisa ditulis sendiri atau dari draf AI. Angka harga tidak pernah dibuat AI — hanya tabel di atas."
+          >
+            <Textarea
+              id="qb-narrative"
+              rows={6}
+              value={narrative}
+              disabled={!editable}
+              onChange={(e) => setNarrative(e.target.value)}
+            />
+          </FormField>
+          {editable && (
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="min-w-56 flex-1">
+                  <Input
+                    aria-label="Arahan untuk AI"
+                    placeholder="Arahan opsional (mis. nada formal, tekankan implementasi)"
+                    maxLength={300}
+                    value={guidance}
+                    onChange={(e) => setGuidance(e.target.value)}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={pending}
+                  onClick={() =>
+                    start(async () => {
+                      const res = await aiDraftQuotationNarrative({
+                        quotationId: q.id,
+                        guidance: guidance || undefined,
+                      });
+                      if (!res.ok) return void toast.error(res.error);
+                      setAiDraft(res.data);
+                    })
+                  }
+                >
+                  <Sparkles /> Buat draf dengan AI
+                </Button>
+              </div>
+              {aiDraft && (
+                <div
+                  className="space-y-2 rounded-lg border border-dashed p-3"
+                  data-testid="ai-narrative-draft"
+                >
+                  <p className="text-xs font-semibold">Draf AI — tinjau dan edit sebelum dipakai</p>
+                  <Textarea
+                    aria-label="Draf narasi AI"
+                    rows={6}
+                    value={aiDraft.draft}
+                    onChange={(e) => setAiDraft({ ...aiDraft, draft: e.target.value })}
+                  />
+                  {aiDraft.warnings.map((w) => (
+                    <p key={w} role="alert" className="text-tone-orange-ink text-xs">
+                      ⚠ {w}
+                    </p>
+                  ))}
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        setNarrative(aiDraft.draft);
+                        setAiDraft(null);
+                        toast.success("Draf dimasukkan. Klik Simpan untuk menyimpan.");
+                      }}
+                    >
+                      Pakai draf ini
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setAiDraft(null)}
+                    >
+                      Buang
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

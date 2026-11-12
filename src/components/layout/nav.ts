@@ -12,6 +12,7 @@ import {
   Package,
   Plug,
   Settings,
+  Sparkles,
   Target,
   UserCircle,
   Users,
@@ -107,6 +108,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/reports",
         icon: BarChart3,
         description: "Laporan performa lead, pipeline, dan penjualan.",
+      },
+      {
+        title: "Tanya CRM (AI)",
+        href: "/insights",
+        icon: Sparkles,
+        description: "Tanya data CRM dengan bahasa natural (hanya baca).",
       },
       {
         title: "Customer Feedback",

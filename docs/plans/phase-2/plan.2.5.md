@@ -14,10 +14,10 @@ Draf narasi quotation dan tanya data dengan bahasa natural, tetap human-in-the-l
 
 ## Tugas
 
-- [ ] Quotation Narrative Drafter: draf teks pengantar/SOW (angka tetap dari kode deterministik).
-- [ ] Natural Language CRM Insights: pertanyaan → query terbatas read-only dengan tenant scope & permission user.
-- [ ] Guardrail: tidak ada penulisan data, tidak ada auto-send; log prompt sesuai keputusan privasi.
-- [ ] Test Red Zone & kebocoran lintas tenant.
+- [x] Quotation Narrative Drafter: draf teks pengantar/SOW (angka tetap dari kode deterministik).
+- [x] Natural Language CRM Insights: pertanyaan → query terbatas read-only dengan tenant scope & permission user.
+- [x] Guardrail: tidak ada penulisan data, tidak ada auto-send; log prompt sesuai keputusan privasi.
+- [x] Test Red Zone & kebocoran lintas tenant.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -25,8 +25,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Vercel AI SDK`.
 
 ## Acceptance Criteria
 
-- [ ] Draf narasi dapat diedit sebelum dipakai.
-- [ ] Insight hanya membaca data yang boleh diakses user.
+- [x] Draf narasi dapat diedit sebelum dipakai.
+- [x] Insight hanya membaca data yang boleh diakses user.
 
 ## Verifikasi
 

@@ -803,6 +803,8 @@ model Quotation {
   total                 Decimal   @default(0) @db.Decimal(18, 2)
   notes                 String?
   terms                 String?
+  /// Narasi pengantar/SOW (diedit user; boleh berasal dari draf AI yang sudah ditinjau)
+  narrative             String?
   pdfKey                String?   @map("pdf_key")
   pdfGeneratedAt        DateTime? @map("pdf_generated_at") @db.Timestamptz(3)
   sentAt                DateTime? @map("sent_at") @db.Timestamptz(3)
