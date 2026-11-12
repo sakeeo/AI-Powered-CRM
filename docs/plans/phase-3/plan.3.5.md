@@ -14,9 +14,9 @@ Forecast penjualan probabilistik berbasis data historis.
 
 ## Tugas
 
-- [ ] Metodologi forecast & validasi backtest.
-- [ ] Visualisasi rentang (P10/P50/P90).
-- [ ] Label jelas: estimasi, bukan jaminan/akuntansi.
+- [x] Metodologi forecast & validasi backtest.
+- [x] Visualisasi rentang (P10/P50/P90).
+- [x] Label jelas: estimasi, bukan jaminan/akuntansi.
 
 ## Pustaka (Library-First, PRD §10.2)
 
@@ -24,8 +24,8 @@ Gunakan pustaka standar berikut; jangan membuat ulang dari nol: `Recharts`.
 
 ## Acceptance Criteria
 
-- [ ] Forecast dapat di-backtest.
-- [ ] Asumsi dan batasan terdokumentasi.
+- [x] Forecast dapat di-backtest.
+- [x] Asumsi dan batasan terdokumentasi.
 
 ## Verifikasi
 

@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CheckSquare,
   FileText,
+  LineChart,
   Handshake,
   LayoutDashboard,
   MessageCircle,
@@ -121,6 +122,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/intelligence",
         icon: BrainCircuit,
         description: "Kesiapan data, akurasi prediksi, anomali, dan forecast.",
+      },
+      {
+        title: "Forecast",
+        href: "/forecast",
+        icon: LineChart,
+        description: "Estimasi penjualan probabilistik (P10/P50/P90) dengan backtest.",
       },
       {
         title: "Customer Feedback",

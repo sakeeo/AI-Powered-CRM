@@ -73,3 +73,29 @@ miliknya. **Tidak ada aksi otonom** — pemindai hanya menulis `insight_alerts` 
 mengubah status alert.
 
 Batasan: total pembelian hanya mata uang default; ambang tetap (belum dapat dikonfigurasi per organisasi).
+
+## 3.5 Forecast penjualan probabilistik
+
+Halaman **Forecast** (`/forecast`). Label wajib: _estimasi, bukan jaminan dan bukan angka akuntansi_ (angka resmi ada di
+Laporan, berbasis Decimal).
+
+**Metode** — simulasi Monte Carlo 2.000 percobaan dengan PRNG ber-seed (mulberry32 → hasil deterministik antar tampilan).
+Tiap deal terbuka menang dengan probabilitas _p_ = win rate historis stage-nya (deal tertutup yang pernah mencapai stage
+itu, dihaluskan prior probabilitas stage — sama dengan 3.2, tanpa pengali aktivitas) dan, bila menang, menyumbang
+`value`. Deal dikelompokkan ke **bulan perkiraan closing**: lewat tanggal → bulan ini; di luar horizon 3 bulan, tanpa
+tanggal, atau mata uang selain mata uang default organisasi → dikecualikan (jumlahnya ditampilkan). Output per bulan &
+total: P10/P50/P90 dari distribusi jumlah nilai yang menang, plus nilai harapan Σ p·v. Visualisasi Recharts (batang
+P10–P90, titik P50).
+
+**Backtest** — untuk tiap bulan lalu (≤ 6): rekonstruksi deal yang masih terbuka di awal bulan dan berperkiraan closing
+di bulan itu; probabilitas dilatih hanya dari deal yang tertutup _sebelum_ awal bulan (tanpa kebocoran) dengan stage pada
+awal bulan (direkonstruksi dari `deal_stage_history`); aktual = nilai deal kohort yang Won sebelum akhir bulan.
+Dilaporkan **cakupan** (persen bulan dengan aktual di dalam P10–P90; ideal ≈ 80%) dan **MAPE** P50.
+
+**Asumsi & batasan**
+- Deal diasumsikan independen (tanpa korelasi antar deal/musiman) → rentang cenderung terlalu sempit bila ada tren pasar.
+- Waktu closing mengikuti `expectedCloseDate` terkini (bisa sudah direvisi sejak dulu) — backtest memakai nilai terkini.
+- Bulan memakai batas UTC; satu mata uang (default organisasi).
+- Dengan sedikit bulan ber-backtest, cakupan/MAPE sangat berfluktuasi — baca sebagai indikatif.
+- Pengguna melihat forecast deal dalam izinnya (Sales Rep: miliknya); pelatihan probabilitas memakai seluruh deal tertutup
+  organisasi (agregat). Diaktifkan hanya bila ≥ 10 deal tertutup dan riwayat ≥ 3 bulan.
