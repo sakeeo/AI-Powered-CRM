@@ -9,12 +9,15 @@ test("whatsapp: hubungkan gateway, pesan masuk lewat webhook muncul di inbox dan
 
   await page.goto("/settings/connectors");
   await page.waitForLoadState("networkidle");
-  await page.getByTestId("wa-row-fonnte").getByRole("button", { name: "Hubungkan" }).click();
+  await page
+    .getByTestId("catalog-wa-fonnte")
+    .getByRole("button", { name: /Hubungkan|Kelola/ })
+    .click();
   await page.getByLabel("Token / API key").fill(`token-e2e-${stamp}-abcdef`);
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
   const secret = (await page.getByTestId("wa-secret").textContent())!.trim();
   expect(secret).toMatch(/^wasec_/);
-  const publicId = (await page.getByTestId("wa-row-fonnte").locator("code").first().textContent())!
+  const publicId = (await page.getByRole("dialog").locator("code").first().textContent())!
     .split("/")
     .pop()!;
   await page.getByRole("button", { name: "Selesai" }).click();

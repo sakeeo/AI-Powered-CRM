@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, KeyRound, Pencil, Plug, PlugZap, Plus, Star, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Pencil, PlugZap, Star, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
@@ -8,14 +8,6 @@ import { SelectField } from "@/components/shared/select-field";
 import { Badge } from "@/components/ui/badge";
 import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -142,16 +134,31 @@ function ConnectorForm({
 export function WhatsappConnectorList({
   connectors,
   canManage,
+  launch,
+  manage,
 }: {
   connectors: ConnectorView[];
   canManage: boolean;
+  launch?: { provider: WaProvider; n: number };
+  /** Permintaan membuka dialog kelola (detail + aksi) dari kartu. */
+  manage?: { provider: WaProvider; n: number };
 }) {
   const byType = new Map(connectors.map((c) => [c.type, c]));
   const [form, setForm] = useState<{ provider: WaProvider; n: number } | null>(null);
   const [secret, setSecret] = useState<{ publicId: string; secret: string } | null>(null);
   const [pending, start] = useTransition();
-  const firstFree =
-    WA_PROVIDERS.find((p) => !byType.has(WA_PROVIDER_INFO[p].type)) ?? WA_PROVIDERS[0];
+  const [seen, setSeen] = useState(launch?.n);
+  if (launch && launch.n !== seen) {
+    setSeen(launch.n);
+    setForm(launch);
+  }
+  const [managed, setManaged] = useState<WaProvider | null>(manage?.provider ?? null);
+  const [seenManage, setSeenManage] = useState(manage?.n);
+  if (manage && manage.n !== seenManage) {
+    setSeenManage(manage.n);
+    setManaged(manage.provider);
+  }
+  const managedP = managed && byType.has(WA_PROVIDER_INFO[managed].type) ? managed : null;
 
   function run(fn: () => Promise<{ ok: boolean; error?: string }>, ok: string) {
     start(async () => {
@@ -161,148 +168,8 @@ export function WhatsappConnectorList({
     });
   }
 
-  return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>WhatsApp Business</CardTitle>
-          <CardDescription>
-            Hubungkan gateway WhatsApp pilihan Anda (BYOK). Pesan masuk tiba lewat webhook ke Inbox;
-            pesan keluar hanya terkirim saat pengguna menekan Kirim.
-          </CardDescription>
-        </div>
-        {canManage && (
-          <CardAction>
-            <Button onClick={() => setForm({ provider: firstFree, n: Date.now() })}>
-              <Plus /> Tambah connector
-            </Button>
-          </CardAction>
-        )}
-      </CardHeader>
-      <CardContent className="divide-y">
-        {WA_PROVIDERS.map((p) => {
-          const info = WA_PROVIDER_INFO[p];
-          const c = byType.get(info.type);
-          const publicId = (c?.settings as S | null)?.publicId;
-          return (
-            <div
-              key={p}
-              data-testid={`wa-row-${p}`}
-              className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0"
-            >
-              <div className="min-w-0 flex-1 basis-64 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h4 className="text-md font-semibold">{info.title}</h4>
-                  {!c ? (
-                    <Badge variant="outline">Belum terhubung</Badge>
-                  ) : c.status === "error" ? (
-                    <Badge variant="destructive">Error</Badge>
-                  ) : (
-                    <Badge variant="secondary">Terhubung</Badge>
-                  )}
-                  {c?.isDefault && <Badge>Default</Badge>}
-                </div>
-                <p className="text-muted-foreground text-xs">{info.description}</p>
-                {c && (
-                  <p className="text-muted-foreground text-xs">
-                    <span className="font-mono">{c.maskedHint}</span>
-                    {c.lastTestedAt && (
-                      <>
-                        {" · Tes: "}
-                        <span
-                          className={c.lastTestOk ? "text-tone-green-ink" : "text-tone-red-ink"}
-                        >
-                          {c.lastTestOk ? "berhasil" : (c.lastTestError ?? "gagal")}
-                        </span>
-                      </>
-                    )}
-                  </p>
-                )}
-                {c && publicId && (
-                  <div className="flex items-center gap-1.5">
-                    <code className="bg-muted max-w-full truncate rounded px-1.5 py-0.5 text-xs">
-                      {`/api/webhooks/whatsapp/${publicId}`}
-                    </code>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      aria-label="Salin URL webhook"
-                      onClick={() => copy(webhookUrl(publicId))}
-                    >
-                      <Copy />
-                    </Button>
-                  </div>
-                )}
-              </div>
-              {canManage && (
-                <div className="flex flex-wrap gap-2">
-                  <RowAction
-                    icon={c ? Pencil : Plug}
-                    label={c ? "Ubah" : "Hubungkan"}
-                    variant={c ? "outline" : "default"}
-                    onClick={() => setForm({ provider: p, n: Date.now() })}
-                  />
-                  {c && (
-                    <>
-                      <RowAction
-                        icon={PlugZap}
-                        label="Test Connection"
-                        variant="outline"
-                        disabled={pending}
-                        onClick={() =>
-                          start(async () => {
-                            const res = await testWhatsappConnector({ provider: p });
-                            if (!res.ok) toast.error(res.error);
-                            else if (res.data.ok) toast.success("Koneksi gateway berhasil");
-                            else toast.error(res.data.error);
-                          })
-                        }
-                      />
-                      <RowAction
-                        icon={KeyRound}
-                        label="Putar secret"
-                        variant="outline"
-                        disabled={pending}
-                        onClick={() =>
-                          start(async () => {
-                            const res = await rotateWhatsappSecret({ provider: p });
-                            if (!res.ok) toast.error(res.error);
-                            else if (publicId)
-                              setSecret({ publicId, secret: res.data.webhookSecret });
-                          })
-                        }
-                      />
-                      {!c.isDefault && (
-                        <RowAction
-                          icon={Star}
-                          label="Jadikan default"
-                          variant="outline"
-                          disabled={pending}
-                          onClick={() =>
-                            run(
-                              () => setDefaultWhatsappConnector({ provider: p }),
-                              "Default diubah",
-                            )
-                          }
-                        />
-                      )}
-                      <RowAction
-                        icon={Trash2}
-                        label="Hapus"
-                        variant="destructive"
-                        disabled={pending}
-                        onClick={() =>
-                          run(() => removeWhatsappConnector({ provider: p }), "Connector dihapus")
-                        }
-                      />
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </CardContent>
+  const extras = (
+    <>
       {form && (
         <ConnectorForm
           key={form.n}
@@ -360,6 +227,141 @@ export function WhatsappConnectorList({
           </DialogContent>
         </Dialog>
       )}
-    </Card>
+    </>
+  );
+  return (
+    <>
+      <Dialog open={!!managedP} onOpenChange={(o) => !o && setManaged(null)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Kelola connector</DialogTitle>
+            <DialogDescription>
+              Detail, webhook, tes koneksi, dan secret gateway WhatsApp.
+            </DialogDescription>
+          </DialogHeader>
+          {(managedP ? [managedP] : []).map((p) => {
+            const info = WA_PROVIDER_INFO[p];
+            const c = byType.get(info.type)!;
+            const publicId = (c.settings as S | null)?.publicId;
+            return (
+              <div
+                key={p}
+                data-testid={`wa-row-${p}`}
+                className="flex flex-wrap items-center justify-between gap-3 py-1"
+              >
+                <div className="min-w-0 flex-1 basis-64 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4 className="text-md font-semibold">{info.title}</h4>
+                    {c.status === "error" ? (
+                      <Badge variant="destructive">Error</Badge>
+                    ) : (
+                      <Badge variant="secondary">Terhubung</Badge>
+                    )}
+                    {c.isDefault && <Badge>Default</Badge>}
+                  </div>
+                  <p className="text-muted-foreground text-xs">{info.description}</p>
+                  {
+                    <p className="text-muted-foreground text-xs">
+                      <span className="font-mono">{c.maskedHint}</span>
+                      {c.lastTestedAt && (
+                        <>
+                          {" · Tes: "}
+                          <span
+                            className={c.lastTestOk ? "text-tone-green-ink" : "text-tone-red-ink"}
+                          >
+                            {c.lastTestOk ? "berhasil" : (c.lastTestError ?? "gagal")}
+                          </span>
+                        </>
+                      )}
+                    </p>
+                  }
+                  {publicId && (
+                    <div className="flex items-center gap-1.5">
+                      <code className="bg-muted max-w-full truncate rounded px-1.5 py-0.5 text-xs">
+                        {`/api/webhooks/whatsapp/${publicId}`}
+                      </code>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label="Salin URL webhook"
+                        onClick={() => copy(webhookUrl(publicId))}
+                      >
+                        <Copy />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                {canManage && (
+                  <div className="flex flex-wrap gap-2">
+                    <RowAction
+                      icon={Pencil}
+                      label="Ubah"
+                      variant="outline"
+                      onClick={() => setForm({ provider: p, n: Date.now() })}
+                    />
+                    {
+                      <>
+                        <RowAction
+                          icon={PlugZap}
+                          label="Test Connection"
+                          variant="outline"
+                          disabled={pending}
+                          onClick={() =>
+                            start(async () => {
+                              const res = await testWhatsappConnector({ provider: p });
+                              if (!res.ok) toast.error(res.error);
+                              else if (res.data.ok) toast.success("Koneksi gateway berhasil");
+                              else toast.error(res.data.error);
+                            })
+                          }
+                        />
+                        <RowAction
+                          icon={KeyRound}
+                          label="Putar secret"
+                          variant="outline"
+                          disabled={pending}
+                          onClick={() =>
+                            start(async () => {
+                              const res = await rotateWhatsappSecret({ provider: p });
+                              if (!res.ok) toast.error(res.error);
+                              else if (publicId)
+                                setSecret({ publicId, secret: res.data.webhookSecret });
+                            })
+                          }
+                        />
+                        {!c.isDefault && (
+                          <RowAction
+                            icon={Star}
+                            label="Jadikan default"
+                            variant="outline"
+                            disabled={pending}
+                            onClick={() =>
+                              run(
+                                () => setDefaultWhatsappConnector({ provider: p }),
+                                "Default diubah",
+                              )
+                            }
+                          />
+                        )}
+                        <RowAction
+                          icon={Trash2}
+                          label="Hapus"
+                          variant="destructive"
+                          disabled={pending}
+                          onClick={() =>
+                            run(() => removeWhatsappConnector({ provider: p }), "Connector dihapus")
+                          }
+                        />
+                      </>
+                    }
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </DialogContent>
+      </Dialog>
+      {extras}
+    </>
   );
 }

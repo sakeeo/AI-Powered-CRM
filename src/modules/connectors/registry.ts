@@ -1,7 +1,14 @@
 /** Katalog Connector Hub. `available: false` = kartu tampil tetapi belum bisa dikonfigurasi. */
 export type ConnectorCategory = "ai" | "webhook" | "whatsapp" | "email";
 
-export const AI_PROVIDERS = ["gemini", "openai", "anthropic", "openrouter"] as const;
+export const AI_PROVIDERS = [
+  "gemini",
+  "openai",
+  "anthropic",
+  "deepseek",
+  "openrouter",
+  "custom",
+] as const;
 export type AiProvider = (typeof AI_PROVIDERS)[number];
 
 export const AI_PROVIDER_INFO: Record<
@@ -12,6 +19,10 @@ export const AI_PROVIDER_INFO: Record<
     description: string;
     defaultModel: string;
     keyHint: string;
+    /** Endpoint bawaan (API kompatibel OpenAI / Gemini / Anthropic). Kosong = wajib diisi user. */
+    defaultBaseUrl: string;
+    /** User boleh mengganti base URL (proxy, gateway, self-host). */
+    baseUrlEditable: boolean;
   }
 > = {
   gemini: {
@@ -20,6 +31,8 @@ export const AI_PROVIDER_INFO: Record<
     description: "Rekomendasi awal. Gunakan API key dari Google AI Studio.",
     defaultModel: "gemini-2.5-flash",
     keyHint: "AIza…",
+    defaultBaseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    baseUrlEditable: false,
   },
   openai: {
     type: "ai_openai",
@@ -27,6 +40,8 @@ export const AI_PROVIDER_INFO: Record<
     description: "Model GPT melalui API key OpenAI.",
     defaultModel: "gpt-4.1-mini",
     keyHint: "sk-…",
+    defaultBaseUrl: "https://api.openai.com/v1",
+    baseUrlEditable: true,
   },
   anthropic: {
     type: "ai_anthropic",
@@ -34,6 +49,17 @@ export const AI_PROVIDER_INFO: Record<
     description: "Model Claude melalui API key Anthropic.",
     defaultModel: "claude-haiku-5-5",
     keyHint: "sk-ant-…",
+    defaultBaseUrl: "https://api.anthropic.com/v1",
+    baseUrlEditable: false,
+  },
+  deepseek: {
+    type: "ai_deepseek",
+    title: "DeepSeek",
+    description: "Model DeepSeek (chat/reasoner) melalui API key platform DeepSeek.",
+    defaultModel: "deepseek-chat",
+    keyHint: "sk-…",
+    defaultBaseUrl: "https://api.deepseek.com/v1",
+    baseUrlEditable: true,
   },
   openrouter: {
     type: "ai_openrouter",
@@ -41,6 +67,18 @@ export const AI_PROVIDER_INFO: Record<
     description: "Satu key untuk banyak model. Nama model berformat vendor/model.",
     defaultModel: "openai/gpt-4o-mini",
     keyHint: "sk-or-…",
+    defaultBaseUrl: "https://openrouter.ai/api/v1",
+    baseUrlEditable: true,
+  },
+  custom: {
+    type: "ai_custom",
+    title: "Custom (OpenAI-compatible)",
+    description:
+      "Endpoint apa pun yang kompatibel dengan API OpenAI (Groq, Together, Ollama, vLLM, LiteLLM, dll).",
+    defaultModel: "",
+    keyHint: "key dari penyedia Anda",
+    defaultBaseUrl: "",
+    baseUrlEditable: true,
   },
 };
 

@@ -8,17 +8,24 @@ import { prisma } from "@/lib/prisma";
 import { forTenant } from "@/lib/tenant";
 import { AI_PROVIDER_INFO, providerFromType, type AiProvider } from "@/modules/connectors/registry";
 
-export function buildModel(provider: AiProvider, apiKey: string, modelId: string): LanguageModel {
+export function buildModel(
+  provider: AiProvider,
+  apiKey: string,
+  modelId: string,
+  baseUrl?: string,
+): LanguageModel {
+  const info = AI_PROVIDER_INFO[provider];
+  const url = (baseUrl || info.defaultBaseUrl).replace(/\/+$/, "");
   switch (provider) {
     case "gemini":
       return createGoogleGenerativeAI({ apiKey })(modelId);
-    case "openai":
-      return createOpenAI({ apiKey })(modelId);
     case "anthropic":
       return createAnthropic({ apiKey })(modelId);
-    case "openrouter":
-      // OpenRouter kompatibel dengan API OpenAI.
-      return createOpenAI({ apiKey, baseURL: "https://openrouter.ai/api/v1" }).chat(modelId);
+    case "openai":
+      return createOpenAI({ apiKey, baseURL: url })(modelId);
+    default:
+      // deepseek, openrouter, custom: kompatibel dengan API OpenAI (chat completions).
+      return createOpenAI({ apiKey, baseURL: url }).chat(modelId);
   }
 }
 
@@ -50,9 +57,9 @@ export async function getAiModel(organizationId: string): Promise<ResolvedAi> {
   ) as {
     apiKey: string;
   };
-  const modelId =
-    (row.settings as { model?: string } | null)?.model ?? AI_PROVIDER_INFO[provider].defaultModel;
-  return { model: buildModel(provider, apiKey, modelId), provider, modelId };
+  const settings = row.settings as { model?: string; baseUrl?: string } | null;
+  const modelId = settings?.model ?? AI_PROVIDER_INFO[provider].defaultModel;
+  return { model: buildModel(provider, apiKey, modelId, settings?.baseUrl), provider, modelId };
 }
 
 /**

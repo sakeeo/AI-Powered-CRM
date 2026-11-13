@@ -6,6 +6,10 @@ test("integrasi: webhook keluar Zapier dibuat (secret sekali, URL privat ditolak
   const stamp = Date.now() % 100000;
   await page.goto("/settings/connectors");
   await page.waitForLoadState("networkidle");
+  await page
+    .getByTestId("catalog-webhook-out")
+    .getByRole("button", { name: /Hubungkan|Kelola/ })
+    .click();
   await page.getByRole("button", { name: "Tambah webhook" }).click();
   await page.getByLabel("Nama", { exact: true }).fill(`Zap ${stamp}`);
   await page.getByLabel("URL (HTTPS)").fill("https://127.0.0.1/hook");

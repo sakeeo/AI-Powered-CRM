@@ -255,7 +255,7 @@ model AuditLog {
 model TenantConnector {
   id              String    @id @default(uuid(7)) @db.Uuid
   organizationId  String    @map("organization_id") @db.Uuid
-  /// ai_gemini | ai_openai | ai_anthropic | ai_openrouter | email_resend | email_smtp | ...
+  /// ai_gemini | ai_openai | ai_anthropic | ai_deepseek | ai_openrouter | email_resend | email_smtp | ...
   type            String
   configEncrypted String    @map("config_encrypted")
   /// Petunjuk kunci yang aman ditampilkan, mis. `sk-...abcd`

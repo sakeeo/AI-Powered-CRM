@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { AI_PROVIDERS, AI_PROVIDER_INFO, type AiProvider } from "@/modules/connectors/registry";
-import { saveAiConnector } from "@/modules/connectors/server/actions";
+import { listAiModels, saveAiConnector } from "@/modules/connectors/server/actions";
 import type { ConnectorView } from "@/modules/connectors/server/queries";
 
 /**
@@ -42,6 +42,32 @@ export function AiConnectorForm({
   const [error, setError] = useState<string>();
   const [pending, start] = useTransition();
   const editing = !!connectors.get(AI_PROVIDER_INFO[initialProvider].type);
+  const [baseUrl, setBaseUrl] = useState(existing?.baseUrl ?? "");
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, startLoad] = useTransition();
+  const providerOptions = AI_PROVIDERS.filter(
+    (p) => editing || !connectors.has(AI_PROVIDER_INFO[p].type),
+  ).map((p) => ({ value: p, label: AI_PROVIDER_INFO[p].title }));
+
+  function fetchModels() {
+    startLoad(async () => {
+      const res = await listAiModels({
+        provider,
+        apiKey: apiKey || undefined,
+        baseUrl: baseUrl || undefined,
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setModels(res.data.models);
+      if (res.data.models.length === 0) toast.info("Penyedia tidak mengembalikan model");
+      else {
+        toast.success(`${res.data.models.length} model ditemukan`);
+        if (!model || !res.data.models.includes(model)) setModel(res.data.models[0]);
+      }
+    });
+  }
 
   function changeProvider(next: string) {
     const p = next as AiProvider;
@@ -49,12 +75,19 @@ export function AiConnectorForm({
     setApiKey("");
     setError(undefined);
     setModel(connectors.get(AI_PROVIDER_INFO[p].type)?.model ?? AI_PROVIDER_INFO[p].defaultModel);
+    setBaseUrl(connectors.get(AI_PROVIDER_INFO[p].type)?.baseUrl ?? "");
+    setModels([]);
   }
 
   function save(e: React.FormEvent) {
     e.preventDefault();
     start(async () => {
-      const res = await saveAiConnector({ provider, apiKey: apiKey || undefined, model });
+      const res = await saveAiConnector({
+        provider,
+        apiKey: apiKey || undefined,
+        model,
+        baseUrl: info.baseUrlEditable ? baseUrl || undefined : undefined,
+      });
       if (!res.ok) {
         setError(res.fieldErrors?.model ?? res.error);
         return;
@@ -83,7 +116,7 @@ export function AiConnectorForm({
               value={provider}
               onChange={changeProvider}
               disabled={editing}
-              options={AI_PROVIDERS.map((p) => ({ value: p, label: AI_PROVIDER_INFO[p].title }))}
+              options={providerOptions}
             />
           </FormField>
           <FormField
@@ -92,7 +125,9 @@ export function AiConnectorForm({
             hint={
               existing ? "Kosongkan untuk mempertahankan key saat ini." : `Contoh: ${info.keyHint}`
             }
-            error={error && !modelError ? error : undefined}
+            error={
+              error && !modelError && !error.toLowerCase().includes("base url") ? error : undefined
+            }
           >
             <Input
               id="ai-key"
@@ -103,8 +138,57 @@ export function AiConnectorForm({
               placeholder={existing?.maskedHint ?? ""}
             />
           </FormField>
-          <FormField id="ai-model" label="Model" error={modelError}>
-            <Input id="ai-model" value={model} onChange={(e) => setModel(e.target.value)} />
+          {info.baseUrlEditable && (
+            <FormField
+              id="ai-base-url"
+              label="Base URL"
+              hint={
+                info.defaultBaseUrl
+                  ? `Opsional. Bawaan: ${info.defaultBaseUrl}`
+                  : "Contoh: https://api.groq.com/openai/v1 (harus https)"
+              }
+              error={error?.toLowerCase().includes("base url") ? error : undefined}
+            >
+              <Input
+                id="ai-base-url"
+                value={baseUrl}
+                onChange={(e) => setBaseUrl(e.target.value)}
+                placeholder={info.defaultBaseUrl}
+              />
+            </FormField>
+          )}
+          <FormField
+            id="ai-model"
+            label="Model"
+            error={modelError}
+            hint={
+              models.length
+                ? `${models.length} model tersedia — pilih dari daftar.`
+                : "Klik “Ambil daftar model” setelah key diisi, atau ketik nama model."
+            }
+          >
+            <div className="flex gap-2">
+              {models.length > 0 ? (
+                <SelectField
+                  id="ai-model"
+                  value={model}
+                  onChange={setModel}
+                  options={(models.includes(model) || !model ? models : [model, ...models]).map(
+                    (m) => ({ value: m, label: m }),
+                  )}
+                />
+              ) : (
+                <Input id="ai-model" value={model} onChange={(e) => setModel(e.target.value)} />
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loadingModels || (!apiKey && !existing)}
+                onClick={fetchModels}
+              >
+                {loadingModels ? "Memuat…" : "Ambil daftar model"}
+              </Button>
+            </div>
           </FormField>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -36,6 +36,10 @@ test("impor CSV: pemetaan kolom, laporan baris error, lalu export", async ({ pag
 test("webhook: buat, secret tampil sekali, rotasi", async ({ page }) => {
   await page.goto("/settings/connectors");
   await page.waitForLoadState("networkidle");
+  await page
+    .getByTestId("catalog-webhook-in")
+    .getByRole("button", { name: /Hubungkan|Kelola/ })
+    .click();
   const create = page.getByRole("button", { name: /Buat webhook|Rotasi secret/ });
   await create.click();
   await expect(page.getByTestId("webhook-secret")).toContainText("whsec_");

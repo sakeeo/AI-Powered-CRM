@@ -6,9 +6,7 @@ import { writeAudit } from "@/lib/audit";
 import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan } from "@/lib/authz";
 import { emitBusinessEvent } from "@/lib/outbound-webhooks";
-import {
-  leadPayload,
-} from "@/modules/integrations/payloads";
+import { leadPayload } from "@/modules/integrations/payloads";
 
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
@@ -53,7 +51,12 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
     } as never,
   });
   if (tagIds?.length) await applyTags(ctx, "lead", lead.id, tagIds);
-  await emitBusinessEvent(ctx.organizationId, "lead.created", `lead.created:${lead.id}`, leadPayload(lead));
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "lead.created",
+    `lead.created:${lead.id}`,
+    leadPayload(lead),
+  );
   await emitAutomationEvent(ctx.db, {
     organizationId: ctx.organizationId,
     trigger: "lead_created",

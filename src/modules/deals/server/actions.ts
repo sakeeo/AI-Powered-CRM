@@ -6,11 +6,7 @@ import { writeAudit } from "@/lib/audit";
 import { emitAutomationEvent } from "@/lib/automation";
 import { assertCan, resolveOwner } from "@/lib/authz";
 import { emitBusinessEvent } from "@/lib/outbound-webhooks";
-import {
-  customerPayload,
-  dealPayload,
-  stageChangePayload,
-} from "@/modules/integrations/payloads";
+import { customerPayload, dealPayload, stageChangePayload } from "@/modules/integrations/payloads";
 
 import { AppError, NotFoundError } from "@/lib/errors";
 import { toDecimal } from "@/lib/money-db";
@@ -90,7 +86,12 @@ export const createDeal = tenantAction(dealSchema, async (ctx, input) => {
     } as never,
   });
   if (tagIds?.length) await applyTags(ctx, "deal", deal.id, tagIds);
-  await emitBusinessEvent(ctx.organizationId, "deal.created", `deal.created:${deal.id}`, dealPayload(deal));
+  await emitBusinessEvent(
+    ctx.organizationId,
+    "deal.created",
+    `deal.created:${deal.id}`,
+    dealPayload(deal),
+  );
   await writeAudit(ctx, {
     action: "deal.created",
     entityType: "Deal",
@@ -229,7 +230,9 @@ export const markDealWon = tenantAction(closeWonSchema, async (ctx, { id }) => {
         id: { not: id },
         status: "won",
         deletedAt: null,
-        ...(partyType === "company" ? { companyId: partyId } : { companyId: null, contactId: partyId }),
+        ...(partyType === "company"
+          ? { companyId: partyId }
+          : { companyId: null, contactId: partyId }),
       },
     });
     if (earlier === 0)

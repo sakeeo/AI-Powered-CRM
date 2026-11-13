@@ -7,10 +7,11 @@ export async function testAiConnection(
   provider: AiProvider,
   apiKey: string,
   modelId: string,
+  baseUrl?: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     await generateText({
-      model: buildModel(provider, apiKey, modelId),
+      model: buildModel(provider, apiKey, modelId, baseUrl),
       prompt: "Balas dengan satu kata: pong",
       maxOutputTokens: 16,
       maxRetries: 0,
