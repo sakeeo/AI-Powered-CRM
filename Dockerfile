@@ -14,7 +14,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
     SKIP_ENV_VALIDATION=1 \
     DATABASE_URL="postgresql://build:build@localhost:5432/build"
-RUN npx prisma generate && npm run build
+# Heap dinaikkan agar build (type check) tidak OOM di VPS RAM 2 GB; tambahkan swap di server.
+RUN npx prisma generate && NODE_OPTIONS=--max-old-space-size=3072 npm run build
 
 # Migrasi database (sekali jalan): `docker compose run --rm migrate`
 FROM builder AS migrate
