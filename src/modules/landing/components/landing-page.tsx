@@ -486,12 +486,12 @@ export function LandingPage() {
         <p className="text-muted-foreground mx-auto mt-6 max-w-6xl border-t px-4 pt-6 text-center text-xs sm:px-6">
           Powered by{" "}
           <a
-            href="https://kebarakkoding.id"
+            href="https://kerabatkoding.id"
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground font-medium hover:underline"
           >
-            kebarakkoding.id
+            kerabatkoding.id
           </a>
         </p>
       </footer>
