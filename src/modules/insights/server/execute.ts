@@ -359,16 +359,16 @@ function listSelect(entity: InsightEntity) {
 function listColumns(entity: InsightEntity) {
   switch (entity) {
     case "lead":
-      return ["Nama", "Status", "Budget", "Owner", "Dibuat"];
+      return ["Nama", "Status", "Budget", "PIC", "Dibuat"];
     case "deal":
-      return ["Judul", "Status", "Nilai", "Stage", "Owner"];
+      return ["Judul", "Status", "Nilai", "Stage", "PIC"];
     case "contact":
     case "company":
-      return ["Nama", "Owner", "Dibuat"];
+      return ["Nama", "PIC", "Dibuat"];
     case "activity":
-      return ["Subjek", "Tipe", "Status", "Tenggat", "Owner"];
+      return ["Subjek", "Tipe", "Status", "Tenggat", "PIC"];
     case "quotation":
-      return ["Nomor", "Judul", "Status", "Total", "Owner"];
+      return ["Nomor", "Judul", "Status", "Total", "PIC"];
   }
 }
 const day = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : "—");

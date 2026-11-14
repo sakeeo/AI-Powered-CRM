@@ -108,7 +108,7 @@ function SegmentDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <form onSubmit={submit} className="space-y-4" noValidate>
           <DialogHeader>
             <DialogTitle>{d.id ? "Ubah segmen dinamis" : "Segmen dinamis baru"}</DialogTitle>

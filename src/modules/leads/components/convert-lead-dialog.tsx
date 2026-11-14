@@ -97,7 +97,7 @@ export function ConvertLeadDialog({
         <ArrowRightLeft /> Konversi
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent>
           <>
             <>
               <DialogHeader>

@@ -20,7 +20,7 @@ export const ACTION_TYPES = ["assign_owner", "create_task", "send_notification"]
 export type ActionType = (typeof ACTION_TYPES)[number];
 
 export const ACTION_LABEL: Record<ActionType, string> = {
-  assign_owner: "Tugaskan owner",
+  assign_owner: "Tugaskan PIC",
   create_task: "Buat task",
   send_notification: "Kirim notifikasi",
 };

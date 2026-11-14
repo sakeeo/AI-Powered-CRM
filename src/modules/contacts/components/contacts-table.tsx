@@ -70,7 +70,7 @@ export function ContactsTable({
       cell: (c) => c.row.original.companies.map((x) => x.company.name).join(", ") || "—",
     },
     {
-      header: "Pemilik",
+      header: "PIC",
       id: "owner",
       cell: (c) => (c.row.original.ownerId && ownerName.get(c.row.original.ownerId)) || "—",
     },
@@ -101,8 +101,8 @@ export function ContactsTable({
           <>
             <UrlFilterSelect
               param="owner"
-              label="Filter pemilik"
-              allLabel="Semua pemilik"
+              label="Filter PIC"
+              allLabel="Semua PIC"
               options={owners.map((o) => ({ value: o.userId, label: o.name }))}
             />
             <CustomizationFilters custom={custom} />

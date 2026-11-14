@@ -88,5 +88,5 @@ export async function assertActiveMember(ctx: TenantContext, userId: string) {
     where: { userId, active: true },
     select: { id: true },
   });
-  if (!ok) throw new AppError("Pemilik harus anggota aktif organisasi");
+  if (!ok) throw new AppError("PIC harus anggota aktif organisasi");
 }

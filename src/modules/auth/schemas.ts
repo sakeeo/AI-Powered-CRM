@@ -51,6 +51,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Email sudah terdaftar.",
   EMAIL_NOT_VERIFIED: "Email belum diverifikasi. Periksa kotak masuk Anda.",
   INVALID_TOKEN: "Tautan reset tidak valid atau sudah kedaluwarsa.",
+  SIGNUP_CLOSED: "Pendaftaran ditutup. Minta undangan dari Owner atau Admin.",
   PASSWORD_TOO_SHORT: "Password minimal 8 karakter.",
 };
 

@@ -142,7 +142,7 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
               )}
             </DetailField>
             <DetailField label="Sumber">{lead.source?.name}</DetailField>
-            <DetailField label="Owner">{owner ?? "Belum ditugaskan"}</DetailField>
+            <DetailField label="PIC">{owner ?? "Belum ditugaskan"}</DetailField>
             <DetailField label="Budget">
               {lead.budget && formatMoney(lead.budget, lead.currency)}
             </DetailField>
@@ -214,13 +214,17 @@ export default async function Page(props: PageProps<"/leads/[id]">) {
           </CardContent>
         </Card>
       )}
-      {score && <LeadScoreCard result={score} />}
-      {followUp && (
-        <FollowUpCard
-          subject={{ type: "lead", id: lead.id }}
-          rec={followUp}
-          canCreate={ctx.ability.can("create", "Activity")}
-        />
+      {(score || followUp) && (
+        <div className="grid gap-4 lg:grid-cols-2 lg:[&>*:only-child]:col-span-2">
+          {score && <LeadScoreCard result={score} />}
+          {followUp && (
+            <FollowUpCard
+              subject={{ type: "lead", id: lead.id }}
+              rec={followUp}
+              canCreate={ctx.ability.can("create", "Activity")}
+            />
+          )}
+        </div>
       )}
       <DuplicatesCard
         entity="lead"

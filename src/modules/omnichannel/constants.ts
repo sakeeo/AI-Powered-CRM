@@ -20,9 +20,9 @@ export const ROUTING_LABEL: Record<RoutingStrategy, { title: string; description
     description: "Percakapan baru belum ditugaskan; tim mengambil sendiri.",
   },
   sticky_owner: {
-    title: "Ikuti pemilik record",
+    title: "Ikuti PIC record",
     description:
-      "Ditugaskan ke pemilik contact/lead yang cocok; bila tak ada pemilik, giliran bergilir dari pool (bila diisi).",
+      "Ditugaskan ke PIC contact/lead yang cocok; bila tak ada PIC, giliran bergilir dari pool (bila diisi).",
   },
   round_robin: {
     title: "Bergilir (round robin)",

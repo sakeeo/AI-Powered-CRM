@@ -250,7 +250,7 @@ export async function getReport(
               "Ditutup",
               "Alasan Lost",
               "Kategori",
-              "Owner",
+              "PIC",
             ],
             rows: closed.map((d) => [
               d.title,
@@ -463,7 +463,7 @@ export async function getReport(
         charts: [],
         sections: [
           {
-            title: "Performa sales per pemilik",
+            title: "Performa sales per PIC",
             columns: [
               "Sales",
               "Lead baru",

@@ -22,7 +22,7 @@ export function AppTopbar({ bell }: { bell?: React.ReactNode }) {
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="h-4" />
       <div className="min-w-0">
-        <h1 className="truncate text-xl font-semibold">{item?.title ?? "CRM"}</h1>
+        <h1 className="truncate text-xl font-semibold">{item?.title ?? "Kerabat CRM"}</h1>
         {item && (
           <p className="text-muted-foreground hidden truncate text-sm sm:block">
             {item.description}

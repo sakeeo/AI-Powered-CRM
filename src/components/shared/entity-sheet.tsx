@@ -2,14 +2,17 @@
 
 import type { ReactNode } from "react";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-/** Slide-over standar untuk Quick Add / edit / preview record. Lebar 30% layar (min 22rem); penuh di mobile. */
+/**
+ * Modal form standar (Quick Add / edit / preview record). Desain modal (header sticky beraksen,
+ * body scroll, footer aksi sticky) ada di `ui/dialog`; letakkan `FormActions` di akhir <form>.
+ */
 export function EntitySheet({
   open,
   onOpenChange,
@@ -24,14 +27,14 @@ export function EntitySheet({
   children: ReactNode;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:w-[30vw] data-[side=right]:sm:max-w-none data-[side=right]:sm:min-w-[22rem]">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          {description && <SheetDescription>{description}</SheetDescription>}
-        </SheetHeader>
-        <div className="px-4 pb-4">{children}</div>
-      </SheetContent>
-    </Sheet>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
   );
 }

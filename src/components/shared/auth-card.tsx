@@ -23,10 +23,8 @@ export function AuthCard({
           >
             <BrainCircuit className="size-6" />
           </span>
-          <strong className="text-2xl font-bold tracking-wide">SMART CRM</strong>
-          <span className="text-muted-foreground text-sm">
-            AI Powered Customer Relation Management
-          </span>
+          <strong className="text-2xl font-bold tracking-wide">Kerabat CRM</strong>
+          <span className="text-muted-foreground text-sm">Pantau setiap lead hingga konversi.</span>
         </div>
         <CardTitle className="text-2xl">{title}</CardTitle>
         <CardDescription className="text-base">{description}</CardDescription>

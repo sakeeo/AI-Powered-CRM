@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthCard } from "@/components/shared/auth-card";
@@ -10,17 +10,26 @@ import { FormField } from "@/components/shared/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { authErrorMessage, signUpSchema, type SignUpInput } from "@/modules/auth/schemas";
+import {
+  authErrorMessage,
+  safeNextPath,
+  signUpSchema,
+  type SignUpInput,
+} from "@/modules/auth/schemas";
 
-export function SignUpForm() {
+export function SignUpForm({ defaultEmail }: { defaultEmail?: string }) {
   const router = useRouter();
+  const params = useSearchParams();
   const [error, setError] = useState<string>();
   const [notice, setNotice] = useState<string>();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpInput>({ resolver: zodResolver(signUpSchema) });
+  } = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: defaultEmail ? { email: defaultEmail } : undefined,
+  });
 
   async function onSubmit({ name, email, password }: SignUpInput) {
     setError(undefined);
@@ -29,7 +38,7 @@ export function SignUpForm() {
     // Bila verifikasi email diwajibkan, server tidak membuat session.
     if (!data?.token)
       return setNotice("Akun dibuat. Periksa email Anda untuk verifikasi, lalu masuk.");
-    router.replace("/dashboard");
+    router.replace(safeNextPath(params.get("next")));
     router.refresh();
   }
 

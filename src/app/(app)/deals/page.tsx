@@ -43,14 +43,18 @@ export default async function Page(props: PageProps<"/deals">) {
     extra: cust.where,
   };
   const pipeline = await getDefaultPipeline(ctx);
-  const view = pickParam(sp, "view") === "board" ? "board" : "list";
+  // Tampilan default = Papan (Kanban). Daftar: ?view=list, atau URL yang membawa parameter khas daftar
+  // (pencarian, sort, filter, saved view) tanpa parameter `view` — agar saved view lama tetap membuka daftar.
+  const explicitView = pickParam(sp, "view");
+  const hasListParams = Object.keys(sp).some((k) => !["view", "owner", "period"].includes(k));
+  const view = explicitView === "list" || (!explicitView && hasListParams) ? "list" : "board";
   const viewSwitch = (
     <div className="flex gap-2">
       <Button asChild variant={view === "list" ? "default" : "outline"} size="sm">
-        <Link href="/deals">Daftar</Link>
+        <Link href="/deals?view=list">Daftar</Link>
       </Button>
       <Button asChild variant={view === "board" ? "default" : "outline"} size="sm">
-        <Link href="/deals?view=board">Papan</Link>
+        <Link href="/deals">Papan</Link>
       </Button>
     </div>
   );
@@ -67,8 +71,8 @@ export default async function Page(props: PageProps<"/deals">) {
           {viewSwitch}
           <UrlFilterSelect
             param="owner"
-            label="Filter owner"
-            allLabel="Semua owner"
+            label="Filter PIC"
+            allLabel="Semua PIC"
             options={[
               { value: "unassigned", label: "Belum ditugaskan" },
               ...owners.map((o) => ({ value: o.userId, label: o.name })),

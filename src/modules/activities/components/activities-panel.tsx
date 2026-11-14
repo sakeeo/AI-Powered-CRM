@@ -7,7 +7,7 @@ import { ActivityItem } from "@/modules/activities/components/activity-item";
 import { listActivityTemplates, listTimeline } from "@/modules/activities/server/queries";
 import { getOrganization, listOwnerOptions } from "@/modules/organizations/server/queries";
 
-/** Panel aktivitas untuk halaman detail lead/contact/company/deal: composer + timeline. */
+/** Panel aktivitas untuk halaman detail lead/contact/company/deal: tombol "Tambah aktivitas" (modal form) + timeline. */
 export async function ActivitiesPanel({
   ctx,
   link,
@@ -29,8 +29,6 @@ export async function ActivitiesPanel({
     <Card>
       <CardHeader>
         <CardTitle>Aktivitas</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
         {ctx.ability.can("create", "Activity") && (
           <ActivityComposer
             link={link}
@@ -40,6 +38,8 @@ export async function ActivitiesPanel({
             timezone={org.timezone}
           />
         )}
+      </CardHeader>
+      <CardContent className="space-y-4">
         {(link.leadId || link.contactId || link.dealId) && (
           <FollowUpGhostwriter link={link} phone={phone} />
         )}

@@ -1,6 +1,8 @@
-# CRM
+# Kerabat CRM
 
-CRM berbasis cloud (multi-tenant, SaaS-ready) untuk Lead Acquisition, Sales Conversion, dan Customer Retention. Lihat [docs/PRD.md](docs/PRD.md).
+_Pantau setiap lead hingga konversi._
+
+Kerabat CRM adalah CRM berbasis cloud (multi-tenant, SaaS-ready) untuk Lead Acquisition, Sales Conversion, dan Customer Retention. Lihat [docs/PRD.md](docs/PRD.md).
 
 ## Dokumen proyek
 
@@ -10,6 +12,7 @@ CRM berbasis cloud (multi-tenant, SaaS-ready) untuk Lead Acquisition, Sales Conv
 - [docs/PROGRESS.md](docs/PROGRESS.md) — status pengerjaan plan
 - [docs/decisions.md](docs/decisions.md) — keputusan produk & teknis
 - [docs/database.md](docs/database.md) — konvensi database, tenant scope, migrasi
+- [docs/deployment.md](docs/deployment.md) — runbook deployment production (VPS, Docker Compose, backup, rollback)
 - [docs/design-system.md](docs/design-system.md) — **satu-satunya** referensi desain UI/UX (acuan: template [docs/spike-tailwind](docs/spike-tailwind))
 
 ## Prasyarat
@@ -80,6 +83,37 @@ docker build -t crm:local .
 ```
 
 Image multi-stage (Next.js standalone, user non-root, healthcheck `/api/health`). Env runtime wajib diberikan saat `docker run` (lihat `.env.example`); `docker --env-file` tidak menghapus tanda kutip, jadi tulis nilai tanpa kutip.
+
+## Deploy ke VPS
+
+Arsitektur: satu VPS dengan Docker Compose — **Caddy** (HTTPS otomatis, hanya port 80/443 terbuka) → **app** (Next.js) + **worker** (BullMQ) + **PostgreSQL** + **Redis** + **MinIO**. Detail lengkap, monitoring, dan rollback: [docs/deployment.md](docs/deployment.md).
+
+**Prasyarat:** Linux ≥ 2 vCPU / 4 GB RAM / 40 GB disk dengan Docker + Compose v2, domain dengan A record ke IP server, firewall hanya 22/80/443. Kode sudah di-commit dan di-push (server mengambil kode lewat `git clone`).
+
+```bash
+# 1. Ambil kode & isi env (buat nilai acak: openssl rand -base64 32)
+git clone https://github.com/sakeeo/AI-Powered-CRM.git /opt/crm && cd /opt/crm
+cp .env.production.example .env.production && chmod 600 .env.production
+
+# 2. Build & jalankan (migrasi database berjalan otomatis sebelum app naik)
+docker compose -f docker-compose.prod.yml --env-file .env.production build
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+
+# 3. Verifikasi
+curl -fsS https://$APP_DOMAIN/api/health
+```
+
+Setelah itu:
+
+1. Buka `https://<domain>/sign-up` **segera** dan daftar sebagai Owner. Pendaftaran hanya terbuka selama belum ada Owner; setelah itu ditutup (anggota baru bergabung lewat undangan).
+2. Atur **Settings → Connectors → Email Delivery** dan kirim email uji (dibutuhkan untuk undangan & reset password), lalu AI/WhatsApp bila perlu.
+3. Jadwalkan backup harian (`scripts/backup.sh`, lihat [docs/backup-restore.md](docs/backup-restore.md)) dan pasang uptime monitor pada `/api/health`.
+
+> **Simpan `ENCRYPTION_KEY` dan `BACKUP_PASSPHRASE` di password manager, terpisah dari server.** `ENCRYPTION_KEY` hilang = semua API key/secret connector tidak dapat didekripsi; `BACKUP_PASSPHRASE` hilang = backup tidak dapat dibuka.
+
+**Rilis baru:** `git pull` → backup → `build` → `up -d` (perintah yang sama dengan langkah 2). **Rollback:** `git checkout <commit lama>` → `build` → `up -d`; migrasi hanya maju, untuk data rusak gunakan restore backup.
+
+Masalah umum: HTTPS tidak terbit (DNS belum mengarah / port 80-443 tertutup); build kehabisan memori (tambahkan swap 2 GB); app langsung berhenti saat start (env kurang/salah — pesan ada di `docker compose logs app`).
 
 ## CI
 

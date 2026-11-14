@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -129,9 +130,11 @@ export function ProductForm({
         />
         <Label htmlFor="isActive">Aktif (bisa dipilih pada deal)</Label>
       </div>
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Menyimpan…" : "Simpan"}
-      </Button>
+      <FormActions>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan…" : "Simpan"}
+        </Button>
+      </FormActions>
     </form>
   );
 }

@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
@@ -18,6 +19,7 @@ import { DuplicateWarning } from "@/modules/duplicates/components/duplicate-warn
 import { checkDuplicates } from "@/modules/duplicates/server/actions";
 import type { DuplicateMatch } from "@/modules/duplicates/server/detect";
 import { createLead, updateLead } from "@/modules/leads/server/actions";
+import { CompanyNameCombobox } from "@/modules/companies/components/company-name-combobox";
 
 export type SourceOption = { id: string; name: string };
 export type OwnerOption = { userId: string; name: string };
@@ -100,7 +102,19 @@ export function LeadForm({
         </FormField>
       </div>
       <FormField id="companyName" label="Perusahaan" error={errors.companyName?.message}>
-        <Input id="companyName" {...register("companyName")} />
+        <Controller
+          control={control}
+          name="companyName"
+          render={({ field }) => (
+            <CompanyNameCombobox
+              id="companyName"
+              value={(field.value as string | undefined) ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              invalid={!!errors.companyName}
+            />
+          )}
+        />
       </FormField>
       <FormField id="needs" label="Kebutuhan" error={errors.needs?.message}>
         <Textarea id="needs" rows={3} {...register("needs")} />
@@ -168,7 +182,7 @@ export function LeadForm({
         </FormField>
       </div>
       {canAssignOwner && (
-        <FormField id="ownerId" label="Ditugaskan ke">
+        <FormField id="ownerId" label="PIC">
           <Controller
             control={control}
             name="ownerId"
@@ -188,9 +202,11 @@ export function LeadForm({
         <Textarea id="notes" rows={3} {...register("notes")} />
       </FormField>
       <CustomizationSection entity="lead" control={control} />
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Menyimpan…" : "Simpan"}
-      </Button>
+      <FormActions>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan…" : "Simpan"}
+        </Button>
+      </FormActions>
     </form>
   );
 }

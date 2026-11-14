@@ -126,7 +126,7 @@ async function runAction(
     if (entity.type !== "lead" && entity.type !== "deal")
       return { type: action.type, ok: false, message: "Entitas tidak dapat ditugaskan" };
     if (action.onlyIfUnassigned && entity.ownerId)
-      return { type: action.type, ok: true, message: "Dilewati: sudah memiliki owner" };
+      return { type: action.type, ok: true, message: "Dilewati: sudah memiliki PIC" };
     const pick = action.userIds[rule.runCount % action.userIds.length];
     if (!(await activeMember(db, pick)))
       return { type: action.type, ok: false, message: "Pengguna bukan anggota aktif" };
@@ -134,7 +134,7 @@ async function runAction(
       await db.lead.update({ where: { id: entity.id }, data: { ownerId: pick } });
     else await db.deal.update({ where: { id: entity.id }, data: { ownerId: pick } });
     entity.ownerId = pick;
-    return { type: action.type, ok: true, message: `Owner → ${pick}` };
+    return { type: action.type, ok: true, message: `PIC → ${pick}` };
   }
 
   if (action.type === "create_task") {

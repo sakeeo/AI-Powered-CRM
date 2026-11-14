@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -88,7 +89,7 @@ export function CompanyForm({
         </FormField>
       </div>
       {canAssignOwner && (
-        <FormField id="ownerId" label="Pemilik">
+        <FormField id="ownerId" label="PIC">
           <Controller
             control={control}
             name="ownerId"
@@ -116,9 +117,11 @@ export function CompanyForm({
         <Textarea id="notes" rows={4} {...register("notes")} />
       </FormField>
       <CustomizationSection entity="company" control={control} />
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Menyimpan…" : "Simpan"}
-      </Button>
+      <FormActions>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan…" : "Simpan"}
+        </Button>
+      </FormActions>
     </form>
   );
 }

@@ -76,7 +76,7 @@ type Owner = { userId: string; name: string };
 const FIELD_LABEL: Record<string, string> = {
   status: "Status",
   source: "Sumber",
-  owner: "Owner",
+  owner: "PIC",
   stage: "Stage",
   type: "Tipe",
   month: "Bulan",

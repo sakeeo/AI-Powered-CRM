@@ -64,7 +64,7 @@ export default async function Page(props: PageProps<"/companies/[id]">) {
             <DetailField label="Website">{company.website}</DetailField>
             <DetailField label="Email">{company.email}</DetailField>
             <DetailField label="Telepon">{company.phone}</DetailField>
-            <DetailField label="Pemilik">{owner}</DetailField>
+            <DetailField label="PIC">{owner}</DetailField>
             <DetailField label="Alamat">
               {[company.address, company.city, company.country].filter(Boolean).join(", ")}
             </DetailField>

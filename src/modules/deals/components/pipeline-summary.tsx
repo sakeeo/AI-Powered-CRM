@@ -2,7 +2,24 @@ import { Card } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
 import type { StageSummary } from "@/modules/deals/server/queries";
 
-/** Ringkasan nilai pipeline per stage (DEAL-14): jumlah deal, total, dan nilai tertimbang. */
+/** Class literal (agar terbaca Tailwind): shadow berwarna per panel, berputar mengikuti urutan stage. */
+const STAGE_SHADOWS = [
+  "shadow-glow-green",
+  "shadow-glow-orange",
+  "shadow-glow-purple",
+  "shadow-glow-red",
+  "shadow-glow-blue",
+] as const;
+
+function money(values: Record<string, number | string>, fallback: string) {
+  const entries = Object.entries(values);
+  return entries.length ? entries.map(([c, v]) => formatMoney(v, c)).join(" · ") : fallback;
+}
+
+/**
+ * Ringkasan nilai pipeline (DEAL-14) dalam satu baris: panel total pipeline (beserta nilai
+ * tertimbang probabilitas) diikuti satu panel per stage (jumlah deal + total nilai).
+ */
 export function PipelineSummary({
   stages,
   defaultCurrency,
@@ -16,47 +33,25 @@ export function PipelineSummary({
       for (const [cur, v] of Object.entries(s[key])) acc[cur] = (acc[cur] ?? 0) + Number(v);
     return acc;
   };
-  const totals = sum("totals");
-  const weighted = sum("weighted");
+  const zero = formatMoney(0, defaultCurrency);
   return (
-    <div className="space-y-3">
-      <Card className="p-card flex flex-wrap gap-x-8 gap-y-2">
-        <div>
-          <p className="text-muted-foreground text-xs">Total pipeline (deal terbuka)</p>
-          <p className="text-kpi-sm font-bold tabular-nums">
-            {Object.keys(totals).length
-              ? Object.entries(totals)
-                  .map(([c, v]) => formatMoney(v, c))
-                  .join(" · ")
-              : formatMoney(0, defaultCurrency)}
-          </p>
-        </div>
-        <div>
-          <p className="text-muted-foreground text-xs">Nilai tertimbang probabilitas</p>
-          <p className="text-kpi-sm font-bold tabular-nums">
-            {Object.keys(weighted).length
-              ? Object.entries(weighted)
-                  .map(([c, v]) => formatMoney(v, c))
-                  .join(" · ")
-              : formatMoney(0, defaultCurrency)}
-          </p>
-        </div>
+    <div className="grid auto-cols-[minmax(10.5rem,1fr)] grid-flow-col gap-3 overflow-x-auto px-1 pt-1 pb-3">
+      <Card className="shadow-glow-blue card-hover p-card gap-1">
+        <p className="text-muted-foreground truncate text-xs">Total pipeline (deal terbuka)</p>
+        <p className="text-lg font-bold tabular-nums">{money(sum("totals"), zero)}</p>
+        <p className="text-muted-foreground text-xs">Tertimbang probabilitas</p>
+        <p className="text-label tabular-nums">{money(sum("weighted"), zero)}</p>
       </Card>
-      <div className="flex gap-3 overflow-x-auto pb-1">
-        {stages.map((s) => (
-          <Card key={s.stageId} className="p-card min-w-44 flex-1 gap-1">
-            <p className="text-muted-foreground truncate text-xs">{s.name}</p>
-            <p className="text-lg font-bold tabular-nums">{s.count} deal</p>
-            <p className="text-label tabular-nums">
-              {Object.keys(s.totals).length
-                ? Object.entries(s.totals)
-                    .map(([c, v]) => formatMoney(v, c))
-                    .join(" · ")
-                : "—"}
-            </p>
-          </Card>
-        ))}
-      </div>
+      {stages.map((s, i) => (
+        <Card
+          key={s.stageId}
+          className={`${STAGE_SHADOWS[i % STAGE_SHADOWS.length]} card-hover p-card gap-1`}
+        >
+          <p className="text-muted-foreground truncate text-xs">{s.name}</p>
+          <p className="text-lg font-bold tabular-nums">{s.count} deal</p>
+          <p className="text-label tabular-nums">{money(s.totals, "—")}</p>
+        </Card>
+      ))}
     </div>
   );
 }

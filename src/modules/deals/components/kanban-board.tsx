@@ -97,7 +97,7 @@ export function KanbanBoard({
                               {...drag.draggableProps}
                               {...drag.dragHandleProps}
                             >
-                              <Card className="p-card gap-1.5">
+                              <Card className="card-hover p-card gap-1.5">
                                 <Link
                                   href={`/deals/${c.id}`}
                                   className="text-sm leading-tight font-medium hover:underline"

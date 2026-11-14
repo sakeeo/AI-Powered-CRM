@@ -1,10 +1,16 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { sendMail } from "@/lib/mailer";
+import {
+  hasPendingInvitation,
+  ownerExists,
+  SIGNUP_CLOSED_CODE,
+} from "@/modules/organizations/server/setup";
 import { prisma } from "@/lib/prisma";
 import { orgPluginAc, orgPluginRoles } from "@/lib/roles";
 import { redis } from "@/lib/redis";
@@ -63,7 +69,7 @@ export const auth = betterAuth({
       // Tidak di-await agar waktu respons tidak membocorkan apakah email terdaftar.
       void sendMail({
         to: user.email,
-        subject: "Reset password CRM",
+        subject: "Reset password Kerabat CRM",
         text: `Halo ${user.name},\n\nBuka tautan berikut untuk mengatur ulang password (berlaku 1 jam):\n${url}\n\nAbaikan email ini bila Anda tidak memintanya.`,
       }).catch((err) => logger.error({ err }, "Gagal mengirim email reset password"));
     },
@@ -73,12 +79,25 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       void sendMail({
         to: user.email,
-        subject: "Verifikasi email CRM",
+        subject: "Verifikasi email Kerabat CRM",
         text: `Halo ${user.name},\n\nVerifikasi email Anda: ${url}`,
       }).catch((err) => logger.error({ err }, "Gagal mengirim email verifikasi"));
     },
   },
   databaseHooks: {
+    user: {
+      create: {
+        // Pendaftaran hanya untuk setup awal (belum ada Owner) atau calon anggota yang diundang.
+        before: async (user) => {
+          if ((await ownerExists()) && !(await hasPendingInvitation(user.email))) {
+            throw new APIError("FORBIDDEN", {
+              code: SIGNUP_CLOSED_CODE,
+              message: "Pendaftaran ditutup. Minta undangan dari Owner atau Admin.",
+            });
+          }
+        },
+      },
+    },
     session: {
       create: {
         // Sesi baru langsung memakai organisasi aktif pertama milik pengguna (bila ada).

@@ -8,6 +8,37 @@ import { prisma } from "@/lib/prisma";
 import { forTenant } from "@/lib/tenant";
 import { AI_PROVIDER_INFO, providerFromType, type AiProvider } from "@/modules/connectors/registry";
 
+/**
+ * Banyak endpoint kompatibel-OpenAI (DeepSeek, gateway kustom) menolak `response_format: json_schema`
+ * ("response_format type is unavailable"). Untuk provider tersebut, ubah ke `json_object` dan
+ * sisipkan skema sebagai instruksi; hasil tetap divalidasi Zod oleh pemanggil.
+ */
+const jsonObjectFetch: typeof fetch = async (input, init) => {
+  if (typeof init?.body === "string") {
+    try {
+      const body = JSON.parse(init.body) as {
+        response_format?: { type?: string; json_schema?: { schema?: unknown } };
+        messages?: { role: string; content: unknown }[];
+      };
+      if (body.response_format?.type === "json_schema") {
+        const schema = JSON.stringify(body.response_format.json_schema?.schema ?? {});
+        body.response_format = { type: "json_object" };
+        body.messages = [
+          ...(body.messages ?? []),
+          {
+            role: "system",
+            content: `Balas HANYA dengan satu objek JSON valid yang sesuai JSON Schema berikut, tanpa teks lain:\n${schema}`,
+          },
+        ];
+        return fetch(input, { ...init, body: JSON.stringify(body) });
+      }
+    } catch {
+      // body bukan JSON: teruskan apa adanya
+    }
+  }
+  return fetch(input, init);
+};
+
 export function buildModel(
   provider: AiProvider,
   apiKey: string,
@@ -23,8 +54,12 @@ export function buildModel(
       return createAnthropic({ apiKey })(modelId);
     case "openai":
       return createOpenAI({ apiKey, baseURL: url })(modelId);
+    case "deepseek":
+    case "custom":
+      // Kompatibel API OpenAI, tetapi umumnya tanpa dukungan json_schema.
+      return createOpenAI({ apiKey, baseURL: url, fetch: jsonObjectFetch }).chat(modelId);
     default:
-      // deepseek, openrouter, custom: kompatibel dengan API OpenAI (chat completions).
+      // openrouter: kompatibel dengan API OpenAI (chat completions).
       return createOpenAI({ apiKey, baseURL: url }).chat(modelId);
   }
 }

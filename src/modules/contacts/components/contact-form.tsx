@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,6 +23,7 @@ import { DuplicateWarning } from "@/modules/duplicates/components/duplicate-warn
 import { checkDuplicates } from "@/modules/duplicates/server/actions";
 import type { DuplicateMatch } from "@/modules/duplicates/server/detect";
 import { createContact, updateContact } from "@/modules/contacts/server/actions";
+import { CompanyMultiCombobox } from "@/modules/companies/components/company-multi-combobox";
 
 export type Option = { id: string; name: string };
 export type OwnerOption = { userId: string; name: string };
@@ -121,40 +122,25 @@ export function ContactForm({
         </FormField>
       </div>
       <div className="space-y-1.5">
-        <Label>Company</Label>
+        <Label htmlFor="companyIds">Company</Label>
         <Controller
           control={control}
           name="companyIds"
           render={({ field }) => (
-            <div className="max-h-36 space-y-1 overflow-y-auto rounded-md border p-2">
-              {companies.length === 0 && (
-                <p className="text-muted-foreground text-xs">Belum ada company.</p>
-              )}
-              {companies.map((c) => {
-                const checked = (field.value ?? []).includes(c.id);
-                return (
-                  <label key={c.id} className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) =>
-                        field.onChange(
-                          v
-                            ? [...(field.value ?? []), c.id]
-                            : (field.value ?? []).filter((x) => x !== c.id),
-                        )
-                      }
-                    />
-                    {c.name}
-                  </label>
-                );
-              })}
-            </div>
+            <CompanyMultiCombobox
+              id="companyIds"
+              value={field.value ?? []}
+              onChange={field.onChange}
+              known={companies}
+            />
           )}
         />
-        <p className="text-muted-foreground text-xs">Company pertama yang dipilih menjadi utama.</p>
+        <p className="text-muted-foreground text-xs">
+          Bisa memilih lebih dari satu; company pertama yang dipilih menjadi utama.
+        </p>
       </div>
       {canAssignOwner && (
-        <FormField id="ownerId" label="Pemilik">
+        <FormField id="ownerId" label="PIC">
           <Controller
             control={control}
             name="ownerId"
@@ -182,9 +168,11 @@ export function ContactForm({
         <Textarea id="notes" rows={4} {...register("notes")} />
       </FormField>
       <CustomizationSection entity="contact" control={control} />
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Menyimpan…" : "Simpan"}
-      </Button>
+      <FormActions>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan…" : "Simpan"}
+        </Button>
+      </FormActions>
     </form>
   );
 }

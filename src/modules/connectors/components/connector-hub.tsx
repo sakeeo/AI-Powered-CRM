@@ -260,7 +260,7 @@ export function ConnectorHub({ connectors, canManage, webhook, outbound, deliver
         manage={emailManage}
       />
       <Dialog open={webhookDlg !== null} onOpenChange={(o) => !o && setWebhookDlg(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               {webhookDlg === "in" ? "Webhook masuk" : "Zapier, Make & webhook keluar"}

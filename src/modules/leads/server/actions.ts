@@ -24,6 +24,7 @@ import {
 } from "@/modules/leads/schemas";
 import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
 import { convertLeadService } from "@/modules/leads/server/conversion";
+import { ensureCompanyByName } from "@/modules/companies/server/ensure";
 import { assertActiveMember } from "@/modules/organizations/server/queries";
 
 async function assertSource(ctx: ActionContext, sourceId?: string) {
@@ -51,6 +52,7 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
     } as never,
   });
   if (tagIds?.length) await applyTags(ctx, "lead", lead.id, tagIds);
+  await ensureCompanyByName(ctx, data.companyName, ownerId);
   await emitBusinessEvent(
     ctx.organizationId,
     "lead.created",
@@ -70,6 +72,7 @@ export const createLead = tenantAction(leadSchema, async (ctx, input) => {
     after: { name: lead.name, ownerId },
   });
   revalidatePath("/leads");
+  revalidatePath("/companies");
   return { id: lead.id };
 });
 
@@ -97,6 +100,7 @@ export const updateLead = tenantAction(updateLeadSchema, async (ctx, input) => {
     },
   });
   if (tagIds) await applyTags(ctx, "lead", id, tagIds);
+  await ensureCompanyByName(ctx, data.companyName, ownerId);
   await writeAudit(ctx, {
     action: "lead.updated",
     entityType: "Lead",

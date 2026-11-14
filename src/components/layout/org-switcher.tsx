@@ -50,7 +50,7 @@ export function OrgSwitcher({
           )}
           <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <strong className="block truncate text-[17px] leading-tight font-bold tracking-tight">
-              {current?.name ?? "CRM"}
+              {current?.name ?? "Kerabat CRM"}
             </strong>
             <span className="text-sidebar-muted block truncate text-xs">
               {current && isRole(current.role) ? ROLE_LABEL[current.role] : "Sales Workspace"}

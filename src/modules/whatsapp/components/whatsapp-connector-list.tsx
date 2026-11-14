@@ -77,13 +77,13 @@ function ConnectorForm({
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{editing ? `Ubah ${info.title}` : "Hubungkan WhatsApp"}</DialogTitle>
+          <DialogDescription>
+            Token disimpan terenkripsi dan tidak pernah ditampilkan kembali.
+          </DialogDescription>
+        </DialogHeader>
         <form onSubmit={save} className="space-y-4" noValidate autoComplete="off">
-          <DialogHeader>
-            <DialogTitle>{editing ? `Ubah ${info.title}` : "Hubungkan WhatsApp"}</DialogTitle>
-            <DialogDescription>
-              Token disimpan terenkripsi dan tidak pernah ditampilkan kembali.
-            </DialogDescription>
-          </DialogHeader>
           <FormField id="wa-provider" label="Provider" hint={info.description}>
             <SelectField
               id="wa-provider"
@@ -232,7 +232,7 @@ export function WhatsappConnectorList({
   return (
     <>
       <Dialog open={!!managedP} onOpenChange={(o) => !o && setManaged(null)}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Kelola connector</DialogTitle>
             <DialogDescription>

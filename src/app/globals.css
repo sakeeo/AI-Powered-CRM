@@ -84,6 +84,8 @@
 
   --shadow-card: 0 2px 6px rgb(37 83 185 / 0.1);
   --shadow-popover: 0 0.5rem 1rem rgb(0 0 0 / 0.15);
+  --shadow-modal-header: 0 2px 6px rgb(0 0 0 / 0.06);
+  --shadow-modal-footer: 0 -2px 6px rgb(0 0 0 / 0.06);
 
   --spacing-card: var(--card-padding);
 
@@ -270,6 +272,86 @@
     ::after {
       transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Modal popup: masuk/keluar dari sudut kanan bawah */
+@keyframes modal-in-br {
+  from {
+    opacity: 0;
+    transform: translate(40vw, 40vh) scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+@keyframes modal-out-br {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(40vw, 40vh) scale(0.2);
+  }
+}
+.modal-br[data-state="open"] {
+  animation: modal-in-br 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.modal-br[data-state="closed"] {
+  animation: modal-out-br 200ms ease-in both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-br[data-state="open"],
+  .modal-br[data-state="closed"] {
+    animation-duration: 1ms;
+  }
+}
+
+/* Shadow berwarna per panel (mis. ringkasan pipeline). Warna mengikuti token tone; berlaku di light & dark. */
+@utility shadow-glow-blue {
+  --glow-color: var(--tone-blue);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--glow-color) 38%, transparent);
+}
+@utility shadow-glow-green {
+  --glow-color: var(--tone-green);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--glow-color) 45%, transparent);
+}
+@utility shadow-glow-orange {
+  --glow-color: var(--tone-orange);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--glow-color) 45%, transparent);
+}
+@utility shadow-glow-purple {
+  --glow-color: var(--tone-purple);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--glow-color) 45%, transparent);
+}
+@utility shadow-glow-red {
+  --glow-color: var(--tone-red);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--glow-color) 38%, transparent);
+}
+
+/* Efek interaktif saat hover: panel terangkat + cincin tipis + shadow menguat (warna --glow-color bila ada).
+   Dengan prefers-reduced-motion: tanpa gerak/transisi, tetapi cincin & shadow tetap berubah sebagai umpan balik. */
+@utility card-hover {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--glow-color, var(--primary)) 45%, transparent),
+      0 10px 24px color-mix(in srgb, var(--glow-color, var(--primary)) 40%, transparent);
+  }
+  &:active {
+    transform: translateY(-1px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover,
+    &:active {
+      transform: none;
     }
   }
 }

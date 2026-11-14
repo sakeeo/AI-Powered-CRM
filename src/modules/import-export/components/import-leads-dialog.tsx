@@ -142,7 +142,7 @@ export function ImportLeadsDialog({
           }
         }}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Impor lead dari CSV</DialogTitle>
             <DialogDescription>
@@ -243,7 +243,7 @@ export function ImportLeadsDialog({
                   />
                 </FormField>
                 {canAssignOwner && (
-                  <FormField id="import-owner" label="Owner">
+                  <FormField id="import-owner" label="PIC">
                     <SelectField
                       id="import-owner"
                       value={ownerId}

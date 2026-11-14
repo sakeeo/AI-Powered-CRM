@@ -113,7 +113,7 @@ export function DealsTable({
           : "—",
     },
     {
-      header: "Owner",
+      header: "PIC",
       id: "owner",
       cell: (c) => (c.row.original.ownerId && ownerName.get(c.row.original.ownerId)) || "—",
     },
@@ -151,8 +151,8 @@ export function DealsTable({
             />
             <UrlFilterSelect
               param="owner"
-              label="Filter owner"
-              allLabel="Semua owner"
+              label="Filter PIC"
+              allLabel="Semua PIC"
               options={owners.map((o) => ({ value: o.userId, label: o.name }))}
             />
           </>

@@ -13,8 +13,8 @@ const jakarta = Plus_Jakarta_Sans({
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "CRM", template: "%s · CRM" },
-  description: "CRM berbasis cloud untuk lead, penjualan, dan retensi pelanggan.",
+  title: { default: "Kerabat CRM", template: "%s · Kerabat CRM" },
+  description: "Kerabat CRM — pantau setiap lead hingga konversi.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

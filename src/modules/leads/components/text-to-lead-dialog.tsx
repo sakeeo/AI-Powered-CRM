@@ -63,7 +63,7 @@ export function TextToLeadDialog({
         <Sparkles /> Dari teks (AI)
       </Button>
       <Dialog open={open} onOpenChange={close}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Buat lead dari teks</DialogTitle>
             <DialogDescription>

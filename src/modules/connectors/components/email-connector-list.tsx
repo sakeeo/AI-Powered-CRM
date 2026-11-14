@@ -70,7 +70,7 @@ export function EmailConnectorList({
   return (
     <>
       <Dialog open={!!managedP} onOpenChange={(o) => !o && setManaged(null)}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Kelola connector</DialogTitle>
             <DialogDescription>

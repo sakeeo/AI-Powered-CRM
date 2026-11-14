@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { tenantAction } from "@/lib/action";
 import { writeAudit } from "@/lib/audit";
-import { assertCan, resolveOwner } from "@/lib/authz";
+import { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
+import { assertCan, resolveOwner, scopeWhere } from "@/lib/authz";
 import { NotFoundError } from "@/lib/errors";
 import { idInput } from "@/lib/schema-helpers";
 import { applyTags, prepareCustomFields } from "@/modules/customization/server/apply";
@@ -72,3 +74,23 @@ export const deleteCompany = tenantAction(idInput, async (ctx, { id }) => {
   });
   revalidatePath("/companies");
 });
+
+/** Autocomplete nama perusahaan (mis. field Perusahaan di form lead). Hanya company yang boleh dilihat user. */
+export const searchCompanyOptions = tenantAction(
+  z.object({ q: z.string().trim().max(160) }),
+  async (ctx, { q }) => {
+    if (!ctx.ability.can("view", "Company")) return [];
+    return ctx.db.company.findMany({
+      where: {
+        AND: [
+          { deletedAt: null },
+          scopeWhere(ctx, "view", "Company") as Prisma.CompanyWhereInput,
+          ...(q ? [{ name: { contains: q, mode: "insensitive" as const } }] : []),
+        ],
+      },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+      take: 8,
+    });
+  },
+);

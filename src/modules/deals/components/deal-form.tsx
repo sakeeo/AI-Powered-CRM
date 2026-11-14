@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { SelectField } from "@/components/shared/select-field";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
@@ -167,7 +168,7 @@ export function DealForm({
         </FormField>
       </div>
       {canAssignOwner && (
-        <FormField id="ownerId" label="Pemilik">
+        <FormField id="ownerId" label="PIC">
           <Controller
             control={control}
             name="ownerId"
@@ -187,9 +188,11 @@ export function DealForm({
         <Textarea id="notes" rows={3} {...register("notes")} />
       </FormField>
       <CustomizationSection entity="deal" control={control} />
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Menyimpan…" : "Simpan"}
-      </Button>
+      <FormActions>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan…" : "Simpan"}
+        </Button>
+      </FormActions>
     </form>
   );
 }

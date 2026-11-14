@@ -104,7 +104,7 @@ export default async function Page(props: PageProps<"/deals/[id]">) {
               {deal.expectedCloseDate &&
                 new Date(deal.expectedCloseDate).toLocaleDateString("id-ID")}
             </DetailField>
-            <DetailField label="Owner">{owner}</DetailField>
+            <DetailField label="PIC">{owner}</DetailField>
             <DetailField label="Contact">
               {deal.contact && (
                 <Link

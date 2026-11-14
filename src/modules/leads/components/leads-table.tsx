@@ -115,7 +115,7 @@ export function LeadsTable({
       cell: (c) => formatMoney(c.row.original.budget, c.row.original.currency),
     },
     {
-      header: "Owner",
+      header: "PIC",
       id: "owner",
       cell: (c) =>
         c.row.original.ownerId ? (
@@ -170,8 +170,8 @@ export function LeadsTable({
             />
             <UrlFilterSelect
               param="owner"
-              label="Filter owner"
-              allLabel="Semua owner"
+              label="Filter PIC"
+              allLabel="Semua PIC"
               options={[
                 { value: "unassigned", label: "Belum ditugaskan" },
                 ...owners.map((o) => ({ value: o.userId, label: o.name })),

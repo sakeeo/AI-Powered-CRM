@@ -89,7 +89,7 @@ export default async function Page(props: PageProps<"/contacts/[id]">) {
             <DetailField label="Alamat">
               {[contact.address, contact.city, contact.country].filter(Boolean).join(", ")}
             </DetailField>
-            <DetailField label="Pemilik">{owner}</DetailField>
+            <DetailField label="PIC">{owner}</DetailField>
           </dl>
         </CardContent>
       </Card>

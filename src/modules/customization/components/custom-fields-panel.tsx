@@ -176,7 +176,7 @@ function FieldDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{editing ? "Ubah custom field" : "Custom field baru"}</DialogTitle>
           <DialogDescription>

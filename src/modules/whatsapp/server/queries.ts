@@ -75,3 +75,22 @@ export async function unreadTotal(ctx: TenantContext) {
   });
   return agg._sum.unreadCount ?? 0;
 }
+
+/**
+ * Apakah organisasi punya minimal satu kanal percakapan yang terhubung dan tidak dinonaktifkan:
+ * connector WhatsApp, connector email (SMTP/Resend), atau integrasi Google (Gmail) aktif.
+ * Inbox hanya dapat dibuka bila hasilnya true.
+ */
+export async function hasConnectedChannel(ctx: TenantContext): Promise<boolean> {
+  const [connector, google] = await Promise.all([
+    ctx.db.tenantConnector.findFirst({
+      where: {
+        status: { not: "disabled" },
+        OR: [{ type: { startsWith: "whatsapp_" } }, { type: { startsWith: "email_" } }],
+      },
+      select: { type: true },
+    }),
+    ctx.db.googleIntegration.findFirst({ where: { status: "active" }, select: { id: true } }),
+  ]);
+  return Boolean(connector || google);
+}

@@ -67,7 +67,7 @@ function ActionEditor({
   onRemove: () => void;
 }) {
   const people = [
-    { value: "owner", label: "Owner record" },
+    { value: "owner", label: "PIC record" },
     ...owners.map((o) => ({ value: o.userId, label: o.name })),
   ];
   return (
@@ -206,7 +206,7 @@ function RuleDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{draft.id ? "Ubah rule" : "Rule baru"}</DialogTitle>
           <DialogDescription>

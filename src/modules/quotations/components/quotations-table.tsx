@@ -13,6 +13,7 @@ import { FormField } from "@/components/shared/form-field";
 import { PageActions } from "@/components/shared/page-actions";
 import { SelectField } from "@/components/shared/select-field";
 import { ToneBadge } from "@/components/shared/tone-badge";
+import { FormActions } from "@/components/shared/form-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/money";
@@ -171,9 +172,11 @@ export function QuotationsTable({
                 options={companies.map((c) => ({ value: c.id, label: c.name }))}
               />
             </FormField>
-            <Button type="submit" disabled={busy}>
-              {busy ? "Membuat…" : "Buat draft"}
-            </Button>
+            <FormActions>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Membuat…" : "Buat draft"}
+              </Button>
+            </FormActions>
           </form>
         )}
       </EntitySheet>

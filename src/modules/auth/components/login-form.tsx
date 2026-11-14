@@ -17,7 +17,7 @@ import {
   type LoginInput,
 } from "@/modules/auth/schemas";
 
-export function LoginForm() {
+export function LoginForm({ allowSignUp = false }: { allowSignUp?: boolean }) {
   const router = useRouter();
   const params = useSearchParams();
   const [error, setError] = useState<string>();
@@ -40,12 +40,21 @@ export function LoginForm() {
       title="Masuk"
       description="Masuk ke workspace CRM Anda."
       footer={
-        <>
-          Belum punya akun?{" "}
-          <Link href="/sign-up" className="text-loud font-medium hover:underline">
-            Daftar
-          </Link>
-        </>
+        allowSignUp ? (
+          <>
+            Belum punya akun?{" "}
+            <Link
+              href={
+                params.get("next")
+                  ? `/sign-up?next=${encodeURIComponent(params.get("next")!)}`
+                  : "/sign-up"
+              }
+              className="text-loud font-medium hover:underline"
+            >
+              Daftar
+            </Link>
+          </>
+        ) : undefined
       }
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
