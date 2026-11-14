@@ -514,7 +514,7 @@ export type CalendarJob = { integrationId: string; activityId: string };
 /** Pemindaian berkala semua koneksi aktif: tarik kalender, sinkron email, dan backfill push. */
 export async function syncAllGoogle(now = new Date()) {
   const integrations = await prisma.googleIntegration.findMany({
-    where: { status: { in: ["active", "error"] } },
+    where: { status: { in: ["active", "error"] }, organization: { deletedAt: null } },
     select: { id: true, organizationId: true, userId: true, syncCalendar: true, syncEmail: true },
   });
   let ok = 0;

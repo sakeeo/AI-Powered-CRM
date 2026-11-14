@@ -201,7 +201,10 @@ export async function scanOrgInsights(organizationId: string, now = new Date()) 
 
 /** Dipanggil worker: pindai semua organisasi (error satu organisasi tidak menghentikan yang lain). */
 export async function scanAllInsights(now = new Date()) {
-  const orgs = await prisma.organization.findMany({ select: { id: true } });
+  const orgs = await prisma.organization.findMany({
+    where: { deletedAt: null },
+    select: { id: true },
+  });
   let created = 0;
   for (const o of orgs) {
     try {

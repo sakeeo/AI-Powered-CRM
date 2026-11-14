@@ -20,7 +20,8 @@ export default defineConfig({
     // Memakai build production; jalankan `npm run build` lebih dulu (CI melakukannya).
     command: `npm run start -- -p ${PORT}`,
     url: `http://localhost:${PORT}/login`,
-    env: { BETTER_AUTH_URL: `http://localhost:${PORT}` },
+    // E2E mendaftarkan banyak pengguna → pendaftaran publik dibuka.
+    env: { BETTER_AUTH_URL: `http://localhost:${PORT}`, PUBLIC_SIGNUP: "true" },
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },

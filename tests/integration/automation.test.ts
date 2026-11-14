@@ -238,7 +238,7 @@ describe("Eksekusi", () => {
   });
 
   it("deal Won → task & notifikasi; dibuka ulang lalu Won lagi memicu kejadian baru", async () => {
-    const o = await makeOrg("Org A");
+    await makeOrg("Org A");
     await actions.createRule({
       name: "Won",
       trigger: "deal_won",

@@ -19,6 +19,7 @@ export async function scanReminders(now = new Date()) {
     where: {
       status: "open",
       ownerId: { not: null },
+      organization: { deletedAt: null },
       dueAt: {
         not: null,
         lt: new Date(now.getTime() + DUE_SOON_MS),

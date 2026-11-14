@@ -105,11 +105,23 @@ curl -fsS https://$APP_DOMAIN/api/health
 
 Setelah itu:
 
-1. Buka `https://<domain>/sign-up` **segera** dan daftar sebagai Owner. Pendaftaran hanya terbuka selama belum ada Owner; setelah itu ditutup (anggota baru bergabung lewat undangan).
+1. Buka `https://<domain>/sign-up` **segera** dan daftar sebagai Owner. Pendaftaran hanya terbuka selama belum ada Owner; setelah itu ditutup (anggota baru bergabung lewat undangan). Untuk mode SaaS (siapa pun boleh mendaftar dan membuat workspace sendiri), set `PUBLIC_SIGNUP=true` di `.env.production`.
 2. Atur **Settings → Connectors → Email Delivery** dan kirim email uji (dibutuhkan untuk undangan & reset password), lalu AI/WhatsApp bila perlu.
 3. Jadwalkan backup harian (`scripts/backup.sh`, lihat [docs/backup-restore.md](docs/backup-restore.md)) dan pasang uptime monitor pada `/api/health`.
 
 > **Simpan `ENCRYPTION_KEY` dan `BACKUP_PASSPHRASE` di password manager, terpisah dari server.** `ENCRYPTION_KEY` hilang = semua API key/secret connector tidak dapat didekripsi; `BACKUP_PASSPHRASE` hilang = backup tidak dapat dibuka.
+
+**Data demo di produksi (opsional, destruktif):** seed **menghapus semua organisasi & pengguna** (kecuali owner demo) lalu mengisi workspace contoh. Backup dulu, lalu jalankan lewat image `migrate`:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production run --rm \
+  -e SEED_ALLOW_PRODUCTION=true \
+  -e SEED_OWNER_EMAIL=owner@domain-anda.com \
+  -e SEED_OWNER_PASSWORD='password-kuat-min-12-karakter' \
+  migrate npx prisma db seed
+```
+
+Tanpa `SEED_ALLOW_PRODUCTION=true` dan `SEED_OWNER_PASSWORD` (≥ 12 karakter) seed menolak berjalan di produksi. Pengguna demo lain memakai password yang sama dengan owner.
 
 **Rilis baru:** `git pull` → backup → `build` → `up -d` (perintah yang sama dengan langkah 2). **Rollback:** `git checkout <commit lama>` → `build` → `up -d`; migrasi hanya maju, untuk data rusak gunakan restore backup.
 

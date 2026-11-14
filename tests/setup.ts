@@ -4,6 +4,9 @@ import "dotenv/config";
 const url = new URL(process.env.DATABASE_URL ?? "postgresql://x:x@localhost:5434/crm_dev");
 url.pathname = "/crm_test";
 process.env.DATABASE_URL = url.toString();
+// Helper test membuat banyak pengguna lewat sign-up → mode pendaftaran terbuka. Aturan "tertutup
+// setelah Owner pertama" diuji khusus di tests/integration/auth.test.ts.
+process.env.PUBLIC_SIGNUP ??= "true";
 
 // Mock API Next.js yang hanya ada di konteks request; berlaku untuk semua test.
 import { vi } from "vitest";

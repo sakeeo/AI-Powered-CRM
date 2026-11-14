@@ -137,6 +137,53 @@ describe("alur autentikasi", () => {
   });
 });
 
+describe("aturan pendaftaran (PUBLIC_SIGNUP=false)", () => {
+  it("terbuka sebelum ada Owner; setelah itu ditutup kecuali untuk undangan pending", async () => {
+    const prev = process.env.PUBLIC_SIGNUP;
+    process.env.PUBLIC_SIGNUP = "false";
+    try {
+      // Belum ada Owner → pendaftaran pertama terbuka.
+      const first = await call("/sign-up/email", { body: USER });
+      expect(first.status).toBe(200);
+      const owner = await testPrisma.user.findUniqueOrThrow({ where: { email: USER.email } });
+      const org = await testPrisma.organization.create({
+        data: { name: "Org Uji", slug: `org-uji-${randomUUID().slice(0, 8)}` },
+      });
+      await testPrisma.member.create({
+        data: { organizationId: org.id, userId: owner.id, role: "owner" },
+      });
+
+      // Owner sudah ada → pendaftaran tanpa undangan ditolak.
+      const closed = await call("/sign-up/email", {
+        body: { name: "Asing", email: "asing@example.com", password: "rahasia-12345" },
+        ip: "10.9.0.2",
+      });
+      expect(closed.status).toBe(403);
+      expect(await closed.json()).toMatchObject({ code: "SIGNUP_CLOSED" });
+      expect(await testPrisma.user.count({ where: { email: "asing@example.com" } })).toBe(0);
+
+      // Calon anggota dengan undangan pending tetap bisa mendaftar.
+      await testPrisma.invitation.create({
+        data: {
+          organizationId: org.id,
+          email: "diundang@example.com",
+          role: "sales_rep",
+          status: "pending",
+          inviterId: owner.id,
+          expiresAt: new Date(Date.now() + 86_400_000),
+        },
+      });
+      const invited = await call("/sign-up/email", {
+        body: { name: "Diundang", email: "diundang@example.com", password: "rahasia-12345" },
+        ip: "10.9.0.3",
+      });
+      expect(invited.status).toBe(200);
+    } finally {
+      process.env.PUBLIC_SIGNUP = prev;
+    }
+  });
+});
+
 describe("rate limiting", () => {
   it("login dibatasi 5x/menit per IP", async () => {
     const same = ip();

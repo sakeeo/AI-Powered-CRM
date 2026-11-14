@@ -402,6 +402,8 @@ describe("konversi lead", () => {
   it("ATOMIK: gagal di tengah transaksi → tidak ada contact/company/deal tersisa dan lead tidak berubah", async () => {
     await makeOrg("Org A");
     const leadId = await qualifiedLead();
+    // Menyimpan lead dengan nama perusahaan baru otomatis membuat company → hitung sebelum konversi.
+    const companiesBefore = await testPrisma.company.count();
     // currency terlalu panjang lolos validasi Zod (service dipanggil langsung) tetapi ditolak database saat membuat deal,
     // SETELAH company dan contact dibuat di transaksi yang sama.
     await expect(
@@ -413,7 +415,7 @@ describe("konversi lead", () => {
       }),
     ).rejects.toBeTruthy();
     expect(await testPrisma.contact.count()).toBe(0);
-    expect(await testPrisma.company.count()).toBe(0);
+    expect(await testPrisma.company.count()).toBe(companiesBefore);
     expect(await testPrisma.deal.count()).toBe(0);
     expect(await testPrisma.contactCompany.count()).toBe(0);
     const lead = await testPrisma.lead.findUniqueOrThrow({ where: { id: leadId } });

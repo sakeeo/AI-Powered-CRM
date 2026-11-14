@@ -306,3 +306,53 @@ describe("tim", () => {
     });
   });
 });
+
+describe("hapus workspace", () => {
+  it("hanya Owner, wajib nama cocok; soft delete membatalkan undangan & menutup akses", async () => {
+    const { owner, orgId } = await setupOrg();
+    const admin = await addMember(owner, orgId, "admin", "Admin");
+    actAs(owner);
+    await actions.inviteMember({ email: "calon@example.com", role: "sales_rep" });
+
+    // Bukan Owner → ditolak.
+    actAs(admin);
+    expect(await actions.deleteWorkspace({ confirmName: "Acme" })).toMatchObject({ ok: false });
+
+    // Nama tidak cocok → ditolak, workspace utuh.
+    actAs(owner);
+    expect(await actions.deleteWorkspace({ confirmName: "acme" })).toMatchObject({ ok: false });
+    expect(
+      (await testPrisma.organization.findUniqueOrThrow({ where: { id: orgId } })).deletedAt,
+    ).toBeNull();
+
+    // Owner + nama cocok → dihapus (soft delete).
+    const res = await actions.deleteWorkspace({ confirmName: "Acme" });
+    expect(res).toMatchObject({ ok: true, data: { nextOrganizationId: null } });
+    const org = await testPrisma.organization.findUniqueOrThrow({ where: { id: orgId } });
+    expect(org.deletedAt).not.toBeNull();
+    expect(
+      await testPrisma.invitation.count({ where: { organizationId: orgId, status: "pending" } }),
+    ).toBe(0);
+    expect(
+      await testPrisma.auditLog.count({
+        where: { organizationId: orgId, action: "organization.deleted" },
+      }),
+    ).toBe(1);
+
+    // Workspace tidak lagi muncul / dapat diakses oleh anggota mana pun.
+    expect(await queries.listMyOrganizations(owner.id)).toHaveLength(0);
+    actAs(admin);
+    expect(await getTenantContext()).toBeNull();
+  });
+
+  it("mengembalikan workspace lain milik pengguna untuk dialihkan", async () => {
+    const { owner } = await setupOrg();
+    const second = await actions.createOrganizationAction({ ...profile, name: "Beta" });
+    if (!second.ok) throw new Error(second.error);
+    // Workspace aktif = Beta (baru dibuat); hapus Beta → dialihkan ke Acme.
+    actAs(owner);
+    const res = await actions.deleteWorkspace({ confirmName: "Beta" });
+    expect(res.ok && res.data.nextOrganizationId).toBeTruthy();
+    expect(await queries.listMyOrganizations(owner.id)).toHaveLength(1);
+  });
+});

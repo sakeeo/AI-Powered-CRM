@@ -8,7 +8,6 @@ import { SelectField } from "@/components/shared/select-field";
 import { RowAction } from "@/components/shared/row-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { formatMoney, formatNumber } from "@/lib/money";
 import { addDealProduct, removeDealProduct } from "@/modules/products/server/actions";

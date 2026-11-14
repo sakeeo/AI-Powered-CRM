@@ -9,6 +9,7 @@ import { sendMail } from "@/lib/mailer";
 import {
   hasPendingInvitation,
   ownerExists,
+  publicSignupEnabled,
   SIGNUP_CLOSED_CODE,
 } from "@/modules/organizations/server/setup";
 import { prisma } from "@/lib/prisma";
@@ -89,7 +90,11 @@ export const auth = betterAuth({
       create: {
         // Pendaftaran hanya untuk setup awal (belum ada Owner) atau calon anggota yang diundang.
         before: async (user) => {
-          if ((await ownerExists()) && !(await hasPendingInvitation(user.email))) {
+          if (
+            !publicSignupEnabled() &&
+            (await ownerExists()) &&
+            !(await hasPendingInvitation(user.email))
+          ) {
             throw new APIError("FORBIDDEN", {
               code: SIGNUP_CLOSED_CODE,
               message: "Pendaftaran ditutup. Minta undangan dari Owner atau Admin.",

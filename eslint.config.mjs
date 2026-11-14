@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "src/generated/**",
+    // Template desain referensi (Spike Tailwind, HTML/JS pihak ketiga) — bukan kode aplikasi.
+    "docs/spike-tailwind/**",
   ]),
   // Isolasi tenant (docs/database.md): kode modul bisnis WAJIB memakai ctx.db (forTenant),
   // bukan prisma mentah. Hanya modul "akar tenant" (organisasi, audit) yang boleh karena

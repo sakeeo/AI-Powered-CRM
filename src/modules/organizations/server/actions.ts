@@ -1,6 +1,8 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { headers } from "next/headers";
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { writeAudit } from "@/lib/audit";
 import { auth } from "@/lib/auth";
@@ -8,7 +10,11 @@ import { tenantAction, type ActionResult } from "@/lib/action";
 import { assertCan } from "@/lib/authz";
 import { AppError, ForbiddenError, UnauthorizedError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 import { forTenant } from "@/lib/tenant";
+import { DEMO_BUSINESSES } from "@/modules/organizations/demo-businesses";
+import { DEMO_PROFILES } from "@/modules/organizations/server/demo-profiles";
+import { createDemoWorkspace } from "@/modules/organizations/server/demo-workspace";
 import { seedOrganizationDefaults } from "@/modules/organizations/server/defaults";
 import { getSession } from "@/lib/session";
 import {
@@ -264,3 +270,85 @@ export const setTeamMembers = tenantAction(teamMembersSchema, async (ctx, { team
   });
   revalidatePath("/users");
 });
+
+// ---------------------------------------------------------------------------
+// Workspace demo (tombol "Load Demo Workspace" di Settings) — hanya Owner.
+// ---------------------------------------------------------------------------
+/**
+ * Membuat organisasi BARU berisi data demo lengkap dengan pengguna ini sebagai Owner.
+ * Tidak mengubah/menghapus data organisasi yang sedang aktif. Pengguna demo memakai domain
+ * `*.example` (tidak menerima email) dan tidak punya akun login. Atomik: gagal = tidak ada sisa data.
+ */
+export const loadDemoWorkspace = tenantAction(
+  z.object({ business: z.enum(DEMO_BUSINESSES) }),
+  async (ctx, { business }) => {
+    if (ctx.role !== "owner") throw ForbiddenError();
+    const rl = await rateLimit(`demo-workspace:${ctx.userId}`, 3, 60 * 60);
+    if (!rl.allowed) {
+      throw new AppError("Workspace demo sudah dibuat beberapa kali. Coba lagi dalam 1 jam.", 429);
+    }
+    const suffix = randomBytes(3).toString("hex");
+    const profile = DEMO_PROFILES[business];
+    const orgName = `Demo · ${profile.orgName}`;
+    const { orgId } = await prisma.$transaction(
+      (tx) =>
+        createDemoWorkspace(tx, {
+          ownerUserId: ctx.userId,
+          orgName,
+          orgSlug: `demo-${business}-${suffix}`,
+          emailDomain: `demo-${suffix}.example`,
+          business,
+        }),
+      { timeout: 180_000, maxWait: 20_000 },
+    );
+    await writeAudit(ctx, {
+      action: "organization.demo_created",
+      entityType: "Organization",
+      entityId: orgId,
+      after: { name: orgName, business },
+    });
+    return { organizationId: orgId, name: orgName };
+  },
+);
+
+// ---------------------------------------------------------------------------
+// Hapus workspace — hanya Owner, dengan konfirmasi nama workspace.
+// ---------------------------------------------------------------------------
+/**
+ * Soft delete organisasi aktif (`deletedAt`): langsung tidak dapat diakses semua anggota, webhook &
+ * job latar belakang berhenti, undangan pending dibatalkan. Data tetap di database (dapat dipulihkan
+ * admin server). Mengembalikan workspace lain milik pengguna untuk dialihkan, atau null → onboarding.
+ */
+export const deleteWorkspace = tenantAction(
+  z.object({ confirmName: z.string().trim().min(1).max(200) }),
+  async (ctx, { confirmName }) => {
+    if (ctx.role !== "owner") throw ForbiddenError();
+    const org = await prisma.organization.findFirst({
+      where: { id: ctx.organizationId, deletedAt: null },
+      select: { id: true, name: true },
+    });
+    if (!org) throw new AppError("Workspace tidak ditemukan", 404, "not_found");
+    if (confirmName !== org.name.trim()) {
+      throw new AppError("Nama workspace tidak cocok. Ketik nama persis untuk konfirmasi.");
+    }
+    await prisma.$transaction([
+      prisma.organization.update({ where: { id: org.id }, data: { deletedAt: new Date() } }),
+      prisma.invitation.updateMany({
+        where: { organizationId: org.id, status: "pending" },
+        data: { status: "canceled" },
+      }),
+    ]);
+    await writeAudit(ctx, {
+      action: "organization.deleted",
+      entityType: "Organization",
+      entityId: org.id,
+      before: { name: org.name },
+    });
+    const next = await prisma.member.findFirst({
+      where: { userId: ctx.userId, active: true, organization: { deletedAt: null } },
+      orderBy: { createdAt: "asc" },
+      select: { organizationId: true },
+    });
+    return { nextOrganizationId: next?.organizationId ?? null };
+  },
+);

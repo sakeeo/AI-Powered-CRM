@@ -18,6 +18,8 @@ const schema = z.object({
   /** OAuth client Google (opsional) untuk sinkronisasi Calendar/Gmail per pengguna. */
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  /** "true" → pendaftaran publik selalu terbuka (mode SaaS). Default: tertutup setelah Owner pertama. */
+  PUBLIC_SIGNUP: z.enum(["true", "false"]).default("false"),
   /** "true" → pengguna wajib verifikasi email sebelum bisa login. */
   REQUIRE_EMAIL_VERIFICATION: z
     .enum(["true", "false"])
